@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import { base } from '$app/paths';
-  import type { SeriesIndex, Series } from '$lib/types';
+  import type { SeriesIndex, Series, ProgramsData, Program } from '$lib/types';
   import { subscriptions, keywords } from '$lib/stores/subscriptions';
   import SeriesCard from '$lib/components/SeriesCard.svelte';
   import { githubSyncConfig } from '$lib/sync/config';
@@ -9,6 +9,7 @@
   import { diagnose, type DiagnosticResult } from '$lib/sync/diagnose';
 
   let allSeries: Series[] = $state([]);
+  let upcomingPrograms: Program[] = $state([]);
   let loading = $state(true);
 
   let showSyncPanel = $state(false);
@@ -44,6 +45,30 @@
         const data: SeriesIndex = await res.json();
         allSeries = data.series;
       }
+
+      // 番組データをロード (直近7日)
+      const latestRes = await fetch(`${base}/data/programs-latest.json`);
+      if (latestRes.ok) {
+        const latest: ProgramsData = await latestRes.json();
+        const [by, bm, bd] = latest.date.split('-').map(Number);
+        const dateList: string[] = [];
+        for (let i = 0; i < 7; i++) {
+          const d = new Date(Date.UTC(by, bm - 1, bd + i));
+          dateList.push(
+            `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, '0')}-${String(d.getUTCDate()).padStart(2, '0')}`,
+          );
+        }
+        const results = await Promise.all(
+          dateList.map(async (date) => {
+            const r = await fetch(`${base}/data/programs-${date}.json`);
+            if (!r.ok) return null;
+            return (await r.json()) as ProgramsData;
+          }),
+        );
+        upcomingPrograms = results
+          .filter((r): r is ProgramsData => r !== null)
+          .flatMap((d) => d.programs);
+      }
     } finally {
       loading = false;
     }
@@ -52,6 +77,32 @@
   let subscribedSeries = $derived(
     allSeries.filter((s) => $subscriptions.has(s.series_id)),
   );
+
+  // 購読中シリーズ+キーワードに一致する今後の番組 (録音予定)
+  let upcomingRecordings = $derived.by(() => {
+    const subIds = $subscriptions;
+    const kws = $keywords;
+    return upcomingPrograms
+      .filter((p) => {
+        if (p.series_id && subIds.has(p.series_id)) return true;
+        if (kws.length > 0) {
+          const text = `${p.title} ${p.subtitle} ${p.content}`.toLowerCase();
+          return kws.some((kw) => text.includes(kw.toLowerCase()));
+        }
+        return false;
+      })
+      .sort((a, b) => a.start_time.localeCompare(b.start_time));
+  });
+
+  function fmtDateTime(iso: string): string {
+    const d = new Date(iso);
+    const wd = ['日', '月', '火', '水', '木', '金', '土'][d.getDay()];
+    return `${d.getMonth() + 1}/${d.getDate()}(${wd}) ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+  }
+
+  function fmtDuration(sec: number): string {
+    return `${Math.floor(sec / 60)}分`;
+  }
 
   function clearAll() {
     if (confirm('すべての購読とキーワードを解除しますか？')) {
@@ -269,7 +320,7 @@
     <div class="empty-icon">⏳</div>
     <p>読み込み中...</p>
   </div>
-{:else if subscribedSeries.length === 0}
+{:else if subscribedSeries.length === 0 && $keywords.length === 0}
   <div class="empty">
     <div class="empty-icon">📻</div>
     <p>まだ購読していません</p>
@@ -278,11 +329,40 @@
     </p>
   </div>
 {:else}
-  <div class="grid">
-    {#each subscribedSeries as series (series.series_id)}
-      <SeriesCard {series} />
-    {/each}
-  </div>
+  {#if upcomingRecordings.length > 0}
+    <section class="upcoming-section">
+      <h2 class="section-title">録音予定 ({upcomingRecordings.length}件 / 7日間)</h2>
+      <div class="upcoming-list">
+        {#each upcomingRecordings as p (p.id)}
+          <div class="upcoming-item">
+            <div class="upcoming-time">
+              <span class="upcoming-date">{fmtDateTime(p.start_time)}</span>
+              <span class="upcoming-dur">{fmtDuration(p.duration_sec)}</span>
+            </div>
+            <div class="upcoming-body">
+              <div class="upcoming-title">{p.title}</div>
+              {#if p.series_name}
+                <span class="upcoming-series">{p.series_name}</span>
+              {/if}
+            </div>
+          </div>
+        {/each}
+      </div>
+    </section>
+  {:else}
+    <div class="info">
+      <p>直近7日間の録音予定はありません。番組データが更新されるとここに表示されます。</p>
+    </div>
+  {/if}
+
+  {#if subscribedSeries.length > 0}
+    <h2 class="section-title" style="margin-top: 2rem;">購読中のシリーズ ({subscribedSeries.length}件)</h2>
+    <div class="grid">
+      {#each subscribedSeries as series (series.series_id)}
+        <SeriesCard {series} />
+      {/each}
+    </div>
+  {/if}
 {/if}
 
 <style>
@@ -537,5 +617,60 @@
     margin: 0;
     font-size: 0.8125rem;
     color: var(--text-2);
+  }
+  .upcoming-section {
+    margin-bottom: 1.5rem;
+  }
+  .upcoming-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.375rem;
+    max-height: 480px;
+    overflow-y: auto;
+  }
+  .upcoming-item {
+    display: flex;
+    gap: 0.875rem;
+    align-items: center;
+    padding: 0.625rem 0.875rem;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--border);
+    transition: background 0.15s;
+  }
+  .upcoming-item:hover {
+    background: rgba(255, 255, 255, 0.05);
+  }
+  .upcoming-time {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    flex-shrink: 0;
+    min-width: 100px;
+  }
+  .upcoming-date {
+    font-size: 0.8125rem;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    color: var(--text-0);
+  }
+  .upcoming-dur {
+    font-size: 0.6875rem;
+    color: var(--text-2);
+  }
+  .upcoming-body {
+    min-width: 0;
+  }
+  .upcoming-title {
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: var(--text-0);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .upcoming-series {
+    font-size: 0.6875rem;
+    color: var(--accent-1);
   }
 </style>

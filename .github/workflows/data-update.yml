@@ -48,10 +48,17 @@ jobs:
         env:
           NHK_API_KEY: ${{ secrets.NHK_API_KEY }}
 
+      - name: Copy data to web static
+        run: |
+          mkdir -p web/static/data
+          cp -f data/series.json web/static/data/
+          cp -f data/programs-latest.json web/static/data/
+          cp -f data/programs-*.json web/static/data/ 2>/dev/null || true
+
       - name: Commit updated data
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add data/
-          git diff --staged --quiet || git commit -m "chore: update programs data [skip ci]"
+          git add data/ web/static/data/
+          git diff --staged --quiet || git commit -m "chore: update programs data"
           git push
