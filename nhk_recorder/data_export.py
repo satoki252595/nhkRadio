@@ -94,16 +94,31 @@ def _dedupe_series_index(index: dict[str, dict]) -> dict[str, dict]:
 def dedupe_programs(programs: list) -> list:
     """同時刻・同タイトルの番組を重複排除する (優先度の高い方を残す)。
 
+    dedup対象:
+    - NHK本家 (r1/r3) vs radiko:JOBK/JOAK (NHK同時配信) → NHK本家を残す
+    - 関東/関西の民放で同一番組 → area別に残す (全国放送網等)
+
     Args:
         programs: Program オブジェクトのリスト
 
     Returns:
         重複排除後のリスト
     """
-    # (start_time, normalized_title) をキーにグルーピング
+    # キー設計:
+    # - NHK: (start_time, title) のみ → 両エリアで重複すれば統合
+    # - Radiko: (start_time, title, area) → 異なるエリアは別物として保持
     by_key: dict = {}
     for p in programs:
-        key = (p.start_time.isoformat(), _normalize_title(p.title))
+        norm = _normalize_title(p.title)
+        is_radiko = p.service.startswith("radiko:")
+        if is_radiko:
+            # 局IDが異なれば別番組 (同じ系列でも局で別アカウント)
+            # → station_id を含めて一意化
+            station = p.service.split(":", 1)[1] if ":" in p.service else ""
+            key = (p.start_time.isoformat(), norm, station)
+        else:
+            key = (p.start_time.isoformat(), norm, "")
+
         existing = by_key.get(key)
         if existing is None or _service_priority(p.service) > _service_priority(existing.service):
             by_key[key] = p
@@ -113,34 +128,64 @@ def dedupe_programs(programs: list) -> list:
     return result
 
 
+from html.parser import HTMLParser as _HTMLParser
+
+
+class _HTMLStripper(_HTMLParser):
+    """HTMLタグを除去してプレーンテキスト化する。
+
+    ブロック要素タグの前後には改行を入れて可読性を保つ。
+    script/style タグの中身は破棄する。
+    """
+    _BLOCK_TAGS = {"br", "p", "div", "li", "h1", "h2", "h3", "h4", "h5", "h6", "tr"}
+    _SKIP_TAGS = {"script", "style", "noscript"}
+
+    def __init__(self):
+        super().__init__(convert_charrefs=True)  # エンティティ自動変換
+        self._chunks: list[str] = []
+        self._skip_depth = 0
+
+    def handle_data(self, data: str) -> None:
+        if self._skip_depth == 0:
+            self._chunks.append(data)
+
+    def handle_starttag(self, tag: str, attrs) -> None:
+        if tag in self._SKIP_TAGS:
+            self._skip_depth += 1
+            return
+        if tag in self._BLOCK_TAGS:
+            self._chunks.append("\n")
+
+    def handle_endtag(self, tag: str) -> None:
+        if tag in self._SKIP_TAGS:
+            self._skip_depth = max(0, self._skip_depth - 1)
+            return
+        if tag in self._BLOCK_TAGS:
+            self._chunks.append("\n")
+
+    def handle_startendtag(self, tag: str, attrs) -> None:
+        if tag in self._BLOCK_TAGS:
+            self._chunks.append("\n")
+
+    def get_text(self) -> str:
+        return "".join(self._chunks)
+
+
 def _strip_html(text: str) -> str:
-    """HTMLタグ・エンティティ・URLを除去してプレーンテキストに変換する。
+    """HTMLタグ・エンティティを除去してプレーンテキストに変換する。
 
     Radikoの番組説明はHTML形式で返されるため、表示前に正規化する。
     """
     if not text:
         return ""
-    t = text
-    # <br>, <BR>, <br /> 等を改行に
-    t = re.sub(r"<br\s*/?>", "\n", t, flags=re.IGNORECASE)
-    # <p>, </p>, <div> 等も改行区切り
-    t = re.sub(r"</?(p|div|li|h[1-6])[^>]*>", "\n", t, flags=re.IGNORECASE)
-    # <a href="...">...</a> はリンクテキストのみ残す
-    t = re.sub(r"<a[^>]*>(.*?)</a>", r"\1", t, flags=re.IGNORECASE | re.DOTALL)
-    # その他全てのタグを除去
-    t = re.sub(r"<[^>]+>", "", t)
-    # HTMLエンティティ
-    entities = {
-        "&amp;": "&", "&lt;": "<", "&gt;": ">",
-        "&quot;": '"', "&apos;": "'", "&nbsp;": " ",
-        "&#39;": "'", "&#34;": '"', "&yen;": "¥",
-    }
-    for k, v in entities.items():
-        t = t.replace(k, v)
-    # 数値参照 &#1234;
-    t = re.sub(r"&#(\d+);", lambda m: chr(int(m.group(1))), t)
-    # 16進参照 &#x1F600;
-    t = re.sub(r"&#x([0-9a-fA-F]+);", lambda m: chr(int(m.group(1), 16)), t)
+    try:
+        stripper = _HTMLStripper()
+        stripper.feed(text)
+        stripper.close()
+        t = stripper.get_text()
+    except Exception:
+        # パース失敗時は正規表現でフォールバック
+        t = re.sub(r"<[^>]+>", "", text)
     # 連続空白・改行を整理
     t = re.sub(r"[ \t\u3000]+", " ", t)
     t = re.sub(r"\n{3,}", "\n\n", t)

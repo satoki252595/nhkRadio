@@ -156,6 +156,11 @@ def main():
         "--skip-nhk", action="store_true",
         help="NHK番組をスキップ (Radiko録音ジョブ専用)",
     )
+    parser.add_argument(
+        "--expected-area", metavar="PREFIX",
+        help="Radiko認証エリアの期待値プレフィックス (例: JP27,JP28=関西)。"
+             "一致しない場合はRadiko録音を無効化する",
+    )
     args = parser.parse_args()
 
     # 設定読み込み
@@ -197,6 +202,15 @@ def main():
         radiko_auth = radiko_mod.authenticate()
         if radiko_auth:
             logger.info("Radiko認証成功: %s (%s)", radiko_auth.area_id, radiko_auth.area_name)
+            # エリアミスマッチ検知
+            if args.expected_area:
+                allowed = {a.strip() for a in args.expected_area.split(",") if a.strip()}
+                if not any(radiko_auth.area_id.startswith(a) for a in allowed):
+                    logger.error(
+                        "VPNエリアミスマッチ: 期待=%s / 実際=%s → Radikoをスキップ",
+                        args.expected_area, radiko_auth.area_id,
+                    )
+                    radiko_auth = None
         else:
             logger.warning("Radiko認証失敗 (日本IPでない可能性)。NHKのみ対象")
 

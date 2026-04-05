@@ -25,16 +25,16 @@ jobs:
     strategy:
       fail-fast: false
       # エリアごとに並列ジョブ: 関東(JP13)→TBS等、関西(JP27)→MBS等
-      # NHKは両方のジョブで録音されうるが、Notion側で重複排除されない点注意
-      # → 関西ジョブのみで --include-radiko を使い、関東は民放のみ録音する設計
+      # NHK重複回避: 関西ジョブだけがNHKを録音、関東は民放のみ
+      # VPNエリア検証: --expected-area で意図しないエリア接続を検出
       matrix:
         include:
           - region: kansai
-            radiko_areas: JP27
+            expected_area: JP25,JP26,JP27,JP28,JP29,JP30  # 関西6府県
             skip_nhk: false
           - region: kanto
-            radiko_areas: JP13
-            skip_nhk: true  # NHKは関西ジョブで録音済み
+            expected_area: JP08,JP09,JP10,JP11,JP12,JP13,JP14  # 関東7都県
+            skip_nhk: true
 
     steps:
       - uses: actions/checkout@v4
@@ -70,6 +70,7 @@ jobs:
         run: |
           if [ -f "data/subscriptions.json" ]; then
             python -m nhk_recorder --subscriptions data/subscriptions.json --within 65 --include-radiko \
+              --expected-area "${{ matrix.expected_area }}" \
               ${{ matrix.skip_nhk && '--skip-nhk' || '' }}
           else
             echo "data/subscriptions.json が存在しません。"
@@ -83,6 +84,7 @@ jobs:
         if: inputs.mode == 'keywords'
         run: |
           python -m nhk_recorder --within 65 --include-radiko \
+            --expected-area "${{ matrix.expected_area }}" \
             ${{ matrix.skip_nhk && '--skip-nhk' || '' }}
         env:
           NHK_API_KEY: ${{ secrets.NHK_API_KEY }}
