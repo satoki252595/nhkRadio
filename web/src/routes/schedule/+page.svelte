@@ -20,12 +20,16 @@
       const latest: ProgramsData = await latestRes.json();
 
       // 今日から7日先までの番組データを並列取得
-      const today = new Date(latest.date + 'T00:00:00+09:00');
+      // latest.date は YYYY-MM-DD (JST) なので文字列で日付を加算する
+      const [baseYear, baseMonth, baseDay] = latest.date.split('-').map(Number);
       const dateList: string[] = [];
       for (let i = 0; i < 7; i++) {
-        const d = new Date(today);
-        d.setDate(d.getDate() + i);
-        dateList.push(d.toISOString().slice(0, 10));
+        // UTCで日付加算してからYYYY-MM-DDを得る (タイムゾーンずれ回避)
+        const d = new Date(Date.UTC(baseYear, baseMonth - 1, baseDay + i));
+        const y = d.getUTCFullYear();
+        const m = String(d.getUTCMonth() + 1).padStart(2, '0');
+        const day = String(d.getUTCDate()).padStart(2, '0');
+        dateList.push(`${y}-${m}-${day}`);
       }
 
       const results = await Promise.all(
