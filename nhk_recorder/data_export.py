@@ -13,6 +13,7 @@
 import argparse
 import json
 import logging
+import re
 import sys
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
@@ -22,6 +23,94 @@ from .config import load_config
 from . import radiko
 
 JST = timezone(timedelta(hours=9))
+
+# NHKのradiko同時配信局 (NHKと重複するため優先度を下げる)
+NHK_SIMULCAST_STATIONS = {"JOBK", "JOAK", "JOBK-FM", "JOAK-FM"}
+
+
+def _normalize_title(title: str) -> str:
+    """番組タイトルを正規化する (局名プレフィックスや全角空白の違いを吸収)。"""
+    # 先頭の [局名] を除去
+    t = re.sub(r"^\[[^\]]+\]\s*", "", title)
+    # 全角スペース・連続空白を単一半角スペースへ
+    t = re.sub(r"[\s　]+", " ", t).strip()
+    return t
+
+
+def _service_priority(service: str) -> int:
+    """サービスの優先度を返す (大きいほど優先)。
+
+    NHKの本家配信(r1/r3)を最優先、NHKのradiko同時配信(JOBK等)を削除対象にする。
+    民放独自局は残す。
+    """
+    if service in ("r1", "r3"):
+        return 100  # NHK本家 = 高音質 = 最優先
+    if service.startswith("radiko:"):
+        station = service.split(":", 1)[1]
+        if station in NHK_SIMULCAST_STATIONS:
+            return 10  # NHKのradiko配信 = 低音質 = NHK本家があれば削除
+        return 50  # 民放独自
+    return 0
+
+
+def _dedupe_series_index(index: dict[str, dict]) -> dict[str, dict]:
+    """シリーズindexから重複を排除する。
+
+    同じ series_name が NHK(r1/r3) と radiko:JOBK 等の同時配信局に
+    存在する場合、音質の良いNHK側を残す。民放独自シリーズはそのまま。
+    """
+    # 正規化名 → [(series_id, entry), ...] でグルーピング
+    by_name: dict[str, list[tuple[str, dict]]] = {}
+    for sid, entry in index.items():
+        key = _normalize_title(entry.get("series_name", ""))
+        by_name.setdefault(key, []).append((sid, entry))
+
+    removed = 0
+    for name, items in by_name.items():
+        if len(items) < 2:
+            continue
+        # 優先度順にソート
+        items.sort(key=lambda x: _service_priority(x[1].get("service", "")), reverse=True)
+        # 先頭(最優先)以外を削除候補に
+        top_priority = _service_priority(items[0][1].get("service", ""))
+        for sid, entry in items[1:]:
+            svc = entry.get("service", "")
+            # 同じ優先度なら残す (R1とR3は両方残す、民放同士も両方残す)
+            if _service_priority(svc) == top_priority:
+                continue
+            # NHK本家がある時に radiko:JOBK 等の同時配信を削除
+            if svc.startswith("radiko:"):
+                station = svc.split(":", 1)[1]
+                if station in NHK_SIMULCAST_STATIONS:
+                    index.pop(sid, None)
+                    removed += 1
+
+    if removed > 0:
+        logger = logging.getLogger(__name__)
+        logger.info("シリーズ重複排除: %d件削除 (NHK同時配信)", removed)
+    return index
+
+
+def dedupe_programs(programs: list) -> list:
+    """同時刻・同タイトルの番組を重複排除する (優先度の高い方を残す)。
+
+    Args:
+        programs: Program オブジェクトのリスト
+
+    Returns:
+        重複排除後のリスト
+    """
+    # (start_time, normalized_title) をキーにグルーピング
+    by_key: dict = {}
+    for p in programs:
+        key = (p.start_time.isoformat(), _normalize_title(p.title))
+        existing = by_key.get(key)
+        if existing is None or _service_priority(p.service) > _service_priority(existing.service):
+            by_key[key] = p
+
+    result = list(by_key.values())
+    result.sort(key=lambda p: p.start_time)
+    return result
 
 
 def _radiko_to_program(rp):
@@ -123,6 +212,10 @@ def main():
         "--include-radiko", action="store_true",
         help="Radiko (民放) の番組も取得する (日本IPが必要)",
     )
+    parser.add_argument(
+        "--rebuild-series", action="store_true",
+        help="既存series.jsonを破棄して作り直す",
+    )
     args = parser.parse_args()
 
     logging.basicConfig(
@@ -141,8 +234,12 @@ def main():
     output_dir.mkdir(parents=True, exist_ok=True)
 
     series_file = output_dir / "series.json"
-    series_index = load_series_index(series_file)
-    logger.info("既存シリーズ数: %d", len(series_index))
+    if args.rebuild_series:
+        series_index: dict[str, dict] = {}
+        logger.info("series.json を再構築します (既存データを破棄)")
+    else:
+        series_index = load_series_index(series_file)
+        logger.info("既存シリーズ数: %d", len(series_index))
 
     # Radiko認証 (オプション)
     radiko_auth = None
@@ -164,6 +261,7 @@ def main():
     end_offset = args.days
 
     total_programs = 0
+    total_deduped = 0
     for i in range(start_offset, end_offset):
         target = (base_date + timedelta(days=i)).strftime("%Y-%m-%d")
         logger.info("番組表取得: %s", target)
@@ -177,6 +275,14 @@ def main():
             for p in rp:
                 programs.append(_radiko_to_program(p))
             total_programs += len(rp)
+
+        # 重複排除 (NHK本家 vs radiko:JOBK等の同時配信)
+        before_dedupe = len(programs)
+        programs = dedupe_programs(programs)
+        deduped_count = before_dedupe - len(programs)
+        total_deduped += deduped_count
+        if deduped_count > 0:
+            logger.info("重複排除: %d件 → %d件 (%d件削除)", before_dedupe, len(programs), deduped_count)
 
         # 番組リストをJSON保存 (未来分のみ、過去分はシリーズ蓄積のみ)
         if i >= 0:
@@ -225,6 +331,9 @@ def main():
                 # ジャンルは最新値で更新
                 if p.genre:
                     entry["genre"] = p.genre
+
+    # シリーズレベルの重複排除: 同名シリーズがNHKとradiko:JOBK両方にある場合、radiko側を削除
+    series_index = _dedupe_series_index(series_index)
 
     save_series_index(series_file, series_index)
     logger.info(
