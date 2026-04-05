@@ -70,6 +70,10 @@ keywords: ["落語", "らくご", "英語"]
 
 これで毎時0分(UTC 0-14 = JST 9-23)に自動起動し、直近65分以内に開始する対象番組を録音します。
 
+録音対象は `data/subscriptions.json`（シリーズ購読方式）をデフォルトで参照します。
+WebUI の「☁ GitHubへプッシュ」で更新するか、キーワード方式に切り替えたい場合は
+手動実行の `mode` を `keywords` に変更してください。
+
 ## コマンド
 
 | コマンド | 説明 |
@@ -77,7 +81,8 @@ keywords: ["落語", "らくご", "英語"]
 | `python -m nhk_recorder --dry-run` | 対象番組の確認のみ |
 | `python -m nhk_recorder` | Timer待機モード(ローカル用) |
 | `python -m nhk_recorder --within 65` | 直近65分以内の番組を即時録音(GitHub Actions用) |
-| `python -m nhk_recorder --subscriptions data/subscriptions.json` | 購読ベースで録音 |
+| `python -m nhk_recorder --subscriptions data/subscriptions.json` | 購読ベースで録音 (ローカルパス) |
+| `python -m nhk_recorder --subscriptions https://.../subscriptions.json` | 購読ベースで録音 (URL 経由、SaaS 移行時用) |
 | `python -m nhk_recorder --date 2026-04-10` | 指定日の番組を対象にする |
 | `python -m nhk_recorder.data_export` | 番組データJSONを生成 (Web UI用) |
 
@@ -131,10 +136,25 @@ npm run dev  # http://localhost:5173
 2. 初回デプロイ後、`https://{username}.github.io/{repo-name}/` でアクセス可能
 
 ### 購読フロー
-1. Webサイトで番組を検索 → 「購読」ボタンをクリック (localStorageに保存)
-2. 「購読中」ページの ⚙️ アイコンで Personal Access Token を設定 (初回のみ)
-3. 「🚀 GitHubへプッシュ」ボタンで `data/subscriptions.json` を自動コミット
-4. 次回のGitHub Actions実行時から、購読した番組が自動録音される
+
+#### 推奨: WebUI から GitHub に直接同期
+1. GitHub で **Fine-grained Personal Access Token** を発行
+   - Settings → Developer settings → Personal access tokens → Fine-grained tokens
+   - Repository access: このリポジトリを選択
+   - Permissions: **Contents: Read and write**
+2. Webサイトの「購読中」ページ → 「⚙ 同期設定」→ PAT / owner / repo を入力して保存
+   (ブラウザの localStorage にのみ保存されます)
+3. 気になる番組を「購読」
+4. 「☁ GitHubへプッシュ」をクリック → `data/subscriptions.json` が自動コミットされる
+5. 次回の GitHub Actions 実行時から、購読した番組が自動録音される
+
+別のブラウザ/端末で購読を引き継ぐ場合は「⬇ GitHubから取得」でリモートの購読リストを読み込めます。
+
+#### トラブルシューティング: 接続テスト
+「☁ GitHubへプッシュ」が 403/404 で失敗する場合は、**⚙ 同期設定** パネルの
+「🔍 接続テスト」ボタンを押してください。トークン認証 → リポジトリアクセス →
+ブランチ確認 → ファイル確認の順に段階的に検証し、原因(トークン権限不足、
+Fine-grained tokenのリポジトリ未選択など)を特定します。
 
 ## テスト
 
@@ -148,4 +168,7 @@ python -m pytest tests/ -v
 - NHK APIは1日300リクエスト制限
 - 録音した音声は個人利用の範囲内でお使いください
 - Notionファイルアップロードは有料プランで5GBまで
-# nhkRadio
+
+## SaaS 化への移行計画
+
+将来のマルチユーザー化・SaaS 化については [`docs/saas-migration.md`](docs/saas-migration.md) を参照。

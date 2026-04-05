@@ -3,16 +3,39 @@
   import { base } from '$app/paths';
   import type { SeriesIndex, Series } from '$lib/types';
   import { subscriptions } from '$lib/stores/subscriptions';
-  import { githubConfig } from '$lib/stores/githubConfig';
-  import { pushJsonFile, type PushResult } from '$lib/github';
   import SeriesCard from '$lib/components/SeriesCard.svelte';
-  import GitHubConfigModal from '$lib/components/GitHubConfigModal.svelte';
+  import { githubSyncConfig } from '$lib/sync/config';
+  import { createGitHubSyncAdapter, type GitHubSyncConfig } from '$lib/sync/github';
+  import { diagnose, type DiagnosticResult } from '$lib/sync/diagnose';
 
   let allSeries: Series[] = $state([]);
   let loading = $state(true);
-  let configOpen = $state(false);
-  let pushing = $state(false);
-  let pushResult: PushResult | null = $state(null);
+
+  let showSyncPanel = $state(false);
+  let syncing = $state(false);
+  let diagnosing = $state(false);
+  let diag = $state<DiagnosticResult | null>(null);
+  let syncMessage = $state<{ kind: 'ok' | 'err'; text: string } | null>(null);
+  let form = $state<GitHubSyncConfig>({
+    token: '',
+    owner: '',
+    repo: '',
+    path: 'data/subscriptions.json',
+    branch: 'main',
+  });
+
+  $effect(() => {
+    const saved = $githubSyncConfig;
+    if (saved) {
+      form = {
+        token: saved.token,
+        owner: saved.owner,
+        repo: saved.repo,
+        path: saved.path ?? 'data/subscriptions.json',
+        branch: saved.branch ?? 'main',
+      };
+    }
+  });
 
   onMount(async () => {
     try {
@@ -30,36 +53,77 @@
     allSeries.filter((s) => $subscriptions.has(s.series_id)),
   );
 
-  let githubReady = $derived(
-    Boolean($githubConfig.token && $githubConfig.owner && $githubConfig.repo),
-  );
-
   function clearAll() {
     if (confirm('すべての購読を解除しますか？')) {
       subscriptions.clear();
     }
   }
 
-  async function pushToGitHub() {
-    if (!githubReady) {
-      configOpen = true;
+  function saveSyncConfig() {
+    if (!form.token || !form.owner || !form.repo) {
+      syncMessage = { kind: 'err', text: 'token / owner / repo は必須です' };
       return;
     }
-    pushing = true;
-    pushResult = null;
+    githubSyncConfig.save({ ...form });
+    syncMessage = { kind: 'ok', text: '設定を保存しました（ブラウザに保存）' };
+  }
+
+  function clearSyncConfig() {
+    githubSyncConfig.clear();
+    form = { token: '', owner: '', repo: '', path: 'data/subscriptions.json', branch: 'main' };
+    syncMessage = { kind: 'ok', text: '設定を削除しました' };
+  }
+
+  async function testConnection() {
+    if (!form.token || !form.owner || !form.repo) {
+      syncMessage = { kind: 'err', text: 'token / owner / repo は必須です' };
+      return;
+    }
+    diagnosing = true;
+    diag = null;
     try {
-      const json = subscriptions.export();
-      const result = await pushJsonFile(
-        $githubConfig,
-        json,
-        `Update subscriptions (${$subscriptions.size} series)`,
-      );
-      pushResult = result;
-      if (result.ok) {
-        setTimeout(() => (pushResult = null), 5000);
-      }
+      diag = await diagnose(form);
     } finally {
-      pushing = false;
+      diagnosing = false;
+    }
+  }
+
+  async function pushToGitHub() {
+    if (!$githubSyncConfig) {
+      syncMessage = { kind: 'err', text: '先に GitHub 設定を保存してください' };
+      return;
+    }
+    syncing = true;
+    syncMessage = null;
+    try {
+      const adapter = createGitHubSyncAdapter($githubSyncConfig);
+      await subscriptions.pushTo(adapter);
+      syncMessage = { kind: 'ok', text: `✓ GitHub にプッシュしました (${$subscriptions.size}件)` };
+    } catch (e) {
+      syncMessage = { kind: 'err', text: `プッシュ失敗: ${(e as Error).message}` };
+    } finally {
+      syncing = false;
+    }
+  }
+
+  async function pullFromGitHub() {
+    if (!$githubSyncConfig) {
+      syncMessage = { kind: 'err', text: '先に GitHub 設定を保存してください' };
+      return;
+    }
+    if (!confirm('GitHub の内容でローカルを上書きします。よろしいですか？')) return;
+    syncing = true;
+    syncMessage = null;
+    try {
+      const adapter = createGitHubSyncAdapter($githubSyncConfig);
+      const ok = await subscriptions.pullFrom(adapter);
+      syncMessage = ok
+        ? { kind: 'ok', text: `✓ GitHub から取得しました (${$subscriptions.size}件)` }
+        : { kind: 'err', text: 'リモートに購読ファイルがありません' };
+    } catch (e) {
+      syncMessage = { kind: 'err', text: `取得失敗: ${(e as Error).message}` };
+    } finally {
+      syncing = false;
     }
   }
 </script>
@@ -68,72 +132,87 @@
   <title>購読中 | NHK Radio</title>
 </svelte:head>
 
-<div class="header-row">
-  <div>
-    <h1 class="page-title">購読中のシリーズ</h1>
-    <p class="page-subtitle">{$subscriptions.size}件 購読中</p>
-  </div>
-  <button class="icon-btn" onclick={() => (configOpen = true)} aria-label="GitHub設定">
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-      <circle cx="12" cy="12" r="3"></circle>
-      <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
-    </svg>
-  </button>
-</div>
+<h1 class="page-title">購読中のシリーズ</h1>
+<p class="page-subtitle">{$subscriptions.size}件 購読中</p>
 
 {#if $subscriptions.size > 0}
   <div class="actions">
-    <button
-      class="btn primary"
-      onclick={pushToGitHub}
-      disabled={pushing}
-      title={githubReady ? 'GitHubリポジトリにsubscriptions.jsonを直接コミット' : 'GitHub設定が未設定です (歯車アイコンから設定)'}
-    >
-      {#if pushing}
-        ⏳ プッシュ中...
-      {:else}
-        🚀 GitHubへプッシュ
-      {/if}
+    <button class="btn primary" onclick={pushToGitHub} disabled={syncing}>
+      {syncing ? '⏳ 同期中...' : '☁ GitHubへプッシュ'}
     </button>
+    <button class="btn" onclick={pullFromGitHub} disabled={syncing}>⬇ GitHubから取得</button>
+    <button class="btn" onclick={() => (showSyncPanel = !showSyncPanel)}>⚙ 同期設定</button>
     <button class="btn danger" onclick={clearAll}>すべて解除</button>
   </div>
+{:else}
+  <div class="actions">
+    <button class="btn" onclick={pullFromGitHub} disabled={syncing || !$githubSyncConfig}>
+      ⬇ GitHubから取得
+    </button>
+    <button class="btn" onclick={() => (showSyncPanel = !showSyncPanel)}>⚙ 同期設定</button>
+  </div>
+{/if}
 
-  {#if pushResult}
-    <div class="result" class:ok={pushResult.ok} class:error={!pushResult.ok}>
-      <strong>{pushResult.ok ? '✓ 成功' : '✗ 失敗'}</strong>
-      <pre>{pushResult.message}</pre>
-      {#if pushResult.commitUrl}
-        <a href={pushResult.commitUrl} target="_blank" rel="noopener">コミットを見る →</a>
-      {/if}
-      {#if pushResult.debug && pushResult.debug.length > 0}
-        <details class="debug">
-          <summary>デバッグログ</summary>
-          <pre>{pushResult.debug.join('\n')}</pre>
-        </details>
-      {/if}
-      {#if !pushResult.ok}
-        <button class="link-btn" style="margin-top: 0.5rem;" onclick={() => (configOpen = true)}>
-          ⚙️ 設定画面で接続テストを実行
-        </button>
-      {/if}
-    </div>
-  {/if}
+{#if syncMessage}
+  <div class="msg {syncMessage.kind}">{syncMessage.text}</div>
+{/if}
 
-  {#if !githubReady}
-    <div class="info">
-      <p>
-        💡 <button class="link-btn" onclick={() => (configOpen = true)}>GitHub連携を設定</button>
-        すると、「GitHubへプッシュ」で購読リストをリポジトリに直接コミットできます。
-      </p>
+{#if showSyncPanel}
+  <div class="sync-panel">
+    <h3>GitHub 同期設定</h3>
+    <p class="hint">
+      Fine-grained PAT（<code>Contents: Read and write</code> 権限）を発行し、対象リポジトリを指定してください。
+      設定はこのブラウザの localStorage にのみ保存されます。
+    </p>
+    <div class="form-row">
+      <label>Personal Access Token
+        <input type="password" bind:value={form.token} placeholder="github_pat_..." autocomplete="off" />
+      </label>
     </div>
-  {:else}
-    <div class="info">
-      <p>
-        購読リストを <code>{$githubConfig.owner}/{$githubConfig.repo}:{$githubConfig.path}</code>
-        にコミットします。次回のActions実行から反映されます。
-      </p>
+    <div class="form-grid">
+      <label>Owner
+        <input type="text" bind:value={form.owner} placeholder="your-name" />
+      </label>
+      <label>Repo
+        <input type="text" bind:value={form.repo} placeholder="nhkRadio" />
+      </label>
+      <label>Branch
+        <input type="text" bind:value={form.branch} placeholder="main" />
+      </label>
+      <label>Path
+        <input type="text" bind:value={form.path} placeholder="data/subscriptions.json" />
+      </label>
     </div>
-  {/if}
+    <div class="form-actions">
+      <button class="btn primary" onclick={saveSyncConfig}>設定を保存</button>
+      <button class="btn" onclick={testConnection} disabled={diagnosing}>
+        {diagnosing ? '⏳ テスト中...' : '🔍 接続テスト'}
+      </button>
+      {#if $githubSyncConfig}
+        <button class="btn danger" onclick={clearSyncConfig}>設定を削除</button>
+      {/if}
+    </div>
+    {#if diag}
+      <div class="diag">
+        <strong>{diag.ok ? '✓ 接続テスト成功' : '✗ 接続テスト失敗'}</strong>
+        {#each diag.steps as s}
+          <div class="diag-step" class:ng={!s.ok}>
+            <div class="diag-step-label">{s.ok ? '✓' : '✗'} {s.step}</div>
+            <div class="diag-step-detail">{s.detail}</div>
+          </div>
+        {/each}
+      </div>
+    {/if}
+  </div>
+{/if}
+
+{#if $subscriptions.size > 0}
+  <div class="info">
+    <p>
+      「GitHubへプッシュ」でリポジトリの <code>{form.path || 'data/subscriptions.json'}</code> を更新すると、
+      GitHub Actions が自動録音します。
+    </p>
+  </div>
 {/if}
 
 {#if loading}
@@ -157,44 +236,11 @@
   </div>
 {/if}
 
-<GitHubConfigModal open={configOpen} onclose={() => (configOpen = false)} />
-
 <style>
-  .header-row {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 1rem;
-    margin-bottom: 1.5rem;
-  }
-  .header-row .page-title,
-  .header-row .page-subtitle {
-    margin-bottom: 0;
-  }
-  .header-row .page-subtitle {
-    margin-top: 0.25rem;
-  }
-  .icon-btn {
-    width: 40px;
-    height: 40px;
-    border-radius: 10px;
-    background: rgba(255, 255, 255, 0.06);
-    border: 1px solid var(--border);
-    color: var(--text-1);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    transition: all 0.15s ease;
-  }
-  .icon-btn:hover {
-    background: rgba(255, 255, 255, 0.1);
-    color: #fff;
-  }
   .actions {
     display: flex;
     gap: 0.5rem;
-    margin-bottom: 0.75rem;
+    margin-bottom: 1rem;
     flex-wrap: wrap;
   }
   .btn {
@@ -207,69 +253,143 @@
     transition: all 0.15s ease;
     border: 1px solid var(--border);
   }
-  .btn:hover:not(:disabled) {
+  .btn:hover {
     background: rgba(255, 255, 255, 0.1);
     color: #fff;
-  }
-  .btn:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
   }
   .btn.primary {
     background: var(--accent-gradient);
     color: #fff;
     border-color: transparent;
   }
-  .btn.primary:hover:not(:disabled) {
+  .btn.primary:hover {
     opacity: 0.9;
   }
   .btn.danger {
     color: var(--danger);
   }
-  .btn.danger:hover:not(:disabled) {
+  .btn.danger:hover {
     background: rgba(248, 113, 113, 0.1);
   }
-  .result {
-    padding: 0.875rem 1rem;
-    border-radius: 12px;
+  .btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+  .msg {
+    padding: 0.625rem 0.875rem;
+    border-radius: 10px;
+    font-size: 0.875rem;
     margin-bottom: 1rem;
+  }
+  .msg.ok {
+    background: rgba(74, 222, 128, 0.08);
+    border: 1px solid rgba(74, 222, 128, 0.25);
+    color: #86efac;
+  }
+  .msg.err {
+    background: rgba(248, 113, 113, 0.08);
+    border: 1px solid rgba(248, 113, 113, 0.25);
+    color: #fca5a5;
+  }
+  .sync-panel {
+    padding: 1rem 1.125rem;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--border);
+    margin-bottom: 1.25rem;
+  }
+  .sync-panel h3 {
+    margin: 0 0 0.5rem;
+    font-size: 1rem;
+  }
+  .sync-panel .hint {
+    font-size: 0.8125rem;
+    color: var(--text-2);
+    margin: 0 0 0.875rem;
+  }
+  .sync-panel .hint code {
+    padding: 0.0625rem 0.3125rem;
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.08);
+    font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+    font-size: 0.8125em;
+  }
+  .form-row,
+  .form-grid {
+    margin-bottom: 0.75rem;
+  }
+  .form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 0.625rem;
+  }
+  .sync-panel label {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    font-size: 0.75rem;
+    color: var(--text-2);
+  }
+  .sync-panel input {
+    padding: 0.5rem 0.625rem;
+    border-radius: 8px;
+    background: rgba(0, 0, 0, 0.25);
+    border: 1px solid var(--border);
+    color: var(--text-1);
+    font-size: 0.875rem;
+    font-family: inherit;
+  }
+  .sync-panel input:focus {
+    outline: none;
+    border-color: rgba(102, 126, 234, 0.5);
+  }
+  .form-actions {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+  .diag {
+    margin-top: 0.875rem;
+    padding: 0.875rem;
+    border-radius: 10px;
+    background: rgba(0, 0, 0, 0.25);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    font-size: 0.8125rem;
+  }
+  .diag > strong {
     font-size: 0.875rem;
   }
-  .result.ok {
-    background: rgba(74, 222, 128, 0.1);
-    border: 1px solid rgba(74, 222, 128, 0.3);
-    color: var(--success);
+  .diag-step {
+    padding: 0.5rem 0.625rem;
+    border-radius: 6px;
+    background: rgba(74, 222, 128, 0.08);
+    border: 1px solid rgba(74, 222, 128, 0.2);
   }
-  .result.error {
-    background: rgba(248, 113, 113, 0.1);
-    border: 1px solid rgba(248, 113, 113, 0.3);
-    color: var(--danger);
+  .diag-step.ng {
+    background: rgba(248, 113, 113, 0.08);
+    border-color: rgba(248, 113, 113, 0.25);
   }
-  .result strong {
-    display: block;
-    margin-bottom: 0.375rem;
+  .diag-step-label {
+    font-weight: 600;
+    margin-bottom: 0.1875rem;
   }
-  .result pre {
-    margin: 0;
+  .diag-step-detail {
+    color: var(--text-1);
     white-space: pre-wrap;
     word-break: break-word;
-    font-family: inherit;
-    font-size: 0.8125rem;
-    color: var(--text-1);
-  }
-  .result a {
-    display: inline-block;
-    margin-top: 0.5rem;
-    color: var(--accent-1);
-    font-size: 0.8125rem;
+    font-size: 0.6875rem;
+    line-height: 1.5;
   }
   .info {
-    padding: 0.875rem 1rem;
+    padding: 1rem;
     border-radius: 12px;
     background: rgba(102, 126, 234, 0.08);
     border: 1px solid rgba(102, 126, 234, 0.2);
     margin-bottom: 1.5rem;
-    font-size: 0.8125rem;
+    font-size: 0.875rem;
     color: var(--text-1);
   }
   .info p {
@@ -281,12 +401,6 @@
     background: rgba(255, 255, 255, 0.08);
     font-family: ui-monospace, 'SF Mono', Menlo, monospace;
     font-size: 0.8125em;
-  }
-  .link-btn {
-    color: var(--accent-1);
-    text-decoration: underline;
-    font: inherit;
-    padding: 0;
   }
   .grid {
     display: grid;
