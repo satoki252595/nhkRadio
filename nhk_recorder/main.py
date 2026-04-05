@@ -16,16 +16,22 @@ from .streams import get_stream_urls
 JST = timezone(timedelta(hours=9))
 
 
-def _load_subscriptions(path: str) -> list[str]:
+def _load_subscriptions(source: str) -> list[str]:
     """購読シリーズIDリストをJSONから読み込む。
 
-    想定形式: {"series_ids": ["ABC123", "XYZ456"]} または ["ABC123", "XYZ456"]
+    source はローカルファイルパス または http(s) URL を受け付ける。
+    想定形式: {"series_ids": [...], "updated_at": "..."} または ["ABC123", ...]
     """
-    p = Path(path)
-    if not p.exists():
-        return []
-    with open(p, encoding="utf-8") as f:
-        data = json.load(f)
+    if source.startswith(("http://", "https://")):
+        import urllib.request
+        with urllib.request.urlopen(source, timeout=30) as resp:
+            data = json.loads(resp.read().decode("utf-8"))
+    else:
+        p = Path(source)
+        if not p.exists():
+            return []
+        with open(p, encoding="utf-8") as f:
+            data = json.load(f)
     if isinstance(data, list):
         return data
     return data.get("series_ids", [])
@@ -82,8 +88,8 @@ def main():
         help="現在からN分以内に開始する番組のみ対象にして即時録音 (GitHub Actions向け)",
     )
     parser.add_argument(
-        "--subscriptions", metavar="PATH",
-        help="購読シリーズIDリストのJSONパス (キーワード方式の代わりに購読ベースで録音)",
+        "--subscriptions", metavar="PATH_OR_URL",
+        help="購読シリーズIDリストのJSON (ファイルパス または http(s) URL)",
     )
     args = parser.parse_args()
 
