@@ -4,16 +4,42 @@
   import type { ProgramsData, Program } from '$lib/types';
   import { subscriptions } from '$lib/stores/subscriptions';
 
-  let data: ProgramsData | null = $state(null);
+  let allPrograms: Program[] = $state([]);
+  let dates: string[] = $state([]);
+  let selectedDate = $state<string>('');
   let loading = $state(true);
   let error: string | null = $state(null);
   let subscribedOnly = $state(false);
+  let query = $state('');
 
   onMount(async () => {
     try {
-      const res = await fetch(`${base}/data/programs-latest.json`);
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      data = await res.json();
+      // programs-latest.json から今日の日付を取得
+      const latestRes = await fetch(`${base}/data/programs-latest.json`);
+      if (!latestRes.ok) throw new Error(`HTTP ${latestRes.status}`);
+      const latest: ProgramsData = await latestRes.json();
+
+      // 今日から7日先までの番組データを並列取得
+      const today = new Date(latest.date + 'T00:00:00+09:00');
+      const dateList: string[] = [];
+      for (let i = 0; i < 7; i++) {
+        const d = new Date(today);
+        d.setDate(d.getDate() + i);
+        dateList.push(d.toISOString().slice(0, 10));
+      }
+
+      const results = await Promise.all(
+        dateList.map(async (date) => {
+          const res = await fetch(`${base}/data/programs-${date}.json`);
+          if (!res.ok) return null;
+          return (await res.json()) as ProgramsData;
+        }),
+      );
+
+      const loaded = results.filter((r): r is ProgramsData => r !== null);
+      dates = loaded.map((d) => d.date);
+      selectedDate = dates[0] ?? '';
+      allPrograms = loaded.flatMap((d) => d.programs);
     } catch (e) {
       error = `データ取得失敗: ${e instanceof Error ? e.message : String(e)}`;
     } finally {
@@ -31,13 +57,35 @@
     return `${min}分`;
   }
 
+  function fmtDateShort(dateStr: string): string {
+    const d = new Date(dateStr + 'T00:00:00+09:00');
+    const wd = ['日', '月', '火', '水', '木', '金', '土'][d.getDay()];
+    return `${d.getMonth() + 1}/${d.getDate()}(${wd})`;
+  }
+
   let filtered = $derived.by(() => {
-    if (!data) return [];
-    let list = [...data.programs].sort((a, b) => a.start_time.localeCompare(b.start_time));
-    if (subscribedOnly) {
-      list = list.filter((p) => $subscriptions.has(p.series_id));
+    let list = [...allPrograms];
+
+    // 日付フィルタ (検索時は全日、そうでなければ選択日のみ)
+    if (!query.trim() && selectedDate) {
+      list = list.filter((p) => p.start_time.startsWith(selectedDate));
     }
-    return list;
+
+    // 購読中フィルタ
+    if (subscribedOnly) {
+      list = list.filter((p) => p.series_id && $subscriptions.has(p.series_id));
+    }
+
+    // キーワード検索 (title + subtitle + content)
+    if (query.trim()) {
+      const q = query.toLowerCase();
+      list = list.filter((p) => {
+        const text = `${p.title} ${p.subtitle} ${p.content} ${p.series_name}`.toLowerCase();
+        return text.includes(q);
+      });
+    }
+
+    return list.sort((a, b) => a.start_time.localeCompare(b.start_time));
   });
 
   function toggleSub(seriesId: string) {
@@ -51,14 +99,35 @@
 </script>
 
 <svelte:head>
-  <title>今日の番組 | NHK Radio</title>
+  <title>番組表 | NHK Radio</title>
 </svelte:head>
 
-<h1 class="page-title">今日の番組</h1>
-{#if data}
-  <p class="page-subtitle">
-    {data.date} · エリア {data.area} · {data.programs.length}番組
-  </p>
+<h1 class="page-title">番組表</h1>
+<p class="page-subtitle">
+  {query.trim() ? `全${dates.length}日から検索` : '1週間分の番組をキーワード検索'} · {filtered.length}件
+</p>
+
+<div class="search-row">
+  <input
+    type="text"
+    bind:value={query}
+    placeholder="🔍 番組名・内容で検索 (例: 落語100選、真打、英語)"
+    class="search"
+  />
+</div>
+
+{#if !query.trim() && dates.length > 0}
+  <div class="date-tabs">
+    {#each dates as d}
+      <button
+        class="date-tab"
+        class:active={selectedDate === d}
+        onclick={() => (selectedDate = d)}
+      >
+        {fmtDateShort(d)}
+      </button>
+    {/each}
+  </div>
 {/if}
 
 <div class="controls">
@@ -81,7 +150,7 @@
 {:else if filtered.length === 0}
   <div class="empty">
     <div class="empty-icon">📭</div>
-    <p>番組がありません</p>
+    <p>該当する番組がありません</p>
   </div>
 {:else}
   <div class="list">
@@ -89,6 +158,9 @@
       {@const isSubscribed = p.series_id && $subscriptions.has(p.series_id)}
       <div class="item" class:subscribed={isSubscribed}>
         <div class="time">
+          {#if query.trim()}
+            <div class="time-date">{fmtDateShort(p.start_time.slice(0, 10))}</div>
+          {/if}
           <div class="time-start">{fmtTime(p.start_time)}</div>
           <div class="time-duration">{fmtDuration(p.duration_sec)}</div>
         </div>
@@ -98,13 +170,17 @@
           {#if p.content}
             <div class="content-text">{p.content.slice(0, 120)}{p.content.length > 120 ? '…' : ''}</div>
           {/if}
+          {#if p.series_name}
+            <div class="series-name">📻 {p.series_name}</div>
+          {/if}
         </div>
         {#if p.series_id}
           <button
             class="sub-toggle"
             class:active={isSubscribed}
             onclick={() => toggleSub(p.series_id)}
-            aria-label={isSubscribed ? '購読解除' : '購読する'}
+            aria-label={isSubscribed ? '購読解除' : 'シリーズを購読'}
+            title={isSubscribed ? '購読解除' : `${p.series_name} を購読`}
           >
             {isSubscribed ? '✓' : '+'}
           </button>
@@ -115,6 +191,56 @@
 {/if}
 
 <style>
+  .search-row {
+    margin-bottom: 0.75rem;
+  }
+  .search {
+    width: 100%;
+    padding: 0.625rem 1rem;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    background: rgba(255, 255, 255, 0.04);
+    color: var(--text-0);
+    font-size: 0.9375rem;
+    outline: none;
+    transition: all 0.15s ease;
+  }
+  .search:focus {
+    border-color: var(--accent-1);
+    background: rgba(255, 255, 255, 0.06);
+  }
+  .search::placeholder {
+    color: var(--text-2);
+  }
+  .date-tabs {
+    display: flex;
+    gap: 0.375rem;
+    margin-bottom: 0.75rem;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 0.25rem;
+  }
+  .date-tab {
+    flex-shrink: 0;
+    padding: 0.4375rem 0.875rem;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--border);
+    color: var(--text-2);
+    font-size: 0.8125rem;
+    font-weight: 500;
+    white-space: nowrap;
+    transition: all 0.15s ease;
+  }
+  .date-tab:hover {
+    color: var(--text-0);
+    background: rgba(255, 255, 255, 0.06);
+  }
+  .date-tab.active {
+    background: var(--accent-gradient);
+    color: #fff;
+    border-color: transparent;
+  }
   .controls {
     display: flex;
     margin-bottom: 1.25rem;
@@ -145,7 +271,7 @@
   }
   .item {
     display: grid;
-    grid-template-columns: 70px auto 1fr auto;
+    grid-template-columns: 80px auto 1fr auto;
     gap: 0.875rem;
     align-items: center;
     padding: 0.875rem 1rem;
@@ -166,6 +292,11 @@
     display: flex;
     flex-direction: column;
     align-items: flex-start;
+  }
+  .time-date {
+    font-size: 0.6875rem;
+    color: var(--accent-1);
+    font-weight: 600;
   }
   .time-start {
     font-size: 1rem;
@@ -209,6 +340,14 @@
     text-overflow: ellipsis;
     white-space: nowrap;
   }
+  .series-name {
+    font-size: 0.6875rem;
+    color: var(--accent-1);
+    margin-top: 0.25rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
   .sub-toggle {
     width: 32px;
     height: 32px;
@@ -231,7 +370,7 @@
   }
   @media (max-width: 640px) {
     .item {
-      grid-template-columns: 60px 1fr auto;
+      grid-template-columns: 70px 1fr auto;
     }
     .service-chip {
       display: none;

@@ -16,11 +16,16 @@ from .streams import get_stream_urls
 JST = timezone(timedelta(hours=9))
 
 
-def _load_subscriptions(source: str) -> list[str]:
-    """購読シリーズIDリストをJSONから読み込む。
+def _load_subscriptions(source: str) -> tuple[list[str], list[str]]:
+    """購読シリーズIDリストとキーワードをJSONから読み込む。
 
     source はローカルファイルパス または http(s) URL を受け付ける。
-    想定形式: {"series_ids": [...], "updated_at": "..."} または ["ABC123", ...]
+    想定形式:
+      {"series_ids": [...], "keywords": [...], "updated_at": "..."}
+      または ["ABC123", ...] (旧形式、series_idsのみ)
+
+    Returns:
+        (series_ids, keywords)
     """
     if source.startswith(("http://", "https://")):
         import urllib.request
@@ -29,12 +34,12 @@ def _load_subscriptions(source: str) -> list[str]:
     else:
         p = Path(source)
         if not p.exists():
-            return []
+            return [], []
         with open(p, encoding="utf-8") as f:
             data = json.load(f)
     if isinstance(data, list):
-        return data
-    return data.get("series_ids", [])
+        return data, []
+    return data.get("series_ids", []), data.get("keywords", [])
 
 
 def _record_immediately(
@@ -115,8 +120,10 @@ def main():
     series_ids: list[str] = []
     matched_keywords: list[str] = []
     if args.subscriptions:
-        series_ids = _load_subscriptions(args.subscriptions)
-        logger.info("購読モード: %d シリーズ", len(series_ids))
+        series_ids, sub_keywords = _load_subscriptions(args.subscriptions)
+        # subscriptions.json 由来のキーワードを優先、無ければ config のキーワード
+        matched_keywords = sub_keywords if sub_keywords else config.keywords
+        logger.info("購読モード: %d シリーズ + %d キーワード", len(series_ids), len(matched_keywords))
         logger.info("対象日: %s / エリア: %s", target_date, config.area)
     else:
         matched_keywords = config.keywords
@@ -132,9 +139,18 @@ def main():
 
     logger.info("合計 %d 件の番組を取得", len(programs))
 
-    # フィルタリング
+    # フィルタリング (シリーズ購読 + キーワードを OR で結合)
     if args.subscriptions:
-        matched = filter_by_series(programs, series_ids)
+        by_series = filter_by_series(programs, series_ids) if series_ids else []
+        by_keyword = filter_programs(programs, matched_keywords) if matched_keywords else []
+        # ID重複排除してマージ
+        seen: set[str] = set()
+        matched: list[Program] = []
+        for p in by_series + by_keyword:
+            if p.id not in seen:
+                seen.add(p.id)
+                matched.append(p)
+        matched.sort(key=lambda p: p.start_time)
     else:
         matched = filter_programs(programs, config.keywords)
 

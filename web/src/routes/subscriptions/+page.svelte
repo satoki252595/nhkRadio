@@ -2,7 +2,7 @@
   import { onMount } from 'svelte';
   import { base } from '$app/paths';
   import type { SeriesIndex, Series } from '$lib/types';
-  import { subscriptions } from '$lib/stores/subscriptions';
+  import { subscriptions, keywords } from '$lib/stores/subscriptions';
   import SeriesCard from '$lib/components/SeriesCard.svelte';
   import { githubSyncConfig } from '$lib/sync/config';
   import { createGitHubSyncAdapter, type GitHubSyncConfig } from '$lib/sync/github';
@@ -54,9 +54,22 @@
   );
 
   function clearAll() {
-    if (confirm('すべての購読を解除しますか？')) {
+    if (confirm('すべての購読とキーワードを解除しますか？')) {
       subscriptions.clear();
     }
+  }
+
+  let kwInput = $state('');
+
+  function addKeyword() {
+    const v = kwInput.trim();
+    if (!v) return;
+    keywords.add(v);
+    kwInput = '';
+  }
+
+  function removeKeyword(kw: string) {
+    keywords.remove(kw);
   }
 
   function saveSyncConfig() {
@@ -156,6 +169,42 @@
 {#if syncMessage}
   <div class="msg {syncMessage.kind}">{syncMessage.text}</div>
 {/if}
+
+<section class="keywords-section">
+  <h2 class="section-title">キーワード録音</h2>
+  <p class="section-hint">
+    番組名・サブタイトル・内容にキーワードが含まれる番組を自動録音します。
+    <br />
+    例: <code>落語100選</code>, <code>真打</code>, <code>朗読</code> など(深夜便の特集コーナーにも対応)
+  </p>
+  <div class="keyword-input">
+    <input
+      type="text"
+      bind:value={kwInput}
+      placeholder="キーワードを入力 (Enterで追加)"
+      onkeydown={(e) => e.key === 'Enter' && addKeyword()}
+    />
+    <button class="btn primary" onclick={addKeyword} disabled={!kwInput.trim()}>追加</button>
+  </div>
+  {#if $keywords.length > 0}
+    <div class="keyword-tags">
+      {#each $keywords as kw}
+        <span class="keyword-tag">
+          {kw}
+          <button
+            class="keyword-remove"
+            onclick={() => removeKeyword(kw)}
+            aria-label={`${kw}を削除`}
+          >
+            ✕
+          </button>
+        </span>
+      {/each}
+    </div>
+  {:else}
+    <p class="keyword-empty">まだキーワードがありません</p>
+  {/if}
+</section>
 
 {#if showSyncPanel}
   <div class="sync-panel">
@@ -406,5 +455,87 @@
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: 1rem;
+  }
+  .keywords-section {
+    margin: 1.5rem 0;
+    padding: 1.125rem 1.25rem;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--border);
+  }
+  .section-title {
+    margin: 0 0 0.375rem;
+    font-size: 1rem;
+    font-weight: 600;
+  }
+  .section-hint {
+    margin: 0 0 0.875rem;
+    font-size: 0.8125rem;
+    color: var(--text-2);
+    line-height: 1.55;
+  }
+  .section-hint code {
+    padding: 0.0625rem 0.3125rem;
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.08);
+    font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+    font-size: 0.9em;
+    color: var(--text-1);
+  }
+  .keyword-input {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+  }
+  .keyword-input input {
+    flex: 1;
+    padding: 0.5rem 0.875rem;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: rgba(0, 0, 0, 0.25);
+    color: var(--text-0);
+    font-size: 0.875rem;
+    outline: none;
+  }
+  .keyword-input input:focus {
+    border-color: var(--accent-1);
+  }
+  .keyword-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  .keyword-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.3125rem 0.5rem 0.3125rem 0.75rem;
+    border-radius: 999px;
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.25), rgba(118, 75, 162, 0.2));
+    border: 1px solid rgba(102, 126, 234, 0.35);
+    color: var(--text-0);
+    font-size: 0.8125rem;
+    font-weight: 500;
+  }
+  .keyword-remove {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.3);
+    color: var(--text-1);
+    font-size: 0.6875rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s ease;
+  }
+  .keyword-remove:hover {
+    background: var(--danger);
+    color: #fff;
+  }
+  .keyword-empty {
+    margin: 0;
+    font-size: 0.8125rem;
+    color: var(--text-2);
   }
 </style>

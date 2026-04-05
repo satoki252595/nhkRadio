@@ -2,6 +2,8 @@ export interface SubscriptionsPayload {
   /** 将来のマルチテナント化用。現状はオプショナル。 */
   user_id?: string;
   series_ids: string[];
+  /** コーナー・キーワードで番組を捕捉 (「落語100選」「真打」など) */
+  keywords?: string[];
   updated_at: string;
 }
 
