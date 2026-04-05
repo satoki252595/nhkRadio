@@ -23,7 +23,8 @@ jobs:
         run: pip install httpx pyyaml
 
       - name: Generate data files
-        run: python -m nhk_recorder.data_export --days 1 --output-dir ./data
+        # 過去7日+未来7日を取得してシリーズカバレッジを最大化
+        run: python -m nhk_recorder.data_export --days 7 --past-days 7 --output-dir ./data
         env:
           NHK_API_KEY: ${{ secrets.NHK_API_KEY }}
 
