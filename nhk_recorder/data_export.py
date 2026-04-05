@@ -113,17 +113,39 @@ def dedupe_programs(programs: list) -> list:
     return result
 
 
+def _strip_time_segment_marker(title: str) -> str:
+    """タイトルから時間帯分割マーカーを除去する。
+
+    Radikoでは長時間番組を時間帯で分割することがあり、以下のマーカーが付く:
+    - (1) (2) (3) 等の数字サフィックス
+    - ①②③ 等の丸数字
+    - 【前半】【後半】【第1部】等
+    - ＜前半＞＜後半＞
+    - ・前半/・後半
+    """
+    t = title
+    # 末尾の (1)(2)(3) や ①②③
+    t = re.sub(r"\s*[(（][1-9][)）]\s*$", "", t)
+    t = re.sub(r"\s*[①②③④⑤⑥⑦⑧⑨⑩]\s*$", "", t)
+    # 【前半】【後半】【第N部】等
+    t = re.sub(r"\s*[【\[＜<](前半|後半|前編|後編|第[1-9]部)[】\]＞>]\s*$", "", t)
+    # 末尾の "・前半" "・後半"
+    t = re.sub(r"\s*[・･](前半|後半|前編|後編)\s*$", "", t)
+    return t.strip()
+
+
 def _radiko_to_program(rp):
     """RadikoProgram を NHK Program 互換オブジェクトに変換。
 
     service は radiko:{station_id} 形式 (例: radiko:ABC)。
-    series_id は station_id + title のハッシュ (安定ID)。
+    series_id は station_id + 正規化タイトルのハッシュ (時間帯分割を同一シリーズに)。
     """
     import hashlib
     from .api import Program
 
-    # 安定したシリーズID生成 (station + title)
-    series_key = f"{rp.station_id}|{rp.title}"
+    # 時間帯マーカーを除去してからハッシュ (同番組を同一シリーズに統合)
+    normalized_title = _strip_time_segment_marker(rp.title)
+    series_key = f"{rp.station_id}|{normalized_title}"
     series_id = "rdk_" + hashlib.md5(series_key.encode("utf-8")).hexdigest()[:12]
 
     return Program(
@@ -135,7 +157,7 @@ def _radiko_to_program(rp):
         start_time=rp.start_time,
         end_time=rp.end_time,
         series_id=series_id,
-        series_name=rp.title,
+        series_name=normalized_title,  # (1)(2)(3) を含まない名前
         episode_name="",
         genre=[],
     )
