@@ -25,6 +25,13 @@ function encodePath(path: string): string {
     .join('/');
 }
 
+function b64encode(s: string): string {
+  const bytes = new TextEncoder().encode(s);
+  let bin = '';
+  for (const b of bytes) bin += String.fromCharCode(b);
+  return btoa(bin);
+}
+
 export async function diagnose(config: GitHubSyncConfig): Promise<DiagnosticResult> {
   const steps: DiagnosticResult['steps'] = [];
   const branch = config.branch ?? 'main';
@@ -71,22 +78,11 @@ export async function diagnose(config: GitHubSyncConfig): Promise<DiagnosticResu
     });
     if (res.ok) {
       const repo = await res.json();
-      const perms = repo.permissions || {};
-      const canWrite = perms.push || perms.maintain || perms.admin;
       steps.push({
         step: '2. リポジトリアクセス',
         ok: true,
-        detail: `${repo.full_name} (${repo.private ? 'private' : 'public'}) / 書き込み権限: ${canWrite ? 'あり' : 'なし'}`,
+        detail: `${repo.full_name} (${repo.private ? 'private' : 'public'}) にアクセス可能`,
       });
-      if (!canWrite) {
-        steps.push({
-          step: '→ 権限エラー',
-          ok: false,
-          detail:
-            'トークンにContents:Write権限がありません。Fine-grained tokenの場合、対象リポジトリで「Contents: Read and write」を設定してください。',
-        });
-        return { ok: false, steps };
-      }
     } else if (res.status === 404) {
       steps.push({
         step: '2. リポジトリアクセス',
@@ -152,16 +148,18 @@ export async function diagnose(config: GitHubSyncConfig): Promise<DiagnosticResu
     return { ok: false, steps };
   }
 
-  // Step 4: ファイルパス確認
+  // Step 4: ファイルパス確認 (shaも取得)
+  let existingSha: string | null = null;
   try {
     const url = `${API_BASE}/repos/${config.owner}/${config.repo}/contents/${encodePath(path)}?ref=${encodeURIComponent(branch)}`;
     const res = await fetch(url, { headers: headers(config.token) });
     if (res.ok) {
       const data = await res.json();
+      existingSha = data.sha as string;
       steps.push({
         step: '4. ファイルパス確認',
         ok: true,
-        detail: `既存ファイルが見つかりました (sha: ${(data.sha as string).slice(0, 7)}) → 更新モード`,
+        detail: `既存ファイルが見つかりました (sha: ${existingSha!.slice(0, 7)}) → 更新モード`,
       });
     } else if (res.status === 404) {
       steps.push({
@@ -180,6 +178,68 @@ export async function diagnose(config: GitHubSyncConfig): Promise<DiagnosticResu
   } catch (e) {
     steps.push({
       step: '4. ファイルパス確認',
+      ok: false,
+      detail: `通信エラー: ${e instanceof Error ? e.message : String(e)}`,
+    });
+    return { ok: false, steps };
+  }
+
+  // Step 5: 実際の書き込みテスト (PUT)
+  // 読み取り権限と書き込み権限は別。PUTが通るか実際に試す。
+  try {
+    const testPath = `.nhk-radio-write-test-${Date.now()}.tmp`;
+    const putUrl = `${API_BASE}/repos/${config.owner}/${config.repo}/contents/${encodePath(testPath)}`;
+    const res = await fetch(putUrl, {
+      method: 'PUT',
+      headers: { ...headers(config.token), 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        message: 'test: write permission check (auto-delete)',
+        content: b64encode('write permission test'),
+        branch,
+      }),
+    });
+    if (res.ok) {
+      const data = await res.json();
+      const testSha = data.content?.sha;
+      steps.push({
+        step: '5. 書き込みテスト',
+        ok: true,
+        detail: `✓ トークンはContents:Write権限を持っています。既存ファイルのsha: ${existingSha ? existingSha.slice(0, 7) : '(新規)'}`,
+      });
+      // 作成したテストファイルを削除
+      if (testSha) {
+        await fetch(putUrl, {
+          method: 'DELETE',
+          headers: { ...headers(config.token), 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            message: 'test: cleanup write permission check',
+            sha: testSha,
+            branch,
+          }),
+        });
+      }
+    } else {
+      const errText = await res.text();
+      let hint = '';
+      if (res.status === 403) {
+        hint =
+          '\n\n【403の原因候補】\n' +
+          '(1) Fine-grained token の Permissions → Contents が「Read and write」になっていない\n' +
+          '(2) ブランチ保護ルール (Branch protection) で直接pushが禁止されている\n' +
+          '    → Settings → Branches → Protection rules を確認\n' +
+          '(3) Organization Fine-grained token policy で制限されている\n' +
+          '(4) トークン作成後に権限を変更したが、トークン再発行していない';
+      }
+      steps.push({
+        step: '5. 書き込みテスト',
+        ok: false,
+        detail: `PUT失敗 ${res.status}: ${errText}${hint}`,
+      });
+      return { ok: false, steps };
+    }
+  } catch (e) {
+    steps.push({
+      step: '5. 書き込みテスト',
       ok: false,
       detail: `通信エラー: ${e instanceof Error ? e.message : String(e)}`,
     });
