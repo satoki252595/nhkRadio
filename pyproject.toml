@@ -1,0 +1,18 @@
+[project]
+name = "nhk-radio-recorder"
+version = "0.1.0"
+description = "NHKラジオ番組の自動録音ツール"
+requires-python = ">=3.10"
+dependencies = [
+    "httpx",
+    "pyyaml",
+]
+
+[project.optional-dependencies]
+dev = ["pytest"]
+
+[tool.setuptools.packages.find]
+include = ["nhk_recorder*"]
+
+[project.scripts]
+nhk-rec = "nhk_recorder.main:main"

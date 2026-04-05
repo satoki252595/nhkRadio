@@ -1,0 +1,54 @@
+name: NHK Radio Recorder
+
+on:
+  schedule:
+    # 毎時0分に実行 (UTC 0-14 = JST 9-23時)
+    - cron: '0 0-14 * * *'
+  workflow_dispatch:  # 手動実行
+    inputs:
+      mode:
+        description: '録音モード'
+        type: choice
+        default: 'subscriptions'
+        options:
+          - subscriptions
+          - keywords
+
+jobs:
+  record:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120  # 最大2時間（60分番組+アップロード余裕）
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install ffmpeg
+        run: sudo apt-get update && sudo apt-get install -y ffmpeg
+
+      - name: Install Python dependencies
+        run: pip install httpx pyyaml
+
+      - name: Record (subscription mode)
+        if: github.event_name == 'schedule' || inputs.mode == 'subscriptions'
+        run: |
+          if [ -f "data/subscriptions.json" ]; then
+            python -m nhk_recorder --subscriptions data/subscriptions.json --within 65
+          else
+            echo "data/subscriptions.json が存在しません。購読リストを配置してください。"
+          fi
+        env:
+          NHK_API_KEY: ${{ secrets.NHK_API_KEY }}
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+          NOTION_DATABASE_ID: ${{ secrets.NOTION_DATABASE_ID }}
+
+      - name: Record (keyword mode)
+        if: inputs.mode == 'keywords'
+        run: python -m nhk_recorder --within 65
+        env:
+          NHK_API_KEY: ${{ secrets.NHK_API_KEY }}
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+          NOTION_DATABASE_ID: ${{ secrets.NOTION_DATABASE_ID }}

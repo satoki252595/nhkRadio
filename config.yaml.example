@@ -1,0 +1,16 @@
+nhk_api_key: "YOUR_API_KEY_HERE"
+area: "270"  # 大阪
+services:
+  - r1   # NHK AM
+  - r3   # NHK FM (※2026年4月よりr2廃止、FMはr3)
+keywords:
+  - "落語"
+  - "らくご"
+  - "英語"
+output_dir: "./recordings"
+log_level: "INFO"
+ffmpeg_path: "ffmpeg"
+
+# Notion連携 (録音後に自動アップロード)
+notion_token: "YOUR_NOTION_TOKEN_HERE"       # https://www.notion.so/profile/integrations で取得
+notion_database_id: "6dc536e3d4404708a92ef5554353fa0d"  # NHKラジオ録音データベースのID
