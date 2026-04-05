@@ -27,6 +27,8 @@ class Program:
     series_name: str = ""
     episode_name: str = ""
     genre: list[str] = field(default_factory=list)
+    # 視聴エリア (JP13=関東, JP27=関西, NHKは "NHK"固定)
+    area: str = ""
 
     @property
     def duration(self) -> int:
@@ -77,6 +79,7 @@ def fetch_programs(config: Config, date: str) -> list[Program]:
                         series_name=ident.get("radioSeriesName", ""),
                         episode_name=ident.get("radioEpisodeName", ""),
                         genre=genres,
+                        area="NHK",  # NHKは全国共通
                     )
                     programs.append(program)
                 except (KeyError, ValueError) as e:

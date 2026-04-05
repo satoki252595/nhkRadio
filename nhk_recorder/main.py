@@ -152,6 +152,10 @@ def main():
         "--include-radiko", action="store_true",
         help="Radiko (民放) も対象にする (日本IPが必要)",
     )
+    parser.add_argument(
+        "--skip-nhk", action="store_true",
+        help="NHK番組をスキップ (Radiko録音ジョブ専用)",
+    )
     args = parser.parse_args()
 
     # 設定読み込み
@@ -231,6 +235,12 @@ def main():
     if not matched:
         logger.info("マッチする番組がありません")
         return
+
+    # --skip-nhk: NHK(r1/r3)番組を除外 (Radiko専用ジョブ向け)
+    if args.skip_nhk:
+        before = len(matched)
+        matched = [p for p in matched if not p.service.startswith(("r1", "r3"))]
+        logger.info("--skip-nhk: NHK番組を%d件スキップ", before - len(matched))
 
     # --within: 指定分以内に開始する番組のみに絞り込み
     if args.within is not None:

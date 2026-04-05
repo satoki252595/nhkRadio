@@ -22,6 +22,19 @@ jobs:
   record:
     runs-on: ubuntu-latest
     timeout-minutes: 120  # 最大2時間（60分番組+アップロード余裕）
+    strategy:
+      fail-fast: false
+      # エリアごとに並列ジョブ: 関東(JP13)→TBS等、関西(JP27)→MBS等
+      # NHKは両方のジョブで録音されうるが、Notion側で重複排除されない点注意
+      # → 関西ジョブのみで --include-radiko を使い、関東は民放のみ録音する設計
+      matrix:
+        include:
+          - region: kansai
+            radiko_areas: JP27
+            skip_nhk: false
+          - region: kanto
+            radiko_areas: JP13
+            skip_nhk: true  # NHKは関西ジョブで録音済み
 
     steps:
       - uses: actions/checkout@v4
@@ -36,22 +49,17 @@ jobs:
       - name: Install Python dependencies
         run: pip install httpx pyyaml
 
-      # VPN Gate 経由で日本IPに切り替え (Radikoアクセス用)
-      # include_radiko が未指定 (schedule経由) の場合も デフォルトで有効化
-      - name: Fetch VPN Gate JP server
-        id: vpn_fetch
-        if: github.event_name == 'schedule' || inputs.include_radiko
-        run: python -m nhk_recorder.vpngate vpn.ovpn
+      # VPN Gate 経由で指定リージョンのIPに切り替え
+      - name: Fetch VPN Gate server (${{ matrix.region }})
+        run: python -m nhk_recorder.vpngate vpn.ovpn --region ${{ matrix.region }}
 
       - name: Connect to VPN Gate
-        if: github.event_name == 'schedule' || inputs.include_radiko
         uses: kota65535/github-openvpn-connect-action@v3
         with:
           config_file: vpn.ovpn
-        continue-on-error: true  # VPN失敗してもNHKは続行可能
+        continue-on-error: true  # VPN失敗時もスキップで続行
 
-      - name: Verify Japan IP
-        if: github.event_name == 'schedule' || inputs.include_radiko
+      - name: Verify IP location
         run: |
           echo "現在のIP:"
           curl -s https://ipinfo.io/json || true
@@ -61,9 +69,10 @@ jobs:
         if: github.event_name == 'schedule' || inputs.mode == 'subscriptions'
         run: |
           if [ -f "data/subscriptions.json" ]; then
-            python -m nhk_recorder --subscriptions data/subscriptions.json --within 65 --include-radiko
+            python -m nhk_recorder --subscriptions data/subscriptions.json --within 65 --include-radiko \
+              ${{ matrix.skip_nhk && '--skip-nhk' || '' }}
           else
-            echo "data/subscriptions.json が存在しません。購読リストを配置してください。"
+            echo "data/subscriptions.json が存在しません。"
           fi
         env:
           NHK_API_KEY: ${{ secrets.NHK_API_KEY }}
@@ -72,7 +81,9 @@ jobs:
 
       - name: Record (keyword mode)
         if: inputs.mode == 'keywords'
-        run: python -m nhk_recorder --within 65 --include-radiko
+        run: |
+          python -m nhk_recorder --within 65 --include-radiko \
+            ${{ matrix.skip_nhk && '--skip-nhk' || '' }}
         env:
           NHK_API_KEY: ${{ secrets.NHK_API_KEY }}
           NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}

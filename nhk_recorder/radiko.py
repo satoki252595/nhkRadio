@@ -47,6 +47,7 @@ class RadikoProgram:
     start_time: datetime
     end_time: datetime
     series_name: str = ""
+    area_id: str = ""  # JP13(東京)/JP27(大阪) 等
 
     @property
     def duration(self) -> int:
@@ -190,6 +191,7 @@ def fetch_programs(area_id: str, date: str) -> list[RadikoProgram]:
                         subtitle="",
                         content=info,
                         performer=pfm,
+                        area_id=area_id,
                         start_time=_parse_radiko_time(ft),
                         end_time=_parse_radiko_time(to),
                         series_name=title,  # Radiko は series_id が無いので title をシリーズ名とする

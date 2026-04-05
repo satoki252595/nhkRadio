@@ -43,7 +43,8 @@ jobs:
         continue-on-error: true
 
       - name: Generate data files (NHK + Radiko)
-        run: python -m nhk_recorder.data_export --days 7 --past-days 7 --output-dir ./data --include-radiko
+        # JP13=東京, JP27=大阪 両方の番組表を取得してシリーズ一覧を充実
+        run: python -m nhk_recorder.data_export --days 7 --past-days 7 --output-dir ./data --include-radiko --radiko-areas JP13,JP27
         env:
           NHK_API_KEY: ${{ secrets.NHK_API_KEY }}
 

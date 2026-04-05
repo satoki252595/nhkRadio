@@ -10,6 +10,7 @@
   let error: string | null = $state(null);
   let query = $state('');
   let serviceFilter = $state<'all' | 'nhk' | 'radiko'>('all');
+  let areaFilter = $state<'all' | 'kanto' | 'kansai'>('all');
 
   onMount(async () => {
     try {
@@ -30,6 +31,13 @@
       list = list.filter((s) => s.service === 'r1' || s.service === 'r3');
     } else if (serviceFilter === 'radiko') {
       list = list.filter((s) => s.service.startsWith('radiko:'));
+    }
+    if (areaFilter === 'kanto') {
+      // JP13=東京 JP14=神奈川 JP11=埼玉 JP12=千葉 JP08=茨城 JP09=栃木 JP10=群馬
+      list = list.filter((s) => /^JP(08|09|10|11|12|13|14)$/.test(s.area ?? '') || s.area === 'NHK');
+    } else if (areaFilter === 'kansai') {
+      // JP27=大阪 JP28=兵庫 JP26=京都 JP29=奈良 JP25=滋賀 JP30=和歌山
+      list = list.filter((s) => /^JP(25|26|27|28|29|30)$/.test(s.area ?? '') || s.area === 'NHK');
     }
     if (query.trim()) {
       const q = query.toLowerCase();
@@ -83,6 +91,29 @@
       onclick={() => (serviceFilter = 'radiko')}
     >
       民放
+    </button>
+  </div>
+  <div class="tabs">
+    <button
+      class="tab"
+      class:active={areaFilter === 'all'}
+      onclick={() => (areaFilter = 'all')}
+    >
+      全国
+    </button>
+    <button
+      class="tab"
+      class:active={areaFilter === 'kanto'}
+      onclick={() => (areaFilter = 'kanto')}
+    >
+      関東
+    </button>
+    <button
+      class="tab"
+      class:active={areaFilter === 'kansai'}
+      onclick={() => (areaFilter = 'kansai')}
+    >
+      関西
     </button>
   </div>
 </div>

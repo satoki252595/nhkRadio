@@ -113,6 +113,41 @@ def dedupe_programs(programs: list) -> list:
     return result
 
 
+def _strip_html(text: str) -> str:
+    """HTMLタグ・エンティティ・URLを除去してプレーンテキストに変換する。
+
+    Radikoの番組説明はHTML形式で返されるため、表示前に正規化する。
+    """
+    if not text:
+        return ""
+    t = text
+    # <br>, <BR>, <br /> 等を改行に
+    t = re.sub(r"<br\s*/?>", "\n", t, flags=re.IGNORECASE)
+    # <p>, </p>, <div> 等も改行区切り
+    t = re.sub(r"</?(p|div|li|h[1-6])[^>]*>", "\n", t, flags=re.IGNORECASE)
+    # <a href="...">...</a> はリンクテキストのみ残す
+    t = re.sub(r"<a[^>]*>(.*?)</a>", r"\1", t, flags=re.IGNORECASE | re.DOTALL)
+    # その他全てのタグを除去
+    t = re.sub(r"<[^>]+>", "", t)
+    # HTMLエンティティ
+    entities = {
+        "&amp;": "&", "&lt;": "<", "&gt;": ">",
+        "&quot;": '"', "&apos;": "'", "&nbsp;": " ",
+        "&#39;": "'", "&#34;": '"', "&yen;": "¥",
+    }
+    for k, v in entities.items():
+        t = t.replace(k, v)
+    # 数値参照 &#1234;
+    t = re.sub(r"&#(\d+);", lambda m: chr(int(m.group(1))), t)
+    # 16進参照 &#x1F600;
+    t = re.sub(r"&#x([0-9a-fA-F]+);", lambda m: chr(int(m.group(1), 16)), t)
+    # 連続空白・改行を整理
+    t = re.sub(r"[ \t\u3000]+", " ", t)
+    t = re.sub(r"\n{3,}", "\n\n", t)
+    t = re.sub(r" *\n *", "\n", t)
+    return t.strip()
+
+
 def _strip_time_segment_marker(title: str) -> str:
     """タイトルから時間帯分割マーカー・エピソード番号を除去する。
 
@@ -157,22 +192,24 @@ def _radiko_to_program(rp):
     from .api import Program
 
     # 時間帯マーカーを除去してからハッシュ (同番組を同一シリーズに統合)
-    normalized_title = _strip_time_segment_marker(rp.title)
+    clean_title = _strip_html(rp.title)
+    normalized_title = _strip_time_segment_marker(clean_title)
     series_key = f"{rp.station_id}|{normalized_title}"
     series_id = "rdk_" + hashlib.md5(series_key.encode("utf-8")).hexdigest()[:12]
 
     return Program(
         id=rp.id,
         service=f"radiko:{rp.station_id}",
-        title=f"[{rp.station_name}] {rp.title}",
-        subtitle=rp.performer,
-        content=rp.content,
+        title=f"[{rp.station_name}] {clean_title}",
+        subtitle=_strip_html(rp.performer),
+        content=_strip_html(rp.content),
         start_time=rp.start_time,
         end_time=rp.end_time,
         series_id=series_id,
-        series_name=normalized_title,  # (1)(2)(3) を含まない名前
+        series_name=normalized_title,
         episode_name="",
         genre=[],
+        area=rp.area_id,  # JP13, JP27 等
     )
 
 
@@ -190,6 +227,7 @@ def program_to_dict(p) -> dict:
         "series_name": p.series_name,
         "episode_name": p.episode_name,
         "genre": p.genre,
+        "area": p.area,
     }
 
 
@@ -251,6 +289,11 @@ def main():
         "--rebuild-series", action="store_true",
         help="既存series.jsonを破棄して作り直す",
     )
+    parser.add_argument(
+        "--radiko-areas", default="",
+        help="Radiko 番組表の追加取得エリア (カンマ区切り、例: JP13,JP27)。"
+             "認証エリア以外の番組表も取得する (録音は認証エリアのみ可能)",
+    )
     args = parser.parse_args()
 
     logging.basicConfig(
@@ -303,13 +346,19 @@ def main():
         programs = fetch_programs(config, target)
         total_programs += len(programs)
 
-        # Radiko番組も追加取得
+        # Radiko番組も追加取得 (認証エリア + 追加エリア)
         if radiko_auth:
-            rp = radiko.fetch_programs(radiko_auth.area_id, target)
-            # RadikoProgram -> Program 互換dict変換
-            for p in rp:
-                programs.append(_radiko_to_program(p))
-            total_programs += len(rp)
+            radiko_area_list = [radiko_auth.area_id]
+            if args.radiko_areas:
+                extra = [a.strip() for a in args.radiko_areas.split(",") if a.strip()]
+                for a in extra:
+                    if a not in radiko_area_list:
+                        radiko_area_list.append(a)
+            for area in radiko_area_list:
+                rp = radiko.fetch_programs(area, target)
+                for p in rp:
+                    programs.append(_radiko_to_program(p))
+                total_programs += len(rp)
 
         # 重複排除 (NHK本家 vs radiko:JOBK等の同時配信)
         before_dedupe = len(programs)
@@ -345,6 +394,7 @@ def main():
                     "series_id": p.series_id,
                     "series_name": p.series_name,
                     "service": p.service,
+                    "area": p.area,
                     "genre": p.genre,
                     "sample_title": p.title,
                     "sample_description": p.content[:200],
@@ -366,6 +416,9 @@ def main():
                 # ジャンルは最新値で更新
                 if p.genre:
                     entry["genre"] = p.genre
+                # エリア情報を補完
+                if p.area and not entry.get("area"):
+                    entry["area"] = p.area
 
     # シリーズレベルの重複排除: 同名シリーズがNHKとradiko:JOBK両方にある場合、radiko側を削除
     series_index = _dedupe_series_index(series_index)

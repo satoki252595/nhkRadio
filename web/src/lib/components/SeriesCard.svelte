@@ -52,6 +52,18 @@
 
   let serviceInfo = $derived(getServiceInfo(series.service));
 
+  function getAreaBadge(area: string | undefined): { label: string; color: string } | null {
+    if (!area) return null;
+    if (area === 'NHK') return null;  // NHKは全国共通なので非表示
+    const kanto = /^JP(08|09|10|11|12|13|14)$/;
+    const kansai = /^JP(25|26|27|28|29|30)$/;
+    if (kanto.test(area)) return { label: '関東', color: '#f59e0b' };
+    if (kansai.test(area)) return { label: '関西', color: '#ec4899' };
+    return { label: area, color: '#6b7280' };
+  }
+
+  let areaBadge = $derived(getAreaBadge(series.area));
+
   function toggle() {
     subscriptions.toggle(series.series_id);
   }
@@ -59,9 +71,16 @@
 
 <div class="card" class:subscribed={isSubscribed}>
   <div class="card-top">
-    <span class="service-badge" style="background: {serviceInfo.bg}">
-      {serviceInfo.label}
-    </span>
+    <div class="badges">
+      <span class="service-badge" style="background: {serviceInfo.bg}">
+        {serviceInfo.label}
+      </span>
+      {#if areaBadge}
+        <span class="area-badge" style="background: {areaBadge.color}">
+          {areaBadge.label}
+        </span>
+      {/if}
+    </div>
     <button
       class="sub-btn"
       class:subscribed={isSubscribed}
@@ -127,11 +146,25 @@
     justify-content: space-between;
     gap: 0.5rem;
   }
+  .badges {
+    display: flex;
+    gap: 0.3125rem;
+    flex-wrap: wrap;
+  }
   .service-badge {
     display: inline-block;
     padding: 0.25rem 0.625rem;
     border-radius: 999px;
     font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    color: #fff;
+  }
+  .area-badge {
+    display: inline-block;
+    padding: 0.25rem 0.5rem;
+    border-radius: 999px;
+    font-size: 0.625rem;
     font-weight: 700;
     letter-spacing: 0.05em;
     color: #fff;

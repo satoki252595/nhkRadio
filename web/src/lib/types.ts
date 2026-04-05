@@ -2,6 +2,7 @@ export interface Series {
   series_id: string;
   series_name: string;
   service: string;
+  area?: string;  // "NHK" | "JP13"(関東) | "JP27"(関西) | ""
   genre: string[];
   sample_title: string;
   sample_description: string;
@@ -27,6 +28,7 @@ export interface Program {
   series_name: string;
   episode_name: string;
   genre: string[];
+  area?: string;
 }
 
 export interface ProgramsData {
