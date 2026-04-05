@@ -132,8 +132,8 @@ npm run dev  # http://localhost:5173
 
 ### 購読フロー
 1. Webサイトで番組を検索 → 「購読」ボタンをクリック (localStorageに保存)
-2. 「購読中」ページで「JSONダウンロード」
-3. ダウンロードした `subscriptions.json` を `data/subscriptions.json` として配置してコミット
+2. 「購読中」ページの ⚙️ アイコンで Personal Access Token を設定 (初回のみ)
+3. 「🚀 GitHubへプッシュ」ボタンで `data/subscriptions.json` を自動コミット
 4. 次回のGitHub Actions実行時から、購読した番組が自動録音される
 
 ## テスト
