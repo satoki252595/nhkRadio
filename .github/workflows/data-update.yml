@@ -5,6 +5,11 @@ on:
     # 毎日 19:30 UTC (JST 04:30) に実行
     - cron: '30 19 * * *'
   workflow_dispatch:
+    inputs:
+      include_radiko:
+        description: 'Radiko (民放) の番組表も取得する'
+        type: boolean
+        default: true
 
 permissions:
   contents: write  # data/*.json を自動コミット
@@ -19,12 +24,26 @@ jobs:
         with:
           python-version: '3.12'
 
+      - name: Install openvpn
+        run: sudo apt-get update && sudo apt-get install -y openvpn
+
       - name: Install Python dependencies
         run: pip install httpx pyyaml
 
-      - name: Generate data files
-        # 過去7日+未来7日を取得してシリーズカバレッジを最大化
-        run: python -m nhk_recorder.data_export --days 7 --past-days 7 --output-dir ./data
+      # VPN Gate 経由でRadiko番組表も取得
+      - name: Fetch VPN Gate JP server
+        if: github.event_name == 'schedule' || inputs.include_radiko
+        run: python -m nhk_recorder.vpngate vpn.ovpn
+
+      - name: Connect to VPN Gate
+        if: github.event_name == 'schedule' || inputs.include_radiko
+        uses: kota65535/github-openvpn-connect-action@v3
+        with:
+          config_file: vpn.ovpn
+        continue-on-error: true
+
+      - name: Generate data files (NHK + Radiko)
+        run: python -m nhk_recorder.data_export --days 7 --past-days 7 --output-dir ./data --include-radiko
         env:
           NHK_API_KEY: ${{ secrets.NHK_API_KEY }}
 

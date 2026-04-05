@@ -19,6 +19,39 @@
     r3: 'NHK FM',
   };
 
+  // Radikoサービスの表示ラベル
+  const radikoStationNames: Record<string, string> = {
+    ABC: 'ABCラジオ',
+    MBS: 'MBSラジオ',
+    OBC: 'OBCラジオ大阪',
+    FMO: 'FM大阪',
+    '802': 'FM802',
+    CCL: 'FM COCOLO',
+    CRK: 'ラジオ関西',
+    KISSFMKOBE: 'Kiss FM KOBE',
+    KBS: 'KBS京都',
+    RN1: 'ラジオNIKKEI第1',
+    RN2: 'ラジオNIKKEI第2',
+    'JOAK-FM': 'NHK-FM 東京',
+    JOBK: 'NHK大阪',
+  };
+
+  function getServiceInfo(service: string) {
+    if (service.startsWith('radiko:')) {
+      const stationId = service.slice(7);
+      return {
+        label: radikoStationNames[stationId] ?? stationId,
+        bg: 'linear-gradient(135deg, #10b981, #047857)',
+      };
+    }
+    return {
+      label: serviceLabels[service] || service.toUpperCase(),
+      bg: serviceColors[service] || '#333',
+    };
+  }
+
+  let serviceInfo = $derived(getServiceInfo(series.service));
+
   function toggle() {
     subscriptions.toggle(series.series_id);
   }
@@ -26,8 +59,8 @@
 
 <div class="card" class:subscribed={isSubscribed}>
   <div class="card-top">
-    <span class="service-badge" style="background: {serviceColors[series.service] || '#333'}">
-      {serviceLabels[series.service] || series.service.toUpperCase()}
+    <span class="service-badge" style="background: {serviceInfo.bg}">
+      {serviceInfo.label}
     </span>
     <button
       class="sub-btn"

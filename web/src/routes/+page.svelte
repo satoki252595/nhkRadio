@@ -9,7 +9,7 @@
   let loading = $state(true);
   let error: string | null = $state(null);
   let query = $state('');
-  let serviceFilter = $state<'all' | 'r1' | 'r3'>('all');
+  let serviceFilter = $state<'all' | 'nhk' | 'radiko'>('all');
 
   onMount(async () => {
     try {
@@ -26,8 +26,10 @@
 
   let filtered = $derived.by(() => {
     let list = allSeries;
-    if (serviceFilter !== 'all') {
-      list = list.filter((s) => s.service === serviceFilter);
+    if (serviceFilter === 'nhk') {
+      list = list.filter((s) => s.service === 'r1' || s.service === 'r3');
+    } else if (serviceFilter === 'radiko') {
+      list = list.filter((s) => s.service.startsWith('radiko:'));
     }
     if (query.trim()) {
       const q = query.toLowerCase();
@@ -70,17 +72,17 @@
     </button>
     <button
       class="tab"
-      class:active={serviceFilter === 'r1'}
-      onclick={() => (serviceFilter = 'r1')}
+      class:active={serviceFilter === 'nhk'}
+      onclick={() => (serviceFilter = 'nhk')}
     >
-      AM
+      NHK
     </button>
     <button
       class="tab"
-      class:active={serviceFilter === 'r3'}
-      onclick={() => (serviceFilter = 'r3')}
+      class:active={serviceFilter === 'radiko'}
+      onclick={() => (serviceFilter = 'radiko')}
     >
-      FM
+      民放
     </button>
   </div>
 </div>

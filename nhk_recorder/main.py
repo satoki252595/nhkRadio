@@ -12,6 +12,7 @@ from .notion import upload_recording
 from .recorder import make_output_path, record
 from .scheduler import schedule_recordings
 from .streams import get_stream_urls
+from . import radiko as radiko_mod
 
 JST = timezone(timedelta(hours=9))
 
@@ -47,17 +48,30 @@ def _record_immediately(
     stream_urls: dict[str, str],
     config: Config,
     matched_keywords: list[str] | None = None,
+    radiko_auth=None,
 ) -> None:
-    """番組を順番に即時録音する（GitHub Actions向け、Timer不使用）。"""
+    """番組を順番に即時録音する（GitHub Actions向け、Timer不使用）。
+
+    NHKとRadiko番組を同じリストで処理可能。
+    service プレフィックス "radiko:" で判別。
+    """
     logger = logging.getLogger(__name__)
     now = datetime.now(JST)
     keywords = matched_keywords or config.keywords
 
     for program in programs:
-        stream_url = stream_urls.get(program.service)
-        if not stream_url:
-            logger.warning("ストリームURLが不明: %s", program.service)
-            continue
+        is_radiko = program.service.startswith("radiko:")
+
+        if is_radiko:
+            if not radiko_auth:
+                logger.warning("Radiko番組だが未認証: %s", program.title)
+                continue
+            station_id = program.service.split(":", 1)[1]
+        else:
+            stream_url = stream_urls.get(program.service)
+            if not stream_url:
+                logger.warning("ストリームURLが不明: %s", program.service)
+                continue
 
         # 残り録音時間を計算
         elapsed = (now - program.start_time).total_seconds()
@@ -69,7 +83,12 @@ def _record_immediately(
         output_path = make_output_path(config.output_dir, program)
 
         logger.info("録音開始: [%s] %s (%d分)", program.service, program.title, duration // 60)
-        success = record(stream_url, duration, output_path, config.ffmpeg_path)
+        if is_radiko:
+            success = radiko_mod.record_program(
+                radiko_auth, station_id, duration, output_path, config.ffmpeg_path
+            )
+        else:
+            success = record(stream_url, duration, output_path, config.ffmpeg_path)
 
         if success and config.notion_token and config.notion_database_id:
             search_text = f"{program.title} {program.subtitle} {program.content}"
@@ -95,6 +114,10 @@ def main():
     parser.add_argument(
         "--subscriptions", metavar="PATH_OR_URL",
         help="購読シリーズIDリストのJSON (ファイルパス または http(s) URL)",
+    )
+    parser.add_argument(
+        "--include-radiko", action="store_true",
+        help="Radiko (民放) も対象にする (日本IPが必要)",
     )
     args = parser.parse_args()
 
@@ -130,14 +153,32 @@ def main():
         logger.info("キーワードモード: %s", matched_keywords)
         logger.info("対象日: %s / エリア: %s / キーワード: %s", target_date, config.area, config.keywords)
 
+    # Radiko認証 (オプション)
+    radiko_auth = None
+    if args.include_radiko:
+        logger.info("Radiko認証を実行中...")
+        radiko_auth = radiko_mod.authenticate()
+        if radiko_auth:
+            logger.info("Radiko認証成功: %s (%s)", radiko_auth.area_id, radiko_auth.area_name)
+        else:
+            logger.warning("Radiko認証失敗 (日本IPでない可能性)。NHKのみ対象")
+
     # 番組表取得
     logger.info("番組表を取得中...")
     programs = fetch_programs(config, target_date)
+
+    # Radiko番組も追加
+    if radiko_auth:
+        rp = radiko_mod.fetch_programs(radiko_auth.area_id, target_date)
+        from .data_export import _radiko_to_program
+        for p in rp:
+            programs.append(_radiko_to_program(p))
+
     if not programs:
         logger.info("番組が取得できませんでした")
         return
 
-    logger.info("合計 %d 件の番組を取得", len(programs))
+    logger.info("合計 %d 件の番組を取得 (NHK + Radiko)", len(programs))
 
     # フィルタリング (シリーズ購読 + キーワードを OR で結合)
     if args.subscriptions:
@@ -194,7 +235,7 @@ def main():
     # 録音実行
     if args.within is not None:
         # GitHub Actions向け: 即時録音モード（Timer不使用）
-        _record_immediately(matched, stream_urls, config, matched_keywords)
+        _record_immediately(matched, stream_urls, config, matched_keywords, radiko_auth)
     else:
         # ローカル向け: Timer待機モード
         schedule_recordings(matched, stream_urls, config, matched_keywords=matched_keywords)

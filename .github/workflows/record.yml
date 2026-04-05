@@ -13,6 +13,10 @@ on:
         options:
           - subscriptions
           - keywords
+      include_radiko:
+        description: 'Radiko (民放) も対象にする (VPN接続を使用)'
+        type: boolean
+        default: true
 
 jobs:
   record:
@@ -26,17 +30,38 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Install ffmpeg
-        run: sudo apt-get update && sudo apt-get install -y ffmpeg
+      - name: Install ffmpeg and openvpn
+        run: sudo apt-get update && sudo apt-get install -y ffmpeg openvpn
 
       - name: Install Python dependencies
         run: pip install httpx pyyaml
+
+      # VPN Gate 経由で日本IPに切り替え (Radikoアクセス用)
+      # include_radiko が未指定 (schedule経由) の場合も デフォルトで有効化
+      - name: Fetch VPN Gate JP server
+        id: vpn_fetch
+        if: github.event_name == 'schedule' || inputs.include_radiko
+        run: python -m nhk_recorder.vpngate vpn.ovpn
+
+      - name: Connect to VPN Gate
+        if: github.event_name == 'schedule' || inputs.include_radiko
+        uses: kota65535/github-openvpn-connect-action@v3
+        with:
+          config_file: vpn.ovpn
+        continue-on-error: true  # VPN失敗してもNHKは続行可能
+
+      - name: Verify Japan IP
+        if: github.event_name == 'schedule' || inputs.include_radiko
+        run: |
+          echo "現在のIP:"
+          curl -s https://ipinfo.io/json || true
+        continue-on-error: true
 
       - name: Record (subscription mode)
         if: github.event_name == 'schedule' || inputs.mode == 'subscriptions'
         run: |
           if [ -f "data/subscriptions.json" ]; then
-            python -m nhk_recorder --subscriptions data/subscriptions.json --within 65
+            python -m nhk_recorder --subscriptions data/subscriptions.json --within 65 --include-radiko
           else
             echo "data/subscriptions.json が存在しません。購読リストを配置してください。"
           fi
@@ -47,7 +72,7 @@ jobs:
 
       - name: Record (keyword mode)
         if: inputs.mode == 'keywords'
-        run: python -m nhk_recorder --within 65
+        run: python -m nhk_recorder --within 65 --include-radiko
         env:
           NHK_API_KEY: ${{ secrets.NHK_API_KEY }}
           NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}

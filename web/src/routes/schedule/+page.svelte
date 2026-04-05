@@ -96,6 +96,20 @@
     r1: 'AM',
     r3: 'FM',
   };
+
+  const radikoStationShort: Record<string, string> = {
+    ABC: 'ABC', MBS: 'MBS', OBC: 'OBC', FMO: 'FMO', '802': '802',
+    CCL: 'CCL', CRK: 'CRK', KISSFMKOBE: 'KISS', KBS: 'KBS',
+    RN1: 'RN1', RN2: 'RN2', 'JOAK-FM': 'AK-FM', JOBK: 'BK',
+  };
+
+  function getServiceChip(service: string): { label: string; className: string } {
+    if (service.startsWith('radiko:')) {
+      const sid = service.slice(7);
+      return { label: radikoStationShort[sid] ?? sid, className: 'service-radiko' };
+    }
+    return { label: serviceLabels[service] || service, className: `service-${service}` };
+  }
 </script>
 
 <svelte:head>
@@ -156,6 +170,7 @@
   <div class="list">
     {#each filtered as p (p.id)}
       {@const isSubscribed = p.series_id && $subscriptions.has(p.series_id)}
+      {@const chip = getServiceChip(p.service)}
       <div class="item" class:subscribed={isSubscribed}>
         <div class="time">
           {#if query.trim()}
@@ -164,7 +179,7 @@
           <div class="time-start">{fmtTime(p.start_time)}</div>
           <div class="time-duration">{fmtDuration(p.duration_sec)}</div>
         </div>
-        <div class="service-chip service-{p.service}">{serviceLabels[p.service] || p.service}</div>
+        <div class="service-chip {chip.className}">{chip.label}</div>
         <div class="body">
           <div class="title">{p.title}</div>
           {#if p.content}
@@ -320,6 +335,9 @@
   }
   .service-r3 {
     background: linear-gradient(135deg, #a855f7, #6b21a8);
+  }
+  .service-radiko {
+    background: linear-gradient(135deg, #10b981, #047857);
   }
   .body {
     min-width: 0;

@@ -19,8 +19,37 @@ from pathlib import Path
 
 from .api import fetch_programs
 from .config import load_config
+from . import radiko
 
 JST = timezone(timedelta(hours=9))
+
+
+def _radiko_to_program(rp):
+    """RadikoProgram を NHK Program 互換オブジェクトに変換。
+
+    service は radiko:{station_id} 形式 (例: radiko:ABC)。
+    series_id は station_id + title のハッシュ (安定ID)。
+    """
+    import hashlib
+    from .api import Program
+
+    # 安定したシリーズID生成 (station + title)
+    series_key = f"{rp.station_id}|{rp.title}"
+    series_id = "rdk_" + hashlib.md5(series_key.encode("utf-8")).hexdigest()[:12]
+
+    return Program(
+        id=rp.id,
+        service=f"radiko:{rp.station_id}",
+        title=f"[{rp.station_name}] {rp.title}",
+        subtitle=rp.performer,
+        content=rp.content,
+        start_time=rp.start_time,
+        end_time=rp.end_time,
+        series_id=series_id,
+        series_name=rp.title,
+        episode_name="",
+        genre=[],
+    )
 
 
 def program_to_dict(p) -> dict:
@@ -90,6 +119,10 @@ def main():
         "--prune-days", type=int, default=14,
         help="何日より古い番組JSONを削除するか (デフォルト: 14)",
     )
+    parser.add_argument(
+        "--include-radiko", action="store_true",
+        help="Radiko (民放) の番組も取得する (日本IPが必要)",
+    )
     args = parser.parse_args()
 
     logging.basicConfig(
@@ -111,6 +144,16 @@ def main():
     series_index = load_series_index(series_file)
     logger.info("既存シリーズ数: %d", len(series_index))
 
+    # Radiko認証 (オプション)
+    radiko_auth = None
+    if args.include_radiko:
+        logger.info("Radiko認証を実行中...")
+        radiko_auth = radiko.authenticate()
+        if radiko_auth:
+            logger.info("Radiko認証成功: %s (%s)", radiko_auth.area_id, radiko_auth.area_name)
+        else:
+            logger.warning("Radiko認証失敗 (日本IPではない可能性)。Radiko番組はスキップ")
+
     # 対象日の計算 (過去→未来の順)
     base_date = (
         datetime.fromisoformat(args.date).replace(tzinfo=JST)
@@ -126,6 +169,14 @@ def main():
         logger.info("番組表取得: %s", target)
         programs = fetch_programs(config, target)
         total_programs += len(programs)
+
+        # Radiko番組も追加取得
+        if radiko_auth:
+            rp = radiko.fetch_programs(radiko_auth.area_id, target)
+            # RadikoProgram -> Program 互換dict変換
+            for p in rp:
+                programs.append(_radiko_to_program(p))
+            total_programs += len(rp)
 
         # 番組リストをJSON保存 (未来分のみ、過去分はシリーズ蓄積のみ)
         if i >= 0:
