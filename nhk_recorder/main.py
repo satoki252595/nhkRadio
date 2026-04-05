@@ -2,6 +2,7 @@ import argparse
 import json
 import logging
 import sys
+import threading
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
@@ -43,6 +44,56 @@ def _load_subscriptions(source: str) -> tuple[list[str], list[str]]:
     return data.get("series_ids", []), data.get("keywords", [])
 
 
+def _record_one(
+    program: Program,
+    stream_urls: dict[str, str],
+    config: Config,
+    keywords: list[str],
+    radiko_auth,
+) -> None:
+    """1番組を録音してNotionにアップロードする (ワーカースレッド用)。"""
+    logger = logging.getLogger(__name__)
+    is_radiko = program.service.startswith("radiko:")
+
+    # ストリーム情報を決定
+    if is_radiko:
+        if not radiko_auth:
+            logger.warning("Radiko番組だが未認証: %s", program.title)
+            return
+        station_id = program.service.split(":", 1)[1]
+    else:
+        stream_url = stream_urls.get(program.service)
+        if not stream_url:
+            logger.warning("ストリームURLが不明: %s", program.service)
+            return
+
+    # 残り録音時間を計算
+    now = datetime.now(JST)
+    elapsed = (now - program.start_time).total_seconds()
+    if elapsed > program.duration:
+        logger.info("既に終了済み: [%s] %s", program.service, program.title)
+        return
+
+    duration = program.duration - max(int(elapsed), 0)
+    output_path = make_output_path(config.output_dir, program)
+
+    logger.info("録音開始: [%s] %s (%d分)", program.service, program.title, duration // 60)
+    if is_radiko:
+        success = radiko_mod.record_program(
+            radiko_auth, station_id, duration, output_path, config.ffmpeg_path
+        )
+    else:
+        success = record(stream_url, duration, output_path, config.ffmpeg_path)
+
+    if success and config.notion_token and config.notion_database_id:
+        search_text = f"{program.title} {program.subtitle} {program.content}"
+        matched_kw = [kw for kw in keywords if kw in search_text]
+        try:
+            upload_recording(config, program, output_path, matched_kw)
+        except Exception as e:
+            logger.error("Notionアップロード失敗: %s - %s", program.title, e)
+
+
 def _record_immediately(
     programs: list[Program],
     stream_urls: dict[str, str],
@@ -50,56 +101,38 @@ def _record_immediately(
     matched_keywords: list[str] | None = None,
     radiko_auth=None,
 ) -> None:
-    """番組を順番に即時録音する（GitHub Actions向け、Timer不使用）。
+    """番組を並列で即時録音する (GitHub Actions向け、Timer不使用)。
+
+    同時刻に複数番組がある場合は並列録音する。録音+アップロードは
+    各スレッドが独立して行うので、1つの失敗が他に波及しない。
 
     NHKとRadiko番組を同じリストで処理可能。
     service プレフィックス "radiko:" で判別。
     """
     logger = logging.getLogger(__name__)
-    now = datetime.now(JST)
     keywords = matched_keywords or config.keywords
 
+    if not programs:
+        return
+
+    logger.info("並列録音: %d番組", len(programs))
+
+    threads: list[threading.Thread] = []
     for program in programs:
-        is_radiko = program.service.startswith("radiko:")
+        t = threading.Thread(
+            target=_record_one,
+            args=(program, stream_urls, config, keywords, radiko_auth),
+            name=f"rec-{program.service}-{program.id[:8]}",
+            daemon=True,
+        )
+        t.start()
+        threads.append(t)
 
-        if is_radiko:
-            if not radiko_auth:
-                logger.warning("Radiko番組だが未認証: %s", program.title)
-                continue
-            station_id = program.service.split(":", 1)[1]
-        else:
-            stream_url = stream_urls.get(program.service)
-            if not stream_url:
-                logger.warning("ストリームURLが不明: %s", program.service)
-                continue
+    # 全スレッド完了を待つ
+    for t in threads:
+        t.join()
 
-        # 残り録音時間を計算
-        elapsed = (now - program.start_time).total_seconds()
-        if elapsed > program.duration:
-            logger.info("既に終了済み: [%s] %s", program.service, program.title)
-            continue
-
-        duration = program.duration - max(int(elapsed), 0)
-        output_path = make_output_path(config.output_dir, program)
-
-        logger.info("録音開始: [%s] %s (%d分)", program.service, program.title, duration // 60)
-        if is_radiko:
-            success = radiko_mod.record_program(
-                radiko_auth, station_id, duration, output_path, config.ffmpeg_path
-            )
-        else:
-            success = record(stream_url, duration, output_path, config.ffmpeg_path)
-
-        if success and config.notion_token and config.notion_database_id:
-            search_text = f"{program.title} {program.subtitle} {program.content}"
-            matched_kw = [kw for kw in keywords if kw in search_text]
-            try:
-                upload_recording(config, program, output_path, matched_kw)
-            except Exception as e:
-                logger.error("Notionアップロード失敗: %s - %s", program.title, e)
-
-        # 時刻を更新（次の番組の判定用）
-        now = datetime.now(JST)
+    logger.info("全録音完了")
 
 
 def main():

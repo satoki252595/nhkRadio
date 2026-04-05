@@ -11,8 +11,10 @@ logger = logging.getLogger(__name__)
 def make_output_path(output_dir: Path, program: Program) -> Path:
     """録音ファイルのパスを生成する。"""
     safe_title = re.sub(r'[\\/*?:"<>|\s]+', "_", program.title)[:50].rstrip("_")
+    # service に "radiko:ABC" のような : が含まれうるのでサニタイズ
+    safe_service = re.sub(r'[\\/*?:"<>|\s]+', "-", program.service)
     ts = program.start_time.strftime("%Y%m%d_%H%M")
-    return output_dir / f"{ts}_{program.service}_{safe_title}.m4a"
+    return output_dir / f"{ts}_{safe_service}_{safe_title}.m4a"
 
 
 def record(stream_url: str, duration: int, output_path: Path, ffmpeg_path: str = "ffmpeg") -> bool:
