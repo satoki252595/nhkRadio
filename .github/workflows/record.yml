@@ -69,7 +69,7 @@ jobs:
         if: github.event_name == 'schedule' || inputs.mode == 'subscriptions'
         run: |
           if [ -f "data/subscriptions.json" ]; then
-            python -m nhk_recorder --subscriptions data/subscriptions.json --within 65 --include-radiko \
+            python -m nhk_recorder --subscriptions data/subscriptions.json --within 480 --include-radiko \
               --expected-area "${{ matrix.expected_area }}" \
               ${{ matrix.skip_nhk && '--skip-nhk' || '' }}
           else

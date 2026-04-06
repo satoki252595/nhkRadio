@@ -32,9 +32,18 @@ class VpnGateServer:
     ovpn_config_b64: str
 
     def write_ovpn(self, path: Path) -> None:
-        """OpenVPN設定ファイルを書き出す。"""
+        """OpenVPN設定ファイルを書き出す。
+
+        OpenVPN 2.6+ は AES-128-CBC をデフォルトの data-ciphers に含めないが、
+        VPN Gate サーバーの多くがこの cipher を使うため、明示的に追加する。
+        """
         path.parent.mkdir(parents=True, exist_ok=True)
         config = base64.b64decode(self.ovpn_config_b64).decode("utf-8", errors="replace")
+
+        # OpenVPN 2.6+ 互換: VPN Gate が使う AES-128-CBC を data-ciphers に追加
+        if "data-ciphers" not in config:
+            config += "\ndata-ciphers AES-256-GCM:AES-128-GCM:CHACHA20-POLY1305:AES-128-CBC\n"
+
         with open(path, "w", encoding="utf-8") as f:
             f.write(config)
 
