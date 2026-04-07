@@ -78,11 +78,45 @@
     allSeries.filter((s) => $subscriptions.has(s.series_id)),
   );
 
+  /** NHK同時配信局 (NHK本家がある場合に除外対象) */
+  const NHK_SIMULCAST = new Set(['JOBK', 'JOAK', 'JOBK-FM', 'JOAK-FM']);
+
+  /** サービスの優先度 (大きいほど優先) */
+  function servicePriority(service: string): number {
+    if (service === 'r1' || service === 'r3') return 100;
+    if (service.startsWith('radiko:')) {
+      const station = service.split(':')[1];
+      return NHK_SIMULCAST.has(station) ? 10 : 50;
+    }
+    return 0;
+  }
+
+  /** タイトルを正規化 (先頭の[局名]除去、空白統一) */
+  function normalizeTitle(title: string): string {
+    return title.replace(/^\[[^\]]+\]\s*/, '').replace(/[\s\u3000]+/g, ' ').trim();
+  }
+
+  /** 同時刻・同タイトルの番組を重複排除 (優先度の高い方を残す) */
+  function dedupePrograms(programs: Program[]): Program[] {
+    const byKey = new Map<string, Program>();
+    for (const p of programs) {
+      const norm = normalizeTitle(p.title);
+      // NHK: (start_time, title) で統合、Radiko: (start_time, title, station) で分離
+      const station = p.service.startsWith('radiko:') ? p.service.split(':')[1] : '';
+      const key = `${p.start_time}|${norm}|${station}`;
+      const existing = byKey.get(key);
+      if (!existing || servicePriority(p.service) > servicePriority(existing.service)) {
+        byKey.set(key, p);
+      }
+    }
+    return [...byKey.values()];
+  }
+
   // 購読中シリーズ+キーワードに一致する今後の番組 (録音予定)
   let upcomingRecordings = $derived.by(() => {
     const subIds = $subscriptions;
     const kws = $keywords;
-    return upcomingPrograms
+    const filtered = upcomingPrograms
       .filter((p) => {
         if (p.series_id && subIds.has(p.series_id)) return true;
         if (kws.length > 0) {
@@ -90,7 +124,8 @@
           return kws.some((kw) => text.includes(kw.toLowerCase()));
         }
         return false;
-      })
+      });
+    return dedupePrograms(filtered)
       .sort((a, b) => a.start_time.localeCompare(b.start_time));
   });
 
