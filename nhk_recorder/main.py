@@ -258,25 +258,36 @@ def main():
         logger.info("マッチする番組がありません")
         return
 
-    # --skip-nhk: NHK(r1/r3)番組を除外 (Radiko専用ジョブ向け)
+    # --skip-nhk: NHK番組を除外 (Radiko専用ジョブ向け)
+    # r1/r3 (NHK本家) に加え、radiko上のNHK同時配信局 (JOAK/JOBK等) も除外。
+    # 関西ジョブがNHK本家で録音するため、関東ジョブではNHK系を全てスキップ。
     if args.skip_nhk:
+        from .data_export import NHK_SIMULCAST_STATIONS
         before = len(matched)
-        matched = [p for p in matched if not p.service.startswith(("r1", "r3"))]
-        logger.info("--skip-nhk: NHK番組を%d件スキップ", before - len(matched))
+        def _is_nhk(p: Program) -> bool:
+            if p.service.startswith(("r1", "r3")):
+                return True
+            if p.service.startswith("radiko:"):
+                station = p.service.split(":", 1)[1]
+                return station in NHK_SIMULCAST_STATIONS
+            return False
+        matched = [p for p in matched if not _is_nhk(p)]
+        logger.info("--skip-nhk: NHK番組を%d件スキップ (同時配信含む)", before - len(matched))
 
-    # --within: 指定分以内に開始する番組のみに絞り込み
-    # start_time ベースでフィルタし、前のcron実行で録音済みの番組を除外する
-    # (end_time > now だと放送中の番組が次のcronでも再マッチしてしまう)
+    # --within: 現在の正時(HH:00)を基準に、1時間幅の番組を対象にする。
+    # 正時ベースのウィンドウにより、隣接するcron実行間の重複を完全排除。
+    # 例: 9:03実行 → [9:00, 10:00) の番組のみ対象
     if args.within is not None:
         now = datetime.now(JST)
-        window_start = now - timedelta(minutes=5)   # 起動遅延を考慮した猶予
-        window_end = now + timedelta(minutes=args.within)
+        hour_floor = now.replace(minute=0, second=0, microsecond=0)
+        window_end = hour_floor + timedelta(hours=1)
         matched = [
             p for p in matched
-            if window_start <= p.start_time <= window_end
+            if hour_floor <= p.start_time < window_end
         ]
         if not matched:
-            logger.info("直近%d分以内に対象番組なし", args.within)
+            logger.info("当該時間帯 (%s-%s) に対象番組なし",
+                        hour_floor.strftime("%H:%M"), window_end.strftime("%H:%M"))
             return
 
     # 重複排除: 同時刻・同タイトルの番組を統合 (NHK本家 vs radiko同時配信等)
