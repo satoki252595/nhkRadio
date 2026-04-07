@@ -3,6 +3,7 @@ import json
 import logging
 import sys
 import threading
+import time
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
@@ -66,6 +67,13 @@ def _record_one(
         if not stream_url:
             logger.warning("ストリームURLが不明: %s", program.service)
             return
+
+    # 番組開始まで待機 (まだ始まっていない場合)
+    now = datetime.now(JST)
+    wait_sec = (program.start_time - now).total_seconds()
+    if wait_sec > 0:
+        logger.info("番組開始まで%d秒待機: [%s] %s", int(wait_sec), program.service, program.title)
+        time.sleep(wait_sec)
 
     # 残り録音時間を計算
     now = datetime.now(JST)
@@ -267,6 +275,13 @@ def main():
         if not matched:
             logger.info("直近%d分以内に対象番組なし", args.within)
             return
+
+    # 重複排除: 同時刻・同タイトルの番組を統合 (NHK本家 vs radiko同時配信等)
+    from .data_export import dedupe_programs
+    before_dedupe = len(matched)
+    matched = dedupe_programs(matched)
+    if before_dedupe != len(matched):
+        logger.info("録音対象の重複排除: %d件 → %d件", before_dedupe, len(matched))
 
     # マッチ結果表示
     logger.info("--- マッチした番組 (%d件) ---", len(matched))
