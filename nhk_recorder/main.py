@@ -265,12 +265,15 @@ def main():
         logger.info("--skip-nhk: NHK番組を%d件スキップ", before - len(matched))
 
     # --within: 指定分以内に開始する番組のみに絞り込み
+    # start_time ベースでフィルタし、前のcron実行で録音済みの番組を除外する
+    # (end_time > now だと放送中の番組が次のcronでも再マッチしてしまう)
     if args.within is not None:
         now = datetime.now(JST)
+        window_start = now - timedelta(minutes=5)   # 起動遅延を考慮した猶予
         window_end = now + timedelta(minutes=args.within)
         matched = [
             p for p in matched
-            if p.start_time <= window_end and p.end_time > now
+            if window_start <= p.start_time <= window_end
         ]
         if not matched:
             logger.info("直近%d分以内に対象番組なし", args.within)
