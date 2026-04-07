@@ -204,6 +204,66 @@ def create_recording_page(
     return page_id
 
 
+def _normalize_title(title: str) -> str:
+    """番組タイトルを正規化 (局名プレフィックスや全角空白の違いを吸収)。"""
+    import re
+    t = re.sub(r"^\[[^\]]+\]\s*", "", title)
+    t = re.sub(r"[\s　]+", " ", t).strip()
+    return t
+
+
+def _check_duplicate(
+    token: str,
+    database_id: str,
+    program: Program,
+) -> bool:
+    """Notion DBに同一番組が既に登録済みかチェックする。
+
+    (放送日, 時間帯) でフィルタし、タイトルを正規化して比較する。
+    NHK本家 (R3) と Radiko同時配信 (JOAK-FM) の重複も検出する。
+    """
+    date_str = program.start_time.strftime("%Y-%m-%d")
+    start_str = program.start_time.strftime("%H:%M")
+    end_str = program.end_time.strftime("%H:%M")
+    time_slot = f"{start_str}-{end_str}"
+
+    try:
+        resp = httpx.post(
+            f"{NOTION_API_BASE}/databases/{database_id}/query",
+            headers=_json_headers(token),
+            json={
+                "filter": {
+                    "and": [
+                        {"property": "放送日", "date": {"equals": date_str}},
+                        {"property": "時間帯", "rich_text": {"equals": time_slot}},
+                    ]
+                },
+                "page_size": 10,
+            },
+            timeout=30,
+        )
+        if resp.status_code != 200:
+            logger.warning("Notion重複チェック失敗 (HTTP %d)、アップロード続行", resp.status_code)
+            return False
+
+        results = resp.json().get("results", [])
+        if not results:
+            return False
+
+        norm_new = _normalize_title(program.title)
+        for page in results:
+            props = page.get("properties", {})
+            title_arr = props.get("番組名", {}).get("title", [])
+            existing_title = title_arr[0]["plain_text"] if title_arr else ""
+            if _normalize_title(existing_title) == norm_new:
+                return True
+
+        return False
+    except httpx.RequestError as e:
+        logger.warning("Notion重複チェックエラー: %s、アップロード続行", e)
+        return False
+
+
 def upload_recording(
     config: Config,
     program: Program,
@@ -218,6 +278,11 @@ def upload_recording(
     if not file_path.exists():
         logger.error("録音ファイルが見つかりません: %s", file_path)
         return False
+
+    # 重複チェック (同一番組が既にアップロード済みならスキップ)
+    if _check_duplicate(config.notion_token, config.notion_database_id, program):
+        logger.info("重複スキップ: %s (Notionに登録済み)", program.title)
+        return True
 
     file_size_mb = file_path.stat().st_size / (1024 * 1024)
     logger.info("Notionアップロード開始: %s (%.1fMB)", file_path.name, file_size_mb)

@@ -239,6 +239,13 @@ def main():
 
     logger.info("合計 %d 件の番組を取得 (NHK + Radiko)", len(programs))
 
+    # NHK/Radiko サイマル重複排除 (NHK本家を優先)
+    from .data_export import dedupe_programs
+    before_dedup = len(programs)
+    programs = dedupe_programs(programs)
+    if len(programs) < before_dedup:
+        logger.info("サイマル重複排除: %d → %d 件", before_dedup, len(programs))
+
     # フィルタリング (シリーズ購読 + キーワードを OR で結合)
     if args.subscriptions:
         by_series = filter_by_series(programs, series_ids) if series_ids else []

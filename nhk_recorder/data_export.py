@@ -105,17 +105,18 @@ def dedupe_programs(programs: list) -> list:
         重複排除後のリスト
     """
     # キー設計:
-    # - NHK: (start_time, title) のみ → 両エリアで重複すれば統合
-    # - Radiko: (start_time, title, area) → 異なるエリアは別物として保持
+    # - NHK本家 + NHKサイマル局: (start_time, title, "") → NHK本家を残す
+    # - 民放Radiko: (start_time, title, station) → 局が異なれば別番組
     by_key: dict = {}
     for p in programs:
         norm = _normalize_title(p.title)
-        is_radiko = p.service.startswith("radiko:")
-        if is_radiko:
-            # 局IDが異なれば別番組 (同じ系列でも局で別アカウント)
-            # → station_id を含めて一意化
+        if p.service.startswith("radiko:"):
             station = p.service.split(":", 1)[1] if ":" in p.service else ""
-            key = (p.start_time.isoformat(), norm, station)
+            if station in NHK_SIMULCAST_STATIONS:
+                # NHKサイマル局はNHK本家と統合 (空キーで一致させる)
+                key = (p.start_time.isoformat(), norm, "")
+            else:
+                key = (p.start_time.isoformat(), norm, station)
         else:
             key = (p.start_time.isoformat(), norm, "")
 
