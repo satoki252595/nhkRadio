@@ -297,20 +297,32 @@ def main():
         matched = [p for p in matched if not _is_nhk(p)]
         logger.info("--skip-nhk: NHK番組を%d件スキップ (同時配信含む)", before - len(matched))
 
-    # --within: 現在の正時(HH:00)を基準に、1時間幅の番組を対象にする。
-    # 正時ベースのウィンドウにより、隣接するcron実行間の重複を完全排除。
-    # 例: 9:03実行 → [9:00, 10:00) の番組のみ対象
+    # --within: cronを1時間前に発火させ、次のHH:00境界の1時間幅を対象にする。
+    # GitHub Actions cronは13-32分遅延するため、1時間前発火 + 待機方式で
+    # 番組頭から確実に録音できるようにする。
+    # 例: 23:13 UTC (cron 23:00 + lag) → 次のHH:00 = 0:00 UTC = JST 9:00
+    #     → JST [9:00, 10:00) の番組を対象に、ジョブ内で待機して録音
+    # 異常遅延 (60分超) を考慮: 直近5分以内に始まった現在時間帯はそのまま使う。
     if args.within is not None:
         now = datetime.now(JST)
-        hour_floor = now.replace(minute=0, second=0, microsecond=0)
-        window_end = hour_floor + timedelta(hours=1)
+        if now.minute < 5:
+            # 既に目標時間帯に少し入っている場合 (cron超遅延) はその時間帯を採用
+            target_hour = now.replace(minute=0, second=0, microsecond=0)
+        else:
+            # 通常: 次のHH:00境界
+            target_hour = (now + timedelta(hours=1)).replace(minute=0, second=0, microsecond=0)
+        window_end = target_hour + timedelta(hours=1)
         matched = [
             p for p in matched
-            if hour_floor <= p.start_time < window_end
+            if target_hour <= p.start_time < window_end
         ]
+        wait_min = max(0, int((target_hour - now).total_seconds() / 60))
+        logger.info(
+            "対象時間帯: [%s, %s) (起動から約%d分待機)",
+            target_hour.strftime("%H:%M"), window_end.strftime("%H:%M"), wait_min,
+        )
         if not matched:
-            logger.info("当該時間帯 (%s-%s) に対象番組なし",
-                        hour_floor.strftime("%H:%M"), window_end.strftime("%H:%M"))
+            logger.info("当該時間帯に対象番組なし")
             return
 
     # 重複排除: 同時刻・同タイトルの番組を統合 (NHK本家 vs radiko同時配信等)

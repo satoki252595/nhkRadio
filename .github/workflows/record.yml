@@ -2,8 +2,12 @@ name: NHK Radio Recorder
 
 on:
   schedule:
-    # 毎時0分に実行 (UTC 0-14 = JST 9-23時)
-    - cron: '0 0-14 * * *'
+    # GitHub Actions の cron は 13-32 分の遅延が常態化しているため、
+    # ターゲット時間の **1時間前** に発火させる。スクリプト側で
+    # 「次のHH:00境界の1時間幅」を録音対象とし、ジョブ内で待機する。
+    # 例: cron 23:00 UTC 発火 → 23:13-32 UTC 起動 → JST 9:00-10:00 の番組を録音
+    # UTC 23,0-13 = JST 8,9-22 → JST 9-23 時の番組をカバー
+    - cron: '0 23,0-13 * * *'
   workflow_dispatch:  # 手動実行
     inputs:
       mode:
@@ -21,7 +25,7 @@ on:
 jobs:
   record:
     runs-on: ubuntu-latest
-    timeout-minutes: 120  # 最大2時間（60分番組+アップロード余裕）
+    timeout-minutes: 180  # cron発火→ターゲット時間まで最大35分待機 + 60分番組 + アップロード余裕
     strategy:
       fail-fast: false
       # エリアごとに並列ジョブ: 関東(JP13)→TBS等、関西(JP27)→MBS等
