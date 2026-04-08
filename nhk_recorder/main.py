@@ -18,6 +18,12 @@ from . import radiko as radiko_mod
 
 JST = timezone(timedelta(hours=9))
 
+# 録音マージン: 番組の前後を含めて録音する
+# - PRE_ROLL: ffmpegのHLS接続オーバーヘッドと冒頭の取りこぼし対策
+# - POST_ROLL: 番組のオーバーラン対策 (定刻より少し延びる場合がある)
+PRE_ROLL_SEC = 10
+POST_ROLL_SEC = 20
+
 
 def _load_subscriptions(source: str) -> tuple[list[str], list[str]]:
     """購読シリーズIDリストとキーワードをJSONから読み込む。
@@ -68,21 +74,31 @@ def _record_one(
             logger.warning("ストリームURLが不明: %s", program.service)
             return
 
-    # 番組開始まで待機 (まだ始まっていない場合)
-    now = datetime.now(JST)
-    wait_sec = (program.start_time - now).total_seconds()
-    if wait_sec > 0:
-        logger.info("番組開始まで%d秒待機: [%s] %s", int(wait_sec), program.service, program.title)
-        time.sleep(wait_sec)
+    # 録音ウィンドウ: [start - PRE_ROLL, end + POST_ROLL]
+    # ffmpegのHLS接続には数秒かかるため、番組開始の少し前から録音を開始する。
+    target_start = program.start_time - timedelta(seconds=PRE_ROLL_SEC)
+    target_end = program.end_time + timedelta(seconds=POST_ROLL_SEC)
 
-    # 残り録音時間を計算
     now = datetime.now(JST)
-    elapsed = (now - program.start_time).total_seconds()
-    if elapsed > program.duration:
+    if now >= target_end:
         logger.info("既に終了済み: [%s] %s", program.service, program.title)
         return
 
-    duration = program.duration - max(int(elapsed), 0)
+    # ターゲット開始時刻まで待機 (既に過ぎていれば即時開始)
+    wait_sec = (target_start - now).total_seconds()
+    if wait_sec > 0:
+        logger.info(
+            "録音開始まで%d秒待機 (pre-roll %ds込み): [%s] %s",
+            int(wait_sec), PRE_ROLL_SEC, program.service, program.title,
+        )
+        time.sleep(wait_sec)
+
+    # 録音時間 = 現時点から target_end までの残り時間
+    now = datetime.now(JST)
+    duration = int((target_end - now).total_seconds())
+    if duration <= 0:
+        logger.info("録音時間が0以下: [%s] %s", program.service, program.title)
+        return
     output_path = make_output_path(config.output_dir, program)
 
     logger.info("録音開始: [%s] %s (%d分)", program.service, program.title, duration // 60)
