@@ -52,8 +52,14 @@
   });
 
   function fmtTime(iso: string): string {
+    // JST固定で表示 (ブラウザのローカルタイムゾーンに依存しない)
     const d = new Date(iso);
-    return d.toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' });
+    return d.toLocaleTimeString('ja-JP', {
+      timeZone: 'Asia/Tokyo',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
+    });
   }
 
   function fmtDuration(sec: number): string {

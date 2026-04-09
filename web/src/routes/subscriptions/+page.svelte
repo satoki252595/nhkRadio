@@ -130,9 +130,26 @@
   });
 
   function fmtDateTime(iso: string): string {
+    // JST固定で表示 (ブラウザのローカルタイムゾーンに依存しない)
+    // ISO文字列は +09:00 オフセット付きなので、Asia/Tokyo に変換して各フィールドを取得
     const d = new Date(iso);
-    const wd = ['日', '月', '火', '水', '木', '金', '土'][d.getDay()];
-    return `${d.getMonth() + 1}/${d.getDate()}(${wd}) ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+    const parts = new Intl.DateTimeFormat('ja-JP', {
+      timeZone: 'Asia/Tokyo',
+      year: 'numeric',
+      month: 'numeric',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      weekday: 'short',
+      hour12: false,
+    }).formatToParts(d);
+    const get = (type: string) => parts.find((p) => p.type === type)?.value ?? '';
+    const month = get('month');
+    const day = get('day');
+    const wd = get('weekday');
+    const hour = get('hour').padStart(2, '0');
+    const minute = get('minute').padStart(2, '0');
+    return `${month}/${day}(${wd}) ${hour}:${minute}`;
   }
 
   function fmtDuration(sec: number): string {
