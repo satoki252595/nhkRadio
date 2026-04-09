@@ -7,6 +7,7 @@
   import { githubSyncConfig } from '$lib/sync/config';
   import { createGitHubSyncAdapter, type GitHubSyncConfig } from '$lib/sync/github';
   import { diagnose, type DiagnosticResult } from '$lib/sync/diagnose';
+  import { fmtJstDateTime } from '$lib/time';
 
   let allSeries: Series[] = $state([]);
   let upcomingPrograms: Program[] = $state([]);
@@ -129,28 +130,7 @@
       .sort((a, b) => a.start_time.localeCompare(b.start_time));
   });
 
-  function fmtDateTime(iso: string): string {
-    // JST固定で表示 (ブラウザのローカルタイムゾーンに依存しない)
-    // ISO文字列は +09:00 オフセット付きなので、Asia/Tokyo に変換して各フィールドを取得
-    const d = new Date(iso);
-    const parts = new Intl.DateTimeFormat('ja-JP', {
-      timeZone: 'Asia/Tokyo',
-      year: 'numeric',
-      month: 'numeric',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-      weekday: 'short',
-      hour12: false,
-    }).formatToParts(d);
-    const get = (type: string) => parts.find((p) => p.type === type)?.value ?? '';
-    const month = get('month');
-    const day = get('day');
-    const wd = get('weekday');
-    const hour = get('hour').padStart(2, '0');
-    const minute = get('minute').padStart(2, '0');
-    return `${month}/${day}(${wd}) ${hour}:${minute}`;
-  }
+  const fmtDateTime = fmtJstDateTime;
 
   function fmtDuration(sec: number): string {
     return `${Math.floor(sec / 60)}分`;

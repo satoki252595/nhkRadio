@@ -10,6 +10,8 @@ from .recorder import make_output_path, record
 logger = logging.getLogger(__name__)
 
 JST = timezone(timedelta(hours=9))
+PRE_ROLL_SEC = 10
+POST_ROLL_SEC = 20
 
 
 def schedule_recordings(
@@ -37,30 +39,37 @@ def schedule_recordings(
             logger.warning("ストリームURLが不明: %s", program.service)
             continue
 
-        seconds_until = (program.start_time - now).total_seconds()
+        # PRE_ROLL/POST_ROLL を含めた録音ウィンドウ
+        target_start = program.start_time - timedelta(seconds=PRE_ROLL_SEC)
+        target_end = program.end_time + timedelta(seconds=POST_ROLL_SEC)
+        seconds_until = (target_start - now).total_seconds()
 
-        if seconds_until < -program.duration:
+        if now >= target_end:
             logger.info("既に終了済み: [%s] %s", program.service, program.title)
             continue
 
         output_path = make_output_path(config.output_dir, program)
 
         # 録音の実行関数
-        def do_record(url=stream_url, dur=program.duration, path=output_path, title=program.title, prog=program):
-            logger.info("録音実行: %s", title)
+        def do_record(url=stream_url, t_end=target_end, path=output_path, title=program.title, prog=program):
+            dur = int((t_end - datetime.now(JST)).total_seconds())
+            if dur <= 0:
+                on_complete()
+                return
+            logger.info("録音実行: %s (%d秒)", title, dur)
             success = record(url, dur, path, config.ffmpeg_path)
             if success:
                 _upload_to_notion(config, prog, path, matched_keywords or [])
             on_complete()
 
-        if seconds_until <= 30:
+        if seconds_until <= 0:
             # 既に開始している/まもなく開始 → 即録音
-            remaining_duration = program.duration + int(min(seconds_until, 0))
+            remaining_duration = int((target_end - now).total_seconds())
             if remaining_duration <= 0:
                 continue
 
             def do_record_now(url=stream_url, dur=remaining_duration, path=output_path, title=program.title, prog=program):
-                logger.info("録音実行(即時): %s", title)
+                logger.info("録音実行(即時): %s (%d秒)", title, dur)
                 success = record(url, dur, path, config.ffmpeg_path)
                 if success:
                     _upload_to_notion(config, prog, path, matched_keywords or [])
@@ -83,9 +92,9 @@ def schedule_recordings(
 
             start_str = program.start_time.strftime("%H:%M")
             logger.info(
-                "録音予約: [%s] %s %s開始 (あと%.0f分, %d秒間)",
+                "録音予約: [%s] %s %s開始 (あと%.0f分, pre-roll %ds込み)",
                 program.service, program.title, start_str,
-                seconds_until / 60, program.duration,
+                seconds_until / 60, PRE_ROLL_SEC,
             )
 
     if remaining["count"] == 0:

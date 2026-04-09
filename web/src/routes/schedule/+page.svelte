@@ -3,6 +3,7 @@
   import { base } from '$app/paths';
   import type { ProgramsData, Program } from '$lib/types';
   import { subscriptions } from '$lib/stores/subscriptions';
+  import { fmtJstTime, fmtJstDateOnly } from '$lib/time';
 
   let allPrograms: Program[] = $state([]);
   let dates: string[] = $state([]);
@@ -51,26 +52,12 @@
     }
   });
 
-  function fmtTime(iso: string): string {
-    // JST固定で表示 (ブラウザのローカルタイムゾーンに依存しない)
-    const d = new Date(iso);
-    return d.toLocaleTimeString('ja-JP', {
-      timeZone: 'Asia/Tokyo',
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: false,
-    });
-  }
+  const fmtTime = fmtJstTime;
+  const fmtDateShort = fmtJstDateOnly;
 
   function fmtDuration(sec: number): string {
     const min = Math.floor(sec / 60);
     return `${min}分`;
-  }
-
-  function fmtDateShort(dateStr: string): string {
-    const d = new Date(dateStr + 'T00:00:00+09:00');
-    const wd = ['日', '月', '火', '水', '木', '金', '土'][d.getDay()];
-    return `${d.getMonth() + 1}/${d.getDate()}(${wd})`;
   }
 
   let filtered = $derived.by(() => {
