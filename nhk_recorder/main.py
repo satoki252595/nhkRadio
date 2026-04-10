@@ -271,12 +271,13 @@ def main():
     window_end: datetime | None = None
     if args.within is not None:
         now = datetime.now(JST)
-        if now.minute < 5:
-            # cron 超遅延で既に目標時間帯に入っている場合はその時間帯を採用
-            target_hour = now.replace(minute=0, second=0, microsecond=0)
-        else:
-            # 通常: 次のHH:00境界
-            target_hour = (now + timedelta(hours=1)).replace(minute=0, second=0, microsecond=0)
+        # cron `0 * * * *` は毎時 HH:00 発火を意図しているが、GitHub Actions では
+        # 13-46 分の遅延が常態化している。各 cron 起動は「次の HH:00 から始まる
+        # 1 時間幅」を録音対象として担当する設計。
+        # 例: cron HH:00 → 起動 HH:13-46 → 待機 → target HH+1:00 - HH+2:00 を録音。
+        # 起動が HH:55 以降ならどちらの target を選ぶかが曖昧になり次の run と重複
+        # するが、Notion 側の重複チェックに任せる。
+        target_hour = (now + timedelta(hours=1)).replace(minute=0, second=0, microsecond=0)
         window_end = target_hour + timedelta(hours=1)
         # target_hour に基づいて broadcast day を計算 (深夜0-5時を正しく扱う)
         if not args.date:
