@@ -274,34 +274,49 @@ def main():
     window_end: datetime | None = None
     if args.within is not None:
         now = datetime.now(JST)
-        # cron `*/30 * * * *` は 30 分毎に発火を試みる (GitHub Actions の発火漏れ
-        # 救済のため冗長化)。各 cron 起動は「次に来る HH:00 から始まる 1 時間幅」
-        # を録音対象とする。
+        # cron `*/30 * * * *` は 30 分毎に発火を試みるが、GitHub Actions の発火漏れ
+        # により 1-2 時間連続で起動しないことがある。録音漏れを最小化するため、
+        # window を **2 時間幅** に広げて隣接 cron を意図的に重複させる。
+        #
+        # 設計:
+        #   target_hour = (now + 1h).floor_to_hour  # 直近の未来HH:00
+        #   window = [target_hour, target_hour + 2h)  # 2時間幅
         #
         # 例:
-        #   HH:00 cron → 起動 HH:13-46 → target = HH+1:00
-        #   HH:30 cron → 起動 HH:43-HH+1:16 → target = HH+1:00 (or HH+2:00 if lag > 30min)
+        #   HH:00 cron 起動 HH:13 → target=HH+1:00, window=[HH+1:00, HH+3:00)
+        #   HH:30 cron 起動 HH:43 → target=HH+1:00, window=[HH+1:00, HH+3:00)  # 同じ
+        #   HH+1:00 cron 起動 HH+1:13 → target=HH+2:00, window=[HH+2:00, HH+4:00)
         #
-        # 本質は「録音対象時間の 15-60 分前に発火し、target_hour まで待機」。
-        # 過去の HH:00 や現在進行中の時間帯には対応せず、常に未来の HH:00 を狙う。
+        # この設計では HH+2:00-HH+3:00 帯の番組は HH:00 cron / HH:30 cron /
+        # HH+1:00 cron / HH+1:30 cron の 4 回試行される。Notion 重複チェックで
+        # 二重登録は防がれる。発火漏れが 4 回連続しない限り録音される。
         target_hour = (now + timedelta(hours=1)).replace(minute=0, second=0, microsecond=0)
-        window_end = target_hour + timedelta(hours=1)
-        # target_hour に基づいて broadcast day を計算 (深夜0-5時を正しく扱う)
+        window_end = target_hour + timedelta(hours=2)
+        # target_hour と window_end が異なる broadcast day をまたぐ場合は両方取得する
+        # (例: target=JST 03:00 → broadcast 4/(N-1), window_end=JST 05:00 → broadcast 4/N)
         if not args.date:
             target_date = _broadcast_date(target_hour)
 
-    logger.info("対象日 (broadcast day): %s", target_date)
+    # 取得すべき broadcast day のリスト (window が日跨ぎする場合は複数)
+    target_dates: list[str] = [target_date]
+    if window_end is not None:
+        # window 内の broadcast day を全部追加
+        bd_end = _broadcast_date(window_end - timedelta(seconds=1))
+        if bd_end != target_date:
+            target_dates.append(bd_end)
+    logger.info("対象 broadcast day: %s", target_dates)
 
-    # 番組表取得
+    # 番組表取得 (複数日対応)
     logger.info("番組表を取得中...")
-    programs = fetch_programs(config, target_date)
-
-    # Radiko番組も追加
-    if radiko_auth:
-        rp = radiko_mod.fetch_programs(radiko_auth.area_id, target_date)
-        from .data_export import _radiko_to_program
-        for p in rp:
-            programs.append(_radiko_to_program(p))
+    programs = []
+    for d in target_dates:
+        programs.extend(fetch_programs(config, d))
+        # Radiko番組も追加
+        if radiko_auth:
+            rp = radiko_mod.fetch_programs(radiko_auth.area_id, d)
+            from .data_export import _radiko_to_program
+            for p in rp:
+                programs.append(_radiko_to_program(p))
 
     if not programs:
         logger.info("番組が取得できませんでした")
