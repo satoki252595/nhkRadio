@@ -245,21 +245,24 @@ def main():
         logger.info("対象日: %s / エリア: %s / キーワード: %s", target_date, config.area, config.keywords)
 
     # Radiko認証 (オプション)
+    # --expected-area は参考情報としてログに残すだけで、ミスマッチでも続行する。
+    # VPN Gate の出口 IP はクライアント IP と異なるため、意図した関東/関西に
+    # 接続できる保証がない。ミスマッチでも実際のエリアで取れる番組は録音する方が
+    # 空振りジョブを減らせる。cron 30分毎の冗長性により、購読番組は統計的に
+    # いずれかの run で取得される。
     radiko_auth = None
     if args.include_radiko:
         logger.info("Radiko認証を実行中...")
         radiko_auth = radiko_mod.authenticate()
         if radiko_auth:
             logger.info("Radiko認証成功: %s (%s)", radiko_auth.area_id, radiko_auth.area_name)
-            # エリアミスマッチ検知
             if args.expected_area:
                 allowed = {a.strip() for a in args.expected_area.split(",") if a.strip()}
                 if not any(radiko_auth.area_id.startswith(a) for a in allowed):
-                    logger.error(
-                        "VPNエリアミスマッチ: 期待=%s / 実際=%s → Radikoをスキップ",
+                    logger.warning(
+                        "VPNエリア参考情報: 期待=%s / 実際=%s (期待外だが実エリアで続行)",
                         args.expected_area, radiko_auth.area_id,
                     )
-                    radiko_auth = None
         else:
             logger.warning("Radiko認証失敗 (日本IPでない可能性)。NHKのみ対象")
 
@@ -271,12 +274,16 @@ def main():
     window_end: datetime | None = None
     if args.within is not None:
         now = datetime.now(JST)
-        # cron `0 * * * *` は毎時 HH:00 発火を意図しているが、GitHub Actions では
-        # 13-46 分の遅延が常態化している。各 cron 起動は「次の HH:00 から始まる
-        # 1 時間幅」を録音対象として担当する設計。
-        # 例: cron HH:00 → 起動 HH:13-46 → 待機 → target HH+1:00 - HH+2:00 を録音。
-        # 起動が HH:55 以降ならどちらの target を選ぶかが曖昧になり次の run と重複
-        # するが、Notion 側の重複チェックに任せる。
+        # cron `*/30 * * * *` は 30 分毎に発火を試みる (GitHub Actions の発火漏れ
+        # 救済のため冗長化)。各 cron 起動は「次に来る HH:00 から始まる 1 時間幅」
+        # を録音対象とする。
+        #
+        # 例:
+        #   HH:00 cron → 起動 HH:13-46 → target = HH+1:00
+        #   HH:30 cron → 起動 HH:43-HH+1:16 → target = HH+1:00 (or HH+2:00 if lag > 30min)
+        #
+        # 本質は「録音対象時間の 15-60 分前に発火し、target_hour まで待機」。
+        # 過去の HH:00 や現在進行中の時間帯には対応せず、常に未来の HH:00 を狙う。
         target_hour = (now + timedelta(hours=1)).replace(minute=0, second=0, microsecond=0)
         window_end = target_hour + timedelta(hours=1)
         # target_hour に基づいて broadcast day を計算 (深夜0-5時を正しく扱う)
