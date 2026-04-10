@@ -24,6 +24,18 @@ JST = timezone(timedelta(hours=9))
 PRE_ROLL_SEC = 10
 POST_ROLL_SEC = 20
 
+# NHK / Radiko の "放送日" (broadcast day) は JST 5:00 から翌日 4:55 まで。
+# 例: JST 4/9 03:00 の番組は 4/8 broadcast day に属し、programs-2026-04-08.json にある。
+BROADCAST_DAY_HOUR = 5
+
+
+def _broadcast_date(dt: datetime) -> str:
+    """壁時計の datetime から broadcast day (YYYY-MM-DD) を返す。
+
+    JST 5:00 未満の場合は前日の broadcast day、5:00 以降は当日。
+    """
+    return (dt - timedelta(hours=BROADCAST_DAY_HOUR)).strftime("%Y-%m-%d")
+
 
 def _load_subscriptions(source: str) -> tuple[list[str], list[str]]:
     """購読シリーズIDリストとキーワードをJSONから読み込む。
@@ -53,26 +65,18 @@ def _load_subscriptions(source: str) -> tuple[list[str], list[str]]:
 
 def _record_one(
     program: Program,
-    stream_urls: dict[str, str],
     config: Config,
     keywords: list[str],
-    radiko_auth,
+    area: str,
 ) -> None:
-    """1番組を録音してNotionにアップロードする (ワーカースレッド用)。"""
+    """1番組を録音してNotionにアップロードする (ワーカースレッド用)。
+
+    ストリームURL/Radiko認証は **録音直前** に取得することで、長時間待機後も
+    確実に新鮮な接続情報を使う (50分以上待機すると古いトークンや古いキャッシュは
+    無効化されることがあるため)。
+    """
     logger = logging.getLogger(__name__)
     is_radiko = program.service.startswith("radiko:")
-
-    # ストリーム情報を決定
-    if is_radiko:
-        if not radiko_auth:
-            logger.warning("Radiko番組だが未認証: %s", program.title)
-            return
-        station_id = program.service.split(":", 1)[1]
-    else:
-        stream_url = stream_urls.get(program.service)
-        if not stream_url:
-            logger.warning("ストリームURLが不明: %s", program.service)
-            return
 
     # 録音ウィンドウ: [start - PRE_ROLL, end + POST_ROLL]
     # ffmpegのHLS接続には数秒かかるため、番組開始の少し前から録音を開始する。
@@ -101,12 +105,25 @@ def _record_one(
         return
     output_path = make_output_path(config.output_dir, program)
 
-    logger.info("録音開始: [%s] %s (%d分)", program.service, program.title, duration // 60)
+    # ストリーム情報を録音直前に取得 (待機中に古くなっている可能性があるため)
     if is_radiko:
+        station_id = program.service.split(":", 1)[1]
+        radiko_auth = radiko_mod.authenticate()
+        if not radiko_auth:
+            logger.error("Radiko再認証失敗、録音中止: %s", program.title)
+            return
+        logger.info("録音開始: [%s] %s (%d分)", program.service, program.title, duration // 60)
         success = radiko_mod.record_program(
             radiko_auth, station_id, duration, output_path, config.ffmpeg_path
         )
     else:
+        # NHK ストリームURLは毎回取得 (master.m3u8 は通常は安定だが念のため)
+        stream_urls = get_stream_urls(area)
+        stream_url = stream_urls.get(program.service)
+        if not stream_url:
+            logger.warning("ストリームURLが不明: %s", program.service)
+            return
+        logger.info("録音開始: [%s] %s (%d分)", program.service, program.title, duration // 60)
         success = record(stream_url, duration, output_path, config.ffmpeg_path)
 
     if success and config.notion_token and config.notion_database_id:
@@ -120,15 +137,17 @@ def _record_one(
 
 def _record_immediately(
     programs: list[Program],
-    stream_urls: dict[str, str],
     config: Config,
+    area: str,
     matched_keywords: list[str] | None = None,
-    radiko_auth=None,
 ) -> None:
     """番組を並列で即時録音する (GitHub Actions向け、Timer不使用)。
 
     同時刻に複数番組がある場合は並列録音する。録音+アップロードは
     各スレッドが独立して行うので、1つの失敗が他に波及しない。
+
+    各スレッドはストリームURL/Radiko認証を録音直前に取得し直すため、
+    長時間待機後でも新鮮な接続情報を使う。
 
     NHKとRadiko番組を同じリストで処理可能。
     service プレフィックス "radiko:" で判別。
@@ -145,7 +164,7 @@ def _record_immediately(
     for program in programs:
         t = threading.Thread(
             target=_record_one,
-            args=(program, stream_urls, config, keywords, radiko_auth),
+            args=(program, config, keywords, area),
             name=f"rec-{program.service}-{program.id[:8]}",
             daemon=True,
         )
@@ -202,8 +221,11 @@ def main():
     )
     logger = logging.getLogger(__name__)
 
-    # 対象日
-    target_date = args.date or datetime.now(JST).strftime("%Y-%m-%d")
+    # 対象日 (broadcast day = JST 5:00-4:55 翌日)
+    # --date 明示指定がある場合はそれを優先。
+    # それ以外で --within 指定時は target_hour ベースで broadcast day を決める
+    # (この時点では target_hour 未確定なので一旦 now ベース、後で再計算する)。
+    target_date = args.date or _broadcast_date(datetime.now(JST))
 
     # 購読モード判定
     series_ids: list[str] = []
@@ -241,6 +263,27 @@ def main():
         else:
             logger.warning("Radiko認証失敗 (日本IPでない可能性)。NHKのみ対象")
 
+    # --within: 録音対象時間帯 (target_hour) を先に確定する。
+    # GitHub Actions cron は 13-46 分遅延するため、cron を 1 時間前に発火させ、
+    # スクリプト側で「次のHH:00境界の1時間幅」を狙う。
+    # target_hour に基づいて broadcast day を計算するので、ここで先に決める。
+    target_hour: datetime | None = None
+    window_end: datetime | None = None
+    if args.within is not None:
+        now = datetime.now(JST)
+        if now.minute < 5:
+            # cron 超遅延で既に目標時間帯に入っている場合はその時間帯を採用
+            target_hour = now.replace(minute=0, second=0, microsecond=0)
+        else:
+            # 通常: 次のHH:00境界
+            target_hour = (now + timedelta(hours=1)).replace(minute=0, second=0, microsecond=0)
+        window_end = target_hour + timedelta(hours=1)
+        # target_hour に基づいて broadcast day を計算 (深夜0-5時を正しく扱う)
+        if not args.date:
+            target_date = _broadcast_date(target_hour)
+
+    logger.info("対象日 (broadcast day): %s", target_date)
+
     # 番組表取得
     logger.info("番組表を取得中...")
     programs = fetch_programs(config, target_date)
@@ -258,14 +301,10 @@ def main():
 
     logger.info("合計 %d 件の番組を取得 (NHK + Radiko)", len(programs))
 
-    # NHK/Radiko サイマル重複排除 (NHK本家を優先)
-    from .data_export import dedupe_programs
-    before_dedup = len(programs)
-    programs = dedupe_programs(programs)
-    if len(programs) < before_dedup:
-        logger.info("サイマル重複排除: %d → %d 件", before_dedup, len(programs))
-
     # フィルタリング (シリーズ購読 + キーワードを OR で結合)
+    # 注意: dedupe (NHK simulcast 排除) は filter の "後" にやる。先に dedupe すると
+    # 「JOAK-FM 側 (rdk_) のシリーズだけ購読」のユーザーで、NHK 本家 r3 が残されたあと
+    # filter_by_series がマッチせず、結局録音されないバグになる。
     if args.subscriptions:
         by_series = filter_by_series(programs, series_ids) if series_ids else []
         by_keyword = filter_programs(programs, matched_keywords) if matched_keywords else []
@@ -284,6 +323,14 @@ def main():
         logger.info("マッチする番組がありません")
         return
 
+    # NHK/Radiko サイマル重複排除 (NHK本家を優先)
+    # filter の後に行うことで、JOAK-FM 側だけ購読していてもマッチしてから本家に統合される。
+    from .data_export import dedupe_programs
+    before_dedup = len(matched)
+    matched = dedupe_programs(matched)
+    if len(matched) < before_dedup:
+        logger.info("サイマル重複排除: %d → %d 件", before_dedup, len(matched))
+
     # --skip-nhk: NHK番組を除外 (Radiko専用ジョブ向け)
     # r1/r3 (NHK本家) に加え、radiko上のNHK同時配信局 (JOAK/JOBK等) も除外。
     # 関西ジョブがNHK本家で録音するため、関東ジョブではNHK系を全てスキップ。
@@ -300,21 +347,9 @@ def main():
         matched = [p for p in matched if not _is_nhk(p)]
         logger.info("--skip-nhk: NHK番組を%d件スキップ (同時配信含む)", before - len(matched))
 
-    # --within: cronを1時間前に発火させ、次のHH:00境界の1時間幅を対象にする。
-    # GitHub Actions cronは13-32分遅延するため、1時間前発火 + 待機方式で
-    # 番組頭から確実に録音できるようにする。
-    # 例: 23:13 UTC (cron 23:00 + lag) → 次のHH:00 = 0:00 UTC = JST 9:00
-    #     → JST [9:00, 10:00) の番組を対象に、ジョブ内で待機して録音
-    # 異常遅延 (60分超) を考慮: 直近5分以内に始まった現在時間帯はそのまま使う。
-    if args.within is not None:
+    # --within: target_hour 時間帯の番組のみに絞り込み
+    if args.within is not None and target_hour is not None:
         now = datetime.now(JST)
-        if now.minute < 5:
-            # 既に目標時間帯に少し入っている場合 (cron超遅延) はその時間帯を採用
-            target_hour = now.replace(minute=0, second=0, microsecond=0)
-        else:
-            # 通常: 次のHH:00境界
-            target_hour = (now + timedelta(hours=1)).replace(minute=0, second=0, microsecond=0)
-        window_end = target_hour + timedelta(hours=1)
         matched = [
             p for p in matched
             if target_hour <= p.start_time < window_end
@@ -322,18 +357,11 @@ def main():
         wait_min = max(0, int((target_hour - now).total_seconds() / 60))
         logger.info(
             "対象時間帯: [%s, %s) (起動から約%d分待機)",
-            target_hour.strftime("%H:%M"), window_end.strftime("%H:%M"), wait_min,
+            target_hour.strftime("%m/%d %H:%M"), window_end.strftime("%m/%d %H:%M"), wait_min,
         )
         if not matched:
             logger.info("当該時間帯に対象番組なし")
             return
-
-    # 重複排除: 同時刻・同タイトルの番組を統合 (NHK本家 vs radiko同時配信等)
-    from .data_export import dedupe_programs
-    before_dedupe = len(matched)
-    matched = dedupe_programs(matched)
-    if before_dedupe != len(matched):
-        logger.info("録音対象の重複排除: %d件 → %d件", before_dedupe, len(matched))
 
     # マッチ結果表示
     logger.info("--- マッチした番組 (%d件) ---", len(matched))
@@ -346,10 +374,6 @@ def main():
         logger.info("ドライラン完了")
         return
 
-    # ストリームURL取得
-    stream_urls = get_stream_urls(config.area)
-    logger.info("ストリームURL: %s", {k: v[:60] + "..." for k, v in stream_urls.items()})
-
     # Notion連携状態表示
     if config.notion_token and config.notion_database_id:
         logger.info("Notion連携: 有効 (録音後に自動アップロード)")
@@ -359,9 +383,13 @@ def main():
     # 録音実行
     if args.within is not None:
         # GitHub Actions向け: 即時録音モード（Timer不使用）
-        _record_immediately(matched, stream_urls, config, matched_keywords, radiko_auth)
+        # ストリームURLは各録音スレッドが直前に取得し直す。
+        _record_immediately(matched, config, config.area, matched_keywords)
     else:
         # ローカル向け: Timer待機モード
+        # こちらは事前取得が必要 (Timer 発火時に毎回再取得するのは本旨と外れる)。
+        stream_urls = get_stream_urls(config.area)
+        logger.info("ストリームURL: %s", {k: v[:60] + "..." for k, v in stream_urls.items()})
         schedule_recordings(matched, stream_urls, config, matched_keywords=matched_keywords)
 
 

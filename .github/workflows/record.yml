@@ -25,7 +25,9 @@ on:
 jobs:
   record:
     runs-on: ubuntu-latest
-    timeout-minutes: 180  # cron発火→ターゲット時間まで最大35分待機 + 60分番組 + アップロード余裕
+    # cron lag (最大46分) + setup (~1分) + 待機 (~14分) + 録音 (最大2時間 = CITY CHILL CLUB等)
+    # + Notion アップロード (大ファイル時 5-10分) で 240分の余裕を確保。
+    timeout-minutes: 240
     strategy:
       fail-fast: false
       # エリアごとに並列ジョブ: 関東(JP13)→TBS等、関西(JP27)→MBS等
