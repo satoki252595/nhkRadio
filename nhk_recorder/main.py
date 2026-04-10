@@ -210,8 +210,11 @@ def main():
     matched_keywords: list[str] = []
     if args.subscriptions:
         series_ids, sub_keywords = _load_subscriptions(args.subscriptions)
-        # subscriptions.json 由来のキーワードを優先、無ければ config のキーワード
-        matched_keywords = sub_keywords if sub_keywords else config.keywords
+        # subscriptions.json のキーワードをそのまま使う (空配列なら空のまま)
+        # 以前は空時に config.keywords にフォールバックしていたが、Web UI でユーザーが
+        # 意図的に空にしたキーワードがバックエンド側で勝手に補完されて意図しない番組が
+        # 録音される問題があったため、subscriptions.json を絶対の正として扱う。
+        matched_keywords = sub_keywords
         logger.info("購読モード: %d シリーズ + %d キーワード", len(series_ids), len(matched_keywords))
         logger.info("対象日: %s / エリア: %s", target_date, config.area)
     else:

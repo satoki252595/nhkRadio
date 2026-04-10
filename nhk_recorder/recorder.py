@@ -36,7 +36,12 @@ def record(stream_url: str, duration: int, output_path: Path, ffmpeg_path: str =
         ffmpeg_path: ffmpegのパス
 
     Returns:
-        成功ならTrue
+        成功ならTrue (出力ファイルが作成されていればTrue扱い)
+
+    Note:
+        subprocess.run の timeout は ffmpeg を強制 kill しファイル破棄につながるため
+        使わない。代わりに Popen + communicate(timeout) で待ち、タイムアウト時は
+        SIGTERM で graceful 終了させて、ファイルが残れば成功扱いにする。
     """
     output_path.parent.mkdir(parents=True, exist_ok=True)
 
@@ -50,21 +55,44 @@ def record(stream_url: str, duration: int, output_path: Path, ffmpeg_path: str =
 
     logger.info("録音開始: %s (%d秒) -> %s", stream_url, duration, output_path.name)
 
+    # ffmpeg は -t で自然終了するはずだが、HLSセグメント取得遅延等で +N秒程度
+    # 余計にかかる場合がある。subprocess を強制 kill するとファイルが残らないため、
+    # 余裕を持って (duration + 180s) 待ち、それでも終わらなければ SIGTERM で
+    # graceful にクローズしてファイルを残す。
+    grace_sec = duration + 180
+
     try:
-        result = subprocess.run(
-            cmd,
-            capture_output=True,
-            timeout=duration + 120,
-        )
-        if result.returncode == 0:
-            logger.info("録音完了: %s", output_path.name)
-            return True
-        else:
-            logger.error("ffmpegエラー (code=%d): %s", result.returncode, result.stderr.decode(errors="replace")[-500:])
-            return False
-    except subprocess.TimeoutExpired:
-        logger.error("録音タイムアウト: %s", output_path.name)
-        return False
+        proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     except FileNotFoundError:
         logger.error("ffmpegが見つかりません: %s", ffmpeg_path)
+        return False
+
+    try:
+        _, stderr = proc.communicate(timeout=grace_sec)
+        if proc.returncode == 0:
+            logger.info("録音完了: %s", output_path.name)
+            return True
+        # 非0終了でも、ファイルがあれば部分録音として残す
+        if output_path.exists() and output_path.stat().st_size > 0:
+            logger.warning(
+                "ffmpeg非0終了 (code=%d) だが出力あり、部分録音として保持: %s",
+                proc.returncode, output_path.name,
+            )
+            return True
+        logger.error("ffmpegエラー (code=%d): %s", proc.returncode, stderr.decode(errors="replace")[-500:])
+        return False
+    except subprocess.TimeoutExpired:
+        # SIGTERM で graceful 終了 → moov atom を書き込ませる
+        logger.warning("録音時間超過 (%ds超)、SIGTERMで graceful 終了します: %s", grace_sec, output_path.name)
+        proc.terminate()
+        try:
+            proc.communicate(timeout=15)
+        except subprocess.TimeoutExpired:
+            logger.error("SIGTERM後も終了せず、SIGKILLします: %s", output_path.name)
+            proc.kill()
+            proc.communicate()
+        if output_path.exists() and output_path.stat().st_size > 0:
+            logger.info("タイムアウトしたが出力あり、保持: %s", output_path.name)
+            return True
+        logger.error("録音タイムアウト & 出力なし: %s", output_path.name)
         return False

@@ -214,7 +214,11 @@ def record_program(
     """Radikoライブストリームを録音する。
 
     Returns:
-        成功ならTrue
+        成功ならTrue (出力ファイルが残っていればTrue扱い)
+
+    Note:
+        recorder.record() と同様、subprocess.run の timeout 強制 kill は
+        ファイル破棄になるため使わず、SIGTERM での graceful 終了に切り替える。
     """
     import subprocess
 
@@ -237,24 +241,42 @@ def record_program(
 
     logger.info("Radiko録音開始: %s (%d秒) -> %s", station_id, duration_sec, output_path.name)
 
+    grace_sec = duration_sec + 180
+
     try:
-        result = subprocess.run(
-            cmd,
-            capture_output=True,
-            timeout=duration_sec + 120,
-        )
-        if result.returncode == 0:
+        proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    except FileNotFoundError:
+        logger.error("ffmpegが見つかりません: %s", ffmpeg_path)
+        return False
+
+    try:
+        _, stderr = proc.communicate(timeout=grace_sec)
+        if proc.returncode == 0:
             logger.info("Radiko録音完了: %s", output_path.name)
+            return True
+        if output_path.exists() and output_path.stat().st_size > 0:
+            logger.warning(
+                "ffmpeg非0終了 (code=%d) だが出力あり、部分録音として保持: %s",
+                proc.returncode, output_path.name,
+            )
             return True
         logger.error(
             "ffmpegエラー (code=%d): %s",
-            result.returncode,
-            result.stderr.decode(errors="replace")[-500:],
+            proc.returncode,
+            stderr.decode(errors="replace")[-500:],
         )
         return False
     except subprocess.TimeoutExpired:
-        logger.error("Radiko録音タイムアウト: %s", output_path.name)
-        return False
-    except FileNotFoundError:
-        logger.error("ffmpegが見つかりません: %s", ffmpeg_path)
+        logger.warning("Radiko録音時間超過 (%ds超)、SIGTERMで graceful 終了: %s", grace_sec, output_path.name)
+        proc.terminate()
+        try:
+            proc.communicate(timeout=15)
+        except subprocess.TimeoutExpired:
+            logger.error("SIGTERM後も終了せず、SIGKILL: %s", output_path.name)
+            proc.kill()
+            proc.communicate()
+        if output_path.exists() and output_path.stat().st_size > 0:
+            logger.info("Radikoタイムアウトしたが出力あり、保持: %s", output_path.name)
+            return True
+        logger.error("Radiko録音タイムアウト & 出力なし: %s", output_path.name)
         return False

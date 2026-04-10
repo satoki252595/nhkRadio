@@ -1,6 +1,8 @@
 import logging
 import math
+import time
 from pathlib import Path
+from typing import Callable, TypeVar
 
 import httpx
 
@@ -13,6 +15,33 @@ NOTION_API_BASE = "https://api.notion.com/v1"
 NOTION_VERSION = "2022-06-28"
 PART_SIZE = 10 * 1024 * 1024  # 10MB
 SMALL_FILE_LIMIT = 20 * 1024 * 1024  # 20MB
+
+# リトライ設定: Notion API は瞬断・タイムアウトが時々起きるため、
+# 録音成功後にアップロード失敗すると永久に消失するので必ずリトライする。
+RETRY_MAX_ATTEMPTS = 4
+RETRY_BACKOFF_BASE = 3.0  # 秒 (3s, 6s, 12s)
+
+T = TypeVar("T")
+
+
+def _retry(label: str, func: Callable[[], T]) -> T | None:
+    """指数バックオフで func() をリトライ。最終失敗時は None を返す。"""
+    last_exc: Exception | None = None
+    for attempt in range(1, RETRY_MAX_ATTEMPTS + 1):
+        try:
+            return func()
+        except (httpx.RequestError, httpx.HTTPStatusError, httpx.TransportError) as e:
+            last_exc = e
+            if attempt < RETRY_MAX_ATTEMPTS:
+                wait = RETRY_BACKOFF_BASE * (2 ** (attempt - 1))
+                logger.warning(
+                    "%s リトライ %d/%d (%.0fs後): %s",
+                    label, attempt, RETRY_MAX_ATTEMPTS - 1, wait, e,
+                )
+                time.sleep(wait)
+            else:
+                logger.error("%s 最終失敗 (%d回試行): %s", label, RETRY_MAX_ATTEMPTS, e)
+    return None
 
 
 def _headers(token: str) -> dict[str, str]:
@@ -46,36 +75,41 @@ def upload_file(token: str, file_path: Path) -> str | None:
 
 
 def _upload_single(token: str, file_path: Path, filename: str, content_type: str) -> str | None:
-    """20MB以下のファイルをsingleモードでアップロード。"""
+    """20MB以下のファイルをsingleモードでアップロード。リトライ対応。"""
     # Step 1: Create file upload
-    resp = httpx.post(
-        f"{NOTION_API_BASE}/file_uploads",
-        headers=_json_headers(token),
-        json={"filename": filename, "content_type": content_type},
-        timeout=30,
-    )
-    if resp.status_code != 200:
-        logger.error("ファイルアップロード作成失敗: %s %s", resp.status_code, resp.text)
+    def _create():
+        r = httpx.post(
+            f"{NOTION_API_BASE}/file_uploads",
+            headers=_json_headers(token),
+            json={"filename": filename, "content_type": content_type},
+            timeout=30,
+        )
+        r.raise_for_status()
+        return r.json()
+
+    upload_data = _retry("ファイルアップロード作成", _create)
+    if not upload_data:
         return None
 
-    upload_data = resp.json()
     upload_id = upload_data["id"]
     upload_url = upload_data.get("upload_url", f"{NOTION_API_BASE}/file_uploads/{upload_id}/send")
 
-    # Step 2: Send file
-    with open(file_path, "rb") as f:
-        resp = httpx.post(
-            upload_url,
-            headers=_headers(token),
-            files={"file": (filename, f, content_type)},
-            timeout=300,
-        )
+    # Step 2: Send file (リトライ毎にファイルを開き直す)
+    def _send():
+        with open(file_path, "rb") as f:
+            r = httpx.post(
+                upload_url,
+                headers=_headers(token),
+                files={"file": (filename, f, content_type)},
+                timeout=300,
+            )
+        r.raise_for_status()
+        return r.json()
 
-    if resp.status_code != 200:
-        logger.error("ファイル送信失敗: %s %s", resp.status_code, resp.text)
+    result = _retry(f"ファイル送信 ({filename})", _send)
+    if not result:
         return None
 
-    result = resp.json()
     if result.get("status") == "uploaded":
         logger.info("ファイルアップロード完了: %s (%s)", filename, upload_id)
         return upload_id
@@ -87,53 +121,61 @@ def _upload_single(token: str, file_path: Path, filename: str, content_type: str
 def _upload_multipart(
     token: str, file_path: Path, filename: str, content_type: str, file_size: int
 ) -> str | None:
-    """20MB超のファイルをmulti_partモードでアップロード。"""
+    """20MB超のファイルをmulti_partモードでアップロード。リトライ対応。"""
     number_of_parts = math.ceil(file_size / PART_SIZE)
 
     # Step 1: Create multi-part upload
-    resp = httpx.post(
-        f"{NOTION_API_BASE}/file_uploads",
-        headers=_json_headers(token),
-        json={
-            "mode": "multi_part",
-            "number_of_parts": number_of_parts,
-            "filename": filename,
-            "content_type": content_type,
-        },
-        timeout=30,
-    )
-    if resp.status_code != 200:
-        logger.error("マルチパートアップロード作成失敗: %s %s", resp.status_code, resp.text)
+    def _create():
+        r = httpx.post(
+            f"{NOTION_API_BASE}/file_uploads",
+            headers=_json_headers(token),
+            json={
+                "mode": "multi_part",
+                "number_of_parts": number_of_parts,
+                "filename": filename,
+                "content_type": content_type,
+            },
+            timeout=30,
+        )
+        r.raise_for_status()
+        return r.json()
+
+    upload_data = _retry("マルチパートアップロード作成", _create)
+    if not upload_data:
         return None
 
-    upload_data = resp.json()
     upload_id = upload_data["id"]
 
-    # Step 2: Send parts
+    # Step 2: Send parts (各パートを個別にリトライ)
     with open(file_path, "rb") as f:
         for part_num in range(1, number_of_parts + 1):
             chunk = f.read(PART_SIZE)
-            resp = httpx.post(
-                f"{NOTION_API_BASE}/file_uploads/{upload_id}/send",
-                headers=_headers(token),
-                files={"file": (filename, chunk, content_type)},
-                data={"part_number": str(part_num)},
-                timeout=300,
-            )
-            if resp.status_code != 200:
-                logger.error("パート%d送信失敗: %s %s", part_num, resp.status_code, resp.text)
+
+            def _send_part(_chunk=chunk, _part=part_num):
+                r = httpx.post(
+                    f"{NOTION_API_BASE}/file_uploads/{upload_id}/send",
+                    headers=_headers(token),
+                    files={"file": (filename, _chunk, content_type)},
+                    data={"part_number": str(_part)},
+                    timeout=300,
+                )
+                r.raise_for_status()
+                return r.json()
+
+            result = _retry(f"パート{part_num}送信", _send_part)
+            if result is None:
                 return None
             logger.info("パート %d/%d アップロード完了", part_num, number_of_parts)
 
     # Step 3: Complete upload
     complete_url = upload_data.get("complete_url", f"{NOTION_API_BASE}/file_uploads/{upload_id}/complete")
-    resp = httpx.post(
-        complete_url,
-        headers=_json_headers(token),
-        timeout=30,
-    )
-    if resp.status_code != 200:
-        logger.error("アップロード完了処理失敗: %s %s", resp.status_code, resp.text)
+
+    def _complete():
+        r = httpx.post(complete_url, headers=_json_headers(token), timeout=30)
+        r.raise_for_status()
+        return r.json()
+
+    if _retry("アップロード完了処理", _complete) is None:
         return None
 
     logger.info("マルチパートアップロード完了: %s (%d parts)", filename, number_of_parts)
@@ -183,22 +225,24 @@ def create_recording_page(
         },
     }
 
-    resp = httpx.post(
-        f"{NOTION_API_BASE}/pages",
-        headers=_json_headers(token),
-        json={
-            "parent": {"database_id": database_id},
-            "properties": properties,
-            "icon": {"emoji": "📻"},
-        },
-        timeout=60,
-    )
+    def _create_page():
+        r = httpx.post(
+            f"{NOTION_API_BASE}/pages",
+            headers=_json_headers(token),
+            json={
+                "parent": {"database_id": database_id},
+                "properties": properties,
+                "icon": {"emoji": "📻"},
+            },
+            timeout=60,
+        )
+        r.raise_for_status()
+        return r.json()
 
-    if resp.status_code != 200:
-        logger.error("Notionページ作成失敗: %s %s", resp.status_code, resp.text)
+    page_data = _retry(f"ページ作成 ({program.title[:30]})", _create_page)
+    if not page_data:
         return None
 
-    page_data = resp.json()
     page_id = page_data["id"]
     logger.info("Notionページ作成完了: %s - %s", program.title, page_id)
     return page_id
