@@ -1,5 +1,6 @@
 import logging
 import math
+import random
 import time
 from pathlib import Path
 from typing import Callable, TypeVar
@@ -18,8 +19,10 @@ SMALL_FILE_LIMIT = 20 * 1024 * 1024  # 20MB
 
 # リトライ設定: Notion API は瞬断・タイムアウトが時々起きるため、
 # 録音成功後にアップロード失敗すると永久に消失するので必ずリトライする。
-RETRY_MAX_ATTEMPTS = 4
-RETRY_BACKOFF_BASE = 3.0  # 秒 (3s, 6s, 12s)
+# 実績: 34MB 50分番組の multipart upload で `Server disconnected` が頻発し、
+# 3 回リトライでも収束しないパートがあったため、6 回 + 長め backoff に拡張。
+RETRY_MAX_ATTEMPTS = 6
+RETRY_BACKOFF_BASE = 5.0  # 秒 (5s, 10s, 20s, 40s, 80s) → 総計最大 155s/パート
 
 T = TypeVar("T")
 
@@ -256,15 +259,15 @@ def _normalize_title(title: str) -> str:
     return t
 
 
-def _check_duplicate(
+def _find_duplicates(
     token: str,
     database_id: str,
     program: Program,
-) -> bool:
-    """Notion DBに同一番組が既に登録済みかチェックする。
+) -> list[dict]:
+    """同一番組の Notion ページを全て返す (正規化タイトル一致のみ)。
 
-    (放送日, 時間帯) でフィルタし、タイトルを正規化して比較する。
-    NHK本家 (R3) と Radiko同時配信 (JOAK-FM) の重複も検出する。
+    (放送日, 時間帯) で Notion をクエリし、そこからタイトル正規化で絞り込む。
+    並列ジョブ間の重複検出や、post-upload cleanup の両方で使う。
     """
     date_str = program.start_time.strftime("%Y-%m-%d")
     start_str = program.start_time.strftime("%H:%M")
@@ -282,30 +285,42 @@ def _check_duplicate(
                         {"property": "時間帯", "rich_text": {"equals": time_slot}},
                     ]
                 },
-                "page_size": 10,
+                "page_size": 20,
             },
             timeout=30,
         )
         if resp.status_code != 200:
-            logger.warning("Notion重複チェック失敗 (HTTP %d)、アップロード続行", resp.status_code)
-            return False
-
+            logger.warning("Notion重複チェック失敗 (HTTP %d)", resp.status_code)
+            return []
         results = resp.json().get("results", [])
-        if not results:
-            return False
-
         norm_new = _normalize_title(program.title)
+        matching = []
         for page in results:
             props = page.get("properties", {})
             title_arr = props.get("番組名", {}).get("title", [])
             existing_title = title_arr[0]["plain_text"] if title_arr else ""
             if _normalize_title(existing_title) == norm_new:
-                return True
-
-        return False
+                matching.append(page)
+        return matching
     except httpx.RequestError as e:
-        logger.warning("Notion重複チェックエラー: %s、アップロード続行", e)
-        return False
+        logger.warning("Notion重複チェックエラー: %s", e)
+        return []
+
+
+def _archive_page(token: str, page_id: str) -> bool:
+    """指定ページを archived (削除) 状態にする。"""
+    def _do():
+        r = httpx.patch(
+            f"{NOTION_API_BASE}/pages/{page_id}",
+            headers=_json_headers(token),
+            json={"archived": True},
+            timeout=30,
+        )
+        r.raise_for_status()
+        return r.json()
+
+    result = _retry(f"ページ archive ({page_id[:8]})", _do)
+    return result is not None
 
 
 def upload_recording(
@@ -314,7 +329,14 @@ def upload_recording(
     file_path: Path,
     matched_keywords: list[str],
 ) -> bool:
-    """録音ファイルをNotionにアップロードし、データベースエントリを作成する。"""
+    """録音ファイルをNotionにアップロードし、データベースエントリを作成する。
+
+    並列ジョブ間の TOCTOU race 対策:
+    1. pre-check: 既存ページがあれば upload 自体スキップ
+    2. post-upload cleanup: アップロード完了後にジッター付きで再クエリし、
+       複数ページがあれば最古 (created_time 最小) 以外を自分 archive する。
+       全ての並列 run が同じ決定 (最古を残す) をするので収束する。
+    """
     if not config.notion_token or not config.notion_database_id:
         logger.debug("Notion連携が未設定のためスキップ")
         return False
@@ -323,8 +345,9 @@ def upload_recording(
         logger.error("録音ファイルが見つかりません: %s", file_path)
         return False
 
-    # 重複チェック (同一番組が既にアップロード済みならスキップ)
-    if _check_duplicate(config.notion_token, config.notion_database_id, program):
+    # pre-check: 既存ページがあれば upload スキップ (ジッター付きで race 緩和)
+    time.sleep(random.uniform(0, 20))
+    if _find_duplicates(config.notion_token, config.notion_database_id, program):
         logger.info("重複スキップ: %s (Notionに登録済み)", program.title)
         return True
 
@@ -344,4 +367,25 @@ def upload_recording(
         file_upload_id,
         matched_keywords,
     )
-    return page_id is not None
+    if not page_id:
+        return False
+
+    # post-upload cleanup: 並列 run が同じ番組を upload した race を修復する。
+    # ジッター付きで待機して他の run のアップロードが完了する時間を与えてから再クエリ。
+    # 複数ある場合は最古 (created_time 最小) を残し、それ以外は archive する。
+    # 全 run が同じ決定ロジックなので、どの run から見ても同じ「最古」が残る。
+    time.sleep(random.uniform(10, 30))
+    duplicates = _find_duplicates(config.notion_token, config.notion_database_id, program)
+    if len(duplicates) > 1:
+        duplicates.sort(key=lambda p: p.get("created_time", ""))
+        keeper = duplicates[0]
+        keeper_id = keeper["id"]
+        logger.warning(
+            "post-upload重複検知: %d件 → 最古(%s)を残して他を archive",
+            len(duplicates), keeper_id[:8],
+        )
+        for dup in duplicates[1:]:
+            dup_id = dup["id"]
+            if _archive_page(config.notion_token, dup_id):
+                logger.info("重複ページ archive: %s", dup_id[:8])
+    return True
