@@ -1,6 +1,5 @@
 import logging
 import math
-import random
 import time
 from pathlib import Path
 from typing import Callable, TypeVar
@@ -329,37 +328,32 @@ def upload_recording(
     file_path: Path,
     matched_keywords: list[str],
 ) -> bool:
-    """録音ファイルをNotionにアップロードし、データベースエントリを作成する。
+    """録音ファイルを Notion にアップロードし、ページを作成する。
 
-    並列ジョブ間の TOCTOU race 対策:
-    1. pre-check: 既存ページがあれば upload 自体スキップ
-    2. post-upload cleanup: アップロード完了後にジッター付きで再クエリし、
-       複数ページがあれば最古 (created_time 最小) 以外を自分 archive する。
-       全ての並列 run が同じ決定 (最古を残す) をするので収束する。
+    v2 (timefree ダウンロード型) では単一ジョブしか動かないため、
+    v1 にあった TOCTOU race 対策 (jitter / post-upload cleanup) は不要。
+    シンプルに pre-check → upload → create だけ行う。
     """
     if not config.notion_token or not config.notion_database_id:
-        logger.debug("Notion連携が未設定のためスキップ")
+        logger.debug("Notion 連携が未設定のためスキップ")
         return False
 
     if not file_path.exists():
         logger.error("録音ファイルが見つかりません: %s", file_path)
         return False
 
-    # pre-check: 既存ページがあれば upload スキップ (ジッター付きで race 緩和)
-    time.sleep(random.uniform(0, 20))
+    # pre-check: 同じ番組が既に Notion にあれば何もしない (冪等性)
     if _find_duplicates(config.notion_token, config.notion_database_id, program):
-        logger.info("重複スキップ: %s (Notionに登録済み)", program.title)
+        logger.info("重複スキップ: %s (Notion に登録済み)", program.title)
         return True
 
     file_size_mb = file_path.stat().st_size / (1024 * 1024)
-    logger.info("Notionアップロード開始: %s (%.1fMB)", file_path.name, file_size_mb)
+    logger.info("Notion アップロード開始: %s (%.1f MB)", file_path.name, file_size_mb)
 
-    # ファイルアップロード
     file_upload_id = upload_file(config.notion_token, file_path)
     if not file_upload_id:
         return False
 
-    # ページ作成
     page_id = create_recording_page(
         config.notion_token,
         config.notion_database_id,
@@ -367,25 +361,4 @@ def upload_recording(
         file_upload_id,
         matched_keywords,
     )
-    if not page_id:
-        return False
-
-    # post-upload cleanup: 並列 run が同じ番組を upload した race を修復する。
-    # ジッター付きで待機して他の run のアップロードが完了する時間を与えてから再クエリ。
-    # 複数ある場合は最古 (created_time 最小) を残し、それ以外は archive する。
-    # 全 run が同じ決定ロジックなので、どの run から見ても同じ「最古」が残る。
-    time.sleep(random.uniform(10, 30))
-    duplicates = _find_duplicates(config.notion_token, config.notion_database_id, program)
-    if len(duplicates) > 1:
-        duplicates.sort(key=lambda p: p.get("created_time", ""))
-        keeper = duplicates[0]
-        keeper_id = keeper["id"]
-        logger.warning(
-            "post-upload重複検知: %d件 → 最古(%s)を残して他を archive",
-            len(duplicates), keeper_id[:8],
-        )
-        for dup in duplicates[1:]:
-            dup_id = dup["id"]
-            if _archive_page(config.notion_token, dup_id):
-                logger.info("重複ページ archive: %s", dup_id[:8])
-    return True
+    return page_id is not None

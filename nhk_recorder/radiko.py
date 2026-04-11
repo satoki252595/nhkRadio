@@ -23,8 +23,10 @@ AUTH1_URL = "https://radiko.jp/v2/api/auth1"
 AUTH2_URL = "https://radiko.jp/v2/api/auth2"
 STATION_LIST_URL = "https://radiko.jp/v3/station/list/{area_id}.xml"
 PROGRAM_DATE_URL = "http://radiko.jp/v3/program/date/{date}/{area_id}.xml"
-STREAM_URL_TEMPLATE = (
-    "https://f-radiko.smartstream.ne.jp/{station_id}/_definst_/simul-stream.stream/playlist.m3u8"
+# Radiko タイムフリー (放送後の番組を任意の時間範囲で取得)
+# ft/to は YYYYMMDDhhmmss (JST)。番組終了後〜7日以内の番組に限る。
+TIMEFREE_URL_TEMPLATE = (
+    "https://radiko.jp/v2/api/ts/playlist.m3u8?station_id={station_id}&l=15&ft={ft}&to={to}"
 )
 
 
@@ -204,79 +206,82 @@ def fetch_programs(area_id: str, date: str) -> list[RadikoProgram]:
     return programs
 
 
-def record_program(
+def download_timefree(
     auth: RadikoAuth,
     station_id: str,
-    duration_sec: int,
+    start_time: datetime,
+    end_time: datetime,
     output_path: Path,
     ffmpeg_path: str = "ffmpeg",
 ) -> bool:
-    """Radikoライブストリームを録音する。
+    """Radiko タイムフリー API で放送済み番組をダウンロードする。
+
+    start_time, end_time は JST aware datetime。過去 7 日以内の番組が対象。
+    auth の area_id に応じて聴取可能な放送局のみダウンロード可能。
+    ライブ録音と違いタイミング依存がないので、いつ呼んでも同じ結果が得られる。
 
     Returns:
-        成功ならTrue (出力ファイルが残っていればTrue扱い)
-
-    Note:
-        recorder.record() と同様、subprocess.run の timeout 強制 kill は
-        ファイル破棄になるため使わず、SIGTERM での graceful 終了に切り替える。
+        成功なら True (部分出力でも True 扱い)
     """
     import subprocess
 
     output_path.parent.mkdir(parents=True, exist_ok=True)
-    stream_url = STREAM_URL_TEMPLATE.format(station_id=station_id)
+    ft = start_time.astimezone(JST).strftime("%Y%m%d%H%M%S")
+    to = end_time.astimezone(JST).strftime("%Y%m%d%H%M%S")
+    duration_sec = int((end_time - start_time).total_seconds())
+    stream_url = TIMEFREE_URL_TEMPLATE.format(station_id=station_id, ft=ft, to=to)
 
     cmd = [
-        ffmpeg_path,
-        "-y",
-        "-headers",
-        f"X-Radiko-AuthToken: {auth.token}",
-        "-i",
-        stream_url,
-        "-t",
-        str(duration_sec),
-        "-c",
-        "copy",
+        ffmpeg_path, "-y",
+        "-headers", f"X-Radiko-AuthToken: {auth.token}",
+        "-i", stream_url,
+        "-c", "copy",
         str(output_path),
     ]
 
-    logger.info("Radiko録音開始: %s (%d秒) -> %s", station_id, duration_sec, output_path.name)
+    logger.info(
+        "Radiko timefree ダウンロード: %s ft=%s to=%s (%d秒) -> %s",
+        station_id, ft, to, duration_sec, output_path.name,
+    )
 
-    grace_sec = duration_sec + 180
+    # タイムフリーは HLS VOD として配信される。ffmpeg が EXT-X-ENDLIST を見て
+    # 自然終了するはずだが、ネットワーク遅延等を考慮し番組長 × 2 + 60s のタイム
+    # アウトを設定。ffmpeg 実測では realtime より速く DL できる。
+    grace_sec = max(duration_sec * 2 + 60, 300)
 
     try:
         proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     except FileNotFoundError:
-        logger.error("ffmpegが見つかりません: %s", ffmpeg_path)
+        logger.error("ffmpeg が見つかりません: %s", ffmpeg_path)
         return False
 
     try:
         _, stderr = proc.communicate(timeout=grace_sec)
         if proc.returncode == 0:
-            logger.info("Radiko録音完了: %s", output_path.name)
+            logger.info("timefree DL 完了: %s", output_path.name)
             return True
         if output_path.exists() and output_path.stat().st_size > 0:
             logger.warning(
-                "ffmpeg非0終了 (code=%d) だが出力あり、部分録音として保持: %s",
+                "ffmpeg 非0終了 (code=%d) だが出力あり、部分保存: %s",
                 proc.returncode, output_path.name,
             )
             return True
         logger.error(
-            "ffmpegエラー (code=%d): %s",
+            "ffmpeg エラー (code=%d): %s",
             proc.returncode,
             stderr.decode(errors="replace")[-500:],
         )
         return False
     except subprocess.TimeoutExpired:
-        logger.warning("Radiko録音時間超過 (%ds超)、SIGTERMで graceful 終了: %s", grace_sec, output_path.name)
+        logger.warning("timefree DL 時間超過 (%ds超)、SIGTERM: %s", grace_sec, output_path.name)
         proc.terminate()
         try:
             proc.communicate(timeout=15)
         except subprocess.TimeoutExpired:
-            logger.error("SIGTERM後も終了せず、SIGKILL: %s", output_path.name)
             proc.kill()
             proc.communicate()
         if output_path.exists() and output_path.stat().st_size > 0:
-            logger.info("Radikoタイムアウトしたが出力あり、保持: %s", output_path.name)
             return True
-        logger.error("Radiko録音タイムアウト & 出力なし: %s", output_path.name)
         return False
+
+

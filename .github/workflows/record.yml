@@ -1,46 +1,32 @@
-name: NHK Radio Recorder
+name: NHK Radio Recorder (Timefree)
+
+# アーキテクチャ v2: Radiko タイムフリー API からの日次バッチダウンロード。
+# live 録音の複雑性 (cron drop/lag, VPN area randomness, TOCTOU race,
+# PRE_ROLL/POST_ROLL, broadcast day 境界) を一切扱わないシンプル設計。
 
 on:
   schedule:
-    # GitHub Actions の cron は (1) 13-46 分の遅延、(2) 発火漏れ (特定時間帯の
-    # スキップ) が両方起きる。これに対抗するため:
-    #   - 30 分毎に発火させ、発火漏れが起きても次の cron が救済
-    #   - 1 時間前から発火して、ジョブ内で待機して番組開始ピッタリから録音
-    # 隣接 run が同じ target_hour を狙うケースは Notion 重複チェックで救済。
-    - cron: '*/30 * * * *'
-  workflow_dispatch:  # 手動実行
+    # JST 06:00 (= UTC 21:00) に前日の放送分をまとめて取得。
+    # GitHub Actions cron は 13-46 分遅延する可能性があるが、timefree は
+    # 放送後 7 日間有効なので 1 時間程度ズレても全く問題ない。
+    - cron: '0 21 * * *'
+  workflow_dispatch:
     inputs:
-      mode:
-        description: '録音モード'
-        type: choice
-        default: 'subscriptions'
-        options:
-          - subscriptions
-          - keywords
-      include_radiko:
-        description: 'Radiko (民放) も対象にする (VPN接続を使用)'
-        type: boolean
-        default: true
+      target_date:
+        description: '対象放送日 (YYYY-MM-DD、デフォルト: 昨日)'
+        type: string
+        required: false
+      days:
+        description: '過去何日分を対象にするか'
+        type: string
+        default: '1'
 
 jobs:
-  record:
+  download:
     runs-on: ubuntu-latest
-    # cron lag (最大46分) + setup (~1分) + 待機 (~14分) + 録音 (最大2時間 = CITY CHILL CLUB等)
-    # + Notion アップロード (大ファイル時 5-10分) で 240分の余裕を確保。
-    timeout-minutes: 240
-    strategy:
-      fail-fast: false
-      # エリアごとに並列ジョブ: 関東(JP13)→TBS等、関西(JP27)→MBS等
-      # NHK重複回避: 関西ジョブだけがNHKを録音、関東は民放のみ
-      # VPNエリア検証: --expected-area で意図しないエリア接続を検出
-      matrix:
-        include:
-          - region: kansai
-            expected_area: JP25,JP26,JP27,JP28,JP29,JP30  # 関西6府県
-            skip_nhk: false
-          - region: kanto
-            expected_area: JP08,JP09,JP10,JP11,JP12,JP13,JP14  # 関東7都県
-            skip_nhk: true
+    # live 録音 (240 分) と違い、timefree は 10-30 分で完了する。
+    # 念のため 90 分確保 (大量購読・大きい番組に対応)。
+    timeout-minutes: 90
 
     steps:
       - uses: actions/checkout@v4
@@ -55,43 +41,26 @@ jobs:
       - name: Install Python dependencies
         run: pip install httpx pyyaml
 
-      # VPN Gate 経由で指定リージョンのIPに切り替え
-      - name: Fetch VPN Gate server (${{ matrix.region }})
-        run: python -m nhk_recorder.vpngate vpn.ovpn --region ${{ matrix.region }}
+      # Radiko タイムフリーは JP IP が必要。area は問わず、どこでも OK。
+      - name: Fetch VPN Gate server (any JP)
+        run: python -m nhk_recorder.vpngate vpn.ovpn
 
       - name: Connect to VPN Gate
         uses: kota65535/github-openvpn-connect-action@v3
         with:
           config_file: vpn.ovpn
-        continue-on-error: true  # VPN失敗時もスキップで続行
 
       - name: Verify IP location
-        run: |
-          echo "現在のIP:"
-          curl -s https://ipinfo.io/json || true
+        run: curl -s https://ipinfo.io/json || true
         continue-on-error: true
 
-      - name: Record (subscription mode)
-        if: github.event_name == 'schedule' || inputs.mode == 'subscriptions'
+      - name: Download timefree recordings
         run: |
-          if [ -f "data/subscriptions.json" ]; then
-            python -m nhk_recorder --subscriptions data/subscriptions.json --within 65 --include-radiko \
-              --expected-area "${{ matrix.expected_area }}" \
-              ${{ matrix.skip_nhk && '--skip-nhk' || '' }}
-          else
-            echo "data/subscriptions.json が存在しません。"
+          ARGS="--subscriptions data/subscriptions.json --days ${{ inputs.days || '1' }}"
+          if [ -n "${{ inputs.target_date }}" ]; then
+            ARGS="$ARGS --target-date ${{ inputs.target_date }}"
           fi
-        env:
-          NHK_API_KEY: ${{ secrets.NHK_API_KEY }}
-          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
-          NOTION_DATABASE_ID: ${{ secrets.NOTION_DATABASE_ID }}
-
-      - name: Record (keyword mode)
-        if: inputs.mode == 'keywords'
-        run: |
-          python -m nhk_recorder --within 65 --include-radiko \
-            --expected-area "${{ matrix.expected_area }}" \
-            ${{ matrix.skip_nhk && '--skip-nhk' || '' }}
+          python -m nhk_recorder $ARGS
         env:
           NHK_API_KEY: ${{ secrets.NHK_API_KEY }}
           NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
