@@ -24,9 +24,11 @@ AUTH2_URL = "https://radiko.jp/v2/api/auth2"
 STATION_LIST_URL = "https://radiko.jp/v3/station/list/{area_id}.xml"
 PROGRAM_DATE_URL = "http://radiko.jp/v3/program/date/{date}/{area_id}.xml"
 # Radiko タイムフリー (放送後の番組を任意の時間範囲で取得)
+# live と同じ smartstream playlist URL に ft/to クエリを付けるだけで timefree になる。
 # ft/to は YYYYMMDDhhmmss (JST)。番組終了後〜7日以内の番組に限る。
 TIMEFREE_URL_TEMPLATE = (
-    "https://radiko.jp/v2/api/ts/playlist.m3u8?station_id={station_id}&l=15&ft={ft}&to={to}"
+    "https://f-radiko.smartstream.ne.jp/{station_id}/_definst_/simul-stream.stream/playlist.m3u8"
+    "?ft={ft}&to={to}"
 )
 
 
@@ -231,10 +233,14 @@ def download_timefree(
     duration_sec = int((end_time - start_time).total_seconds())
     stream_url = TIMEFREE_URL_TEMPLATE.format(station_id=station_id, ft=ft, to=to)
 
+    # `-t duration_sec` で明示的に録音時間を指定する。timefree m3u8 は live と
+    # 同じ URL パターンなので EXT-X-ENDLIST が付かず ffmpeg が自然終了しない。
+    # -t がないとストリームが続く限り永遠に読み続けてしまう。
     cmd = [
         ffmpeg_path, "-y",
         "-headers", f"X-Radiko-AuthToken: {auth.token}",
         "-i", stream_url,
+        "-t", str(duration_sec),
         "-c", "copy",
         str(output_path),
     ]
@@ -244,10 +250,9 @@ def download_timefree(
         station_id, ft, to, duration_sec, output_path.name,
     )
 
-    # タイムフリーは HLS VOD として配信される。ffmpeg が EXT-X-ENDLIST を見て
-    # 自然終了するはずだが、ネットワーク遅延等を考慮し番組長 × 2 + 60s のタイム
-    # アウトを設定。ffmpeg 実測では realtime より速く DL できる。
-    grace_sec = max(duration_sec * 2 + 60, 300)
+    # 番組長 + バッファ。timefree は HTTP なので realtime より速く DL 完了する
+    # ことが多いが、HLS セグメント取得の遅延を考慮して +180 秒の余裕。
+    grace_sec = duration_sec + 180
 
     try:
         proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
