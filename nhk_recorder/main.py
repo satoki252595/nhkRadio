@@ -29,6 +29,39 @@ from .matcher import filter_by_series, filter_programs
 from .notion import upload_recording
 from .recorder import make_output_path
 
+
+def _load_programs_from_json(json_path: Path) -> list[Program]:
+    """data/programs-YYYY-MM-DD.json を読んで Program リストに変換する。
+
+    NHK API v3 は過去日付の番組表を 400 で拒否するため、data-update
+    ワークフローが毎日生成してリポジトリに commit している既存 JSON を
+    直接読むのが確実。NHK / Radiko を区別せず両方含まれている。
+    """
+    if not json_path.exists():
+        return []
+    with open(json_path, encoding="utf-8") as f:
+        data = json.load(f)
+    programs: list[Program] = []
+    for p in data.get("programs", []):
+        try:
+            programs.append(Program(
+                id=p.get("id", ""),
+                service=p.get("service", ""),
+                title=p.get("title", ""),
+                subtitle=p.get("subtitle", ""),
+                content=p.get("content", ""),
+                start_time=datetime.fromisoformat(p["start_time"]),
+                end_time=datetime.fromisoformat(p["end_time"]),
+                series_id=p.get("series_id", ""),
+                series_name=p.get("series_name", ""),
+                episode_name=p.get("episode_name", ""),
+                genre=p.get("genre", []) or [],
+                area=p.get("area", "") or "",
+            ))
+        except (KeyError, ValueError):
+            continue
+    return programs
+
 JST = timezone(timedelta(hours=9))
 
 # NHK / Radiko の放送日は JST 5:00 - 翌 4:55
@@ -171,16 +204,27 @@ def main() -> None:
     logger.info("このエリアの NHK 局: AM=%s, FM=%s", nhk_am, nhk_fm)
 
     # 番組表の取得 + フィルタリング (対象日すべて)
+    # NHK API v3 は過去日付を 400 で拒否するため、data-update ワークフローが
+    # 毎日 JST 04:30 に生成して commit する data/programs-YYYY-MM-DD.json を
+    # 読む (NHK + Radiko 両方含まれている)。未来日付や JSON が未生成の場合は
+    # NHK API + Radiko API にフォールバック。
+    data_dir = Path(__file__).resolve().parent.parent / "data"
     matched: list[Program] = []
     seen_ids: set[str] = set()
     for target_date in target_dates:
         logger.info("番組表取得: %s", target_date)
-        programs = fetch_programs(config, target_date)
-        # Radiko 番組も追加
-        rp = radiko_mod.fetch_programs(radiko_auth.area_id, target_date)
-        from .data_export import _radiko_to_program
-        for p in rp:
-            programs.append(_radiko_to_program(p))
+        json_path = data_dir / f"programs-{target_date}.json"
+        programs = _load_programs_from_json(json_path)
+        if programs:
+            logger.info("  → JSON から %d 件ロード", len(programs))
+        else:
+            logger.info("  → JSON が無いため API にフォールバック")
+            programs = fetch_programs(config, target_date)
+            # Radiko 番組も API から追加
+            rp = radiko_mod.fetch_programs(radiko_auth.area_id, target_date)
+            from .data_export import _radiko_to_program
+            for p in rp:
+                programs.append(_radiko_to_program(p))
 
         # シリーズ / キーワード マッチング
         by_series = filter_by_series(programs, series_ids) if series_ids else []
