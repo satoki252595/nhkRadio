@@ -41,7 +41,7 @@ JST = timezone(timedelta(hours=9))
 BROADCAST_DAY_HOUR = 5
 
 # VPN 接続の最大試行回数 (足りない area を探し続ける上限)
-MAX_VPN_ATTEMPTS = 10
+MAX_VPN_ATTEMPTS = 15
 
 
 def _broadcast_date(dt: datetime) -> str:
