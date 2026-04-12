@@ -1,14 +1,12 @@
 name: NHK Radio Recorder (Timefree)
 
-# アーキテクチャ v2: Radiko タイムフリー API からの日次バッチダウンロード。
-# live 録音の複雑性 (cron drop/lag, VPN area randomness, TOCTOU race,
-# PRE_ROLL/POST_ROLL, broadcast day 境界) を一切扱わないシンプル設計。
+# v2 アーキテクチャ: Radiko タイムフリー API からの日次バッチダウンロード。
+# VPN は Python 側で管理 (vpn_manager.py) し、複数の Radiko area を
+# 順次カバーする multi-pass 方式で area 固定局の取得率を高める。
 
 on:
   schedule:
     # JST 06:00 (= UTC 21:00) に前日の放送分をまとめて取得。
-    # GitHub Actions cron は 13-46 分遅延する可能性があるが、timefree は
-    # 放送後 7 日間有効なので 1 時間程度ズレても全く問題ない。
     - cron: '0 21 * * *'
   workflow_dispatch:
     inputs:
@@ -20,14 +18,16 @@ on:
         description: '過去何日分を対象にするか'
         type: string
         default: '1'
+      max_vpn_attempts:
+        description: '最大 VPN 試行回数 (area カバーのため複数回接続試行)'
+        type: string
+        default: '10'
 
 jobs:
   download:
     runs-on: ubuntu-latest
-    # Radiko timefree は 1x realtime でしか取れない (chunklist window が時間と
-    # ともに進行するため)。並列スレッドで同時ダウンロードすれば総時間 = max(番組長)。
-    # 最長 2 時間番組 + setup + アップロードで 180 分確保。
-    timeout-minutes: 180
+    # 最長 2h 番組 + 複数 VPN 張り直し + setup + upload
+    timeout-minutes: 240
 
     steps:
       - uses: actions/checkout@v4
@@ -42,22 +42,13 @@ jobs:
       - name: Install Python dependencies
         run: pip install httpx pyyaml
 
-      # Radiko タイムフリーは JP IP が必要。area は問わず、どこでも OK。
-      - name: Fetch VPN Gate server (any JP)
-        run: python -m nhk_recorder.vpngate vpn.ovpn
+      - name: Verify sudo without password
+        run: sudo -n true
 
-      - name: Connect to VPN Gate
-        uses: kota65535/github-openvpn-connect-action@v3
-        with:
-          config_file: vpn.ovpn
-
-      - name: Verify IP location
-        run: curl -s https://ipinfo.io/json || true
-        continue-on-error: true
-
-      - name: Download timefree recordings
+      - name: Download timefree recordings (multi-VPN-pass)
         run: |
           ARGS="--subscriptions data/subscriptions.json --days ${{ inputs.days || '1' }}"
+          ARGS="$ARGS --max-vpn-attempts ${{ inputs.max_vpn_attempts || '10' }}"
           if [ -n "${{ inputs.target_date }}" ]; then
             ARGS="$ARGS --target-date ${{ inputs.target_date }}"
           fi
@@ -66,3 +57,7 @@ jobs:
           NHK_API_KEY: ${{ secrets.NHK_API_KEY }}
           NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
           NOTION_DATABASE_ID: ${{ secrets.NOTION_DATABASE_ID }}
+
+      - name: Cleanup VPN on job end
+        if: always()
+        run: sudo pkill -TERM openvpn 2>/dev/null || true
