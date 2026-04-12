@@ -218,12 +218,13 @@ def download_timefree(
 ) -> bool:
     """Radiko タイムフリー API で放送済み番組をダウンロードする。
 
-    start_time, end_time は JST aware datetime。過去 7 日以内の番組が対象。
-    auth の area_id に応じて聴取可能な放送局のみダウンロード可能。
-    ライブ録音と違いタイミング依存がないので、いつ呼んでも同じ結果が得られる。
+    Note: Radiko 側の HLS 配信は timefree でも 1x realtime が上限 (chunklist
+    window が時間とともに進むため、並列セグメント取得しても加速できない)。
+    長時間番組は呼び出し側で並列 (threading) 起動して同時ダウンロードする。
+    各スレッドが独立した ffmpeg プロセスを起動すれば並列 DL できる。
 
     Returns:
-        成功なら True (部分出力でも True 扱い)
+        成功なら True
     """
     import subprocess
 
@@ -233,9 +234,13 @@ def download_timefree(
     duration_sec = int((end_time - start_time).total_seconds())
     stream_url = TIMEFREE_URL_TEMPLATE.format(station_id=station_id, ft=ft, to=to)
 
-    # `-t duration_sec` で明示的に録音時間を指定する。timefree m3u8 は live と
-    # 同じ URL パターンなので EXT-X-ENDLIST が付かず ffmpeg が自然終了しない。
-    # -t がないとストリームが続く限り永遠に読み続けてしまう。
+    logger.info(
+        "Radiko timefree DL: %s ft=%s to=%s (%d秒) -> %s",
+        station_id, ft, to, duration_sec, output_path.name,
+    )
+
+    # `-t duration_sec` で明示的に録音時間を指定する必要がある (EXT-X-ENDLIST が
+    # 付かないため ffmpeg が live 扱いし、そのままだと永遠に読み続ける)。
     cmd = [
         ffmpeg_path, "-y",
         "-headers", f"X-Radiko-AuthToken: {auth.token}",
@@ -244,14 +249,7 @@ def download_timefree(
         "-c", "copy",
         str(output_path),
     ]
-
-    logger.info(
-        "Radiko timefree ダウンロード: %s ft=%s to=%s (%d秒) -> %s",
-        station_id, ft, to, duration_sec, output_path.name,
-    )
-
-    # 番組長 + バッファ。timefree は HTTP なので realtime より速く DL 完了する
-    # ことが多いが、HLS セグメント取得の遅延を考慮して +180 秒の余裕。
+    # 番組長 + 180s バッファ (ネットワーク遅延対策)
     grace_sec = duration_sec + 180
 
     try:
@@ -273,12 +271,11 @@ def download_timefree(
             return True
         logger.error(
             "ffmpeg エラー (code=%d): %s",
-            proc.returncode,
-            stderr.decode(errors="replace")[-500:],
+            proc.returncode, stderr.decode(errors="replace")[-500:],
         )
         return False
     except subprocess.TimeoutExpired:
-        logger.warning("timefree DL 時間超過 (%ds超)、SIGTERM: %s", grace_sec, output_path.name)
+        logger.warning("timefree DL 時間超過 (%ds), SIGTERM: %s", grace_sec, output_path.name)
         proc.terminate()
         try:
             proc.communicate(timeout=15)

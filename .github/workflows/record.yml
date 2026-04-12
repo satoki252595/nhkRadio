@@ -24,9 +24,10 @@ on:
 jobs:
   download:
     runs-on: ubuntu-latest
-    # live 録音 (240 分) と違い、timefree は 10-30 分で完了する。
-    # 念のため 90 分確保 (大量購読・大きい番組に対応)。
-    timeout-minutes: 90
+    # Radiko timefree は 1x realtime でしか取れない (chunklist window が時間と
+    # ともに進行するため)。並列スレッドで同時ダウンロードすれば総時間 = max(番組長)。
+    # 最長 2 時間番組 + setup + アップロードで 180 分確保。
+    timeout-minutes: 180
 
     steps:
       - uses: actions/checkout@v4

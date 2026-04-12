@@ -19,6 +19,7 @@ import argparse
 import json
 import logging
 import sys
+import threading
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
@@ -263,12 +264,14 @@ def main() -> None:
         logger.info("対象番組なし、終了")
         return
 
-    # ダウンロード + アップロード
-    success = 0
-    failed = 0
-    skipped = 0
+    # 並列ダウンロード + アップロード
+    # Radiko timefree は 1x realtime でしか取れない (chunklist window が時間と
+    # ともに進むため) ので、複数番組を threading で同時並列実行して総時間を
+    # max(番組長) + バッファに収める。
+    counters = {"success": 0, "failed": 0, "skipped": 0}
+    counters_lock = threading.Lock()
 
-    for p in matched:
+    def _process_one(p: Program) -> None:
         # 未放送はスキップ (timefree にまだ無い)
         if p.end_time > now:
             logger.info(
@@ -279,8 +282,9 @@ def main() -> None:
                 p.end_time.strftime("%H:%M"),
                 p.title[:50],
             )
-            skipped += 1
-            continue
+            with counters_lock:
+                counters["skipped"] += 1
+            return
 
         station_id = _service_to_station(p.service, nhk_am, nhk_fm)
         if not station_id:
@@ -288,8 +292,9 @@ def main() -> None:
                 "ステーション ID 解決不可: service=%s area=%s → %s",
                 p.service, radiko_auth.area_id, p.title[:50],
             )
-            failed += 1
-            continue
+            with counters_lock:
+                counters["failed"] += 1
+            return
 
         # このエリアで当該局が聴取可能か確認 (NHK 以外)
         if p.service.startswith("radiko:") and station_id not in area_stations:
@@ -297,14 +302,12 @@ def main() -> None:
                 "当該エリア (%s) で聴取不可: station=%s → %s",
                 radiko_auth.area_id, station_id, p.title[:50],
             )
-            failed += 1
-            continue
+            with counters_lock:
+                counters["failed"] += 1
+            return
 
         output_path = make_output_path(config.output_dir, p)
-        logger.info(
-            "→ ダウンロード: [%s→%s] %s",
-            p.service, station_id, p.title[:50],
-        )
+        logger.info("→ ダウンロード: [%s→%s] %s", p.service, station_id, p.title[:50])
 
         ok = radiko_mod.download_timefree(
             radiko_auth, station_id,
@@ -313,37 +316,50 @@ def main() -> None:
         )
         if not ok:
             logger.error("ダウンロード失敗: %s", p.title[:50])
-            failed += 1
-            continue
+            with counters_lock:
+                counters["failed"] += 1
+            return
 
-        # Notion アップロード
         if config.notion_token and config.notion_database_id:
             search_text = f"{p.title} {p.subtitle} {p.content}"
             matched_kw = [kw for kw in keywords if kw in search_text]
             try:
-                if upload_recording(config, p, output_path, matched_kw):
-                    success += 1
-                else:
-                    failed += 1
+                uploaded = upload_recording(config, p, output_path, matched_kw)
             except Exception as e:
                 logger.error("Notion アップロード失敗: %s - %s", p.title[:50], e)
-                failed += 1
+                uploaded = False
+            with counters_lock:
+                if uploaded:
+                    counters["success"] += 1
+                else:
+                    counters["failed"] += 1
         else:
-            success += 1
+            with counters_lock:
+                counters["success"] += 1
 
-        # ジョブ完了後にファイル削除 (GitHub Actions runner の容量対策)
+        # 完了後にファイル削除 (ディスク節約)
         try:
             output_path.unlink(missing_ok=True)
         except OSError:
             pass
 
+    logger.info("並列ダウンロード開始: %d 番組", len(matched))
+    threads: list[threading.Thread] = []
+    for p in matched:
+        t = threading.Thread(target=_process_one, args=(p,), daemon=True,
+                             name=f"dl-{p.id[:8]}")
+        t.start()
+        threads.append(t)
+    for t in threads:
+        t.join()
+
     logger.info(
         "=== 完了: 成功 %d / 失敗 %d / スキップ %d ===",
-        success, failed, skipped,
+        counters["success"], counters["failed"], counters["skipped"],
     )
     # 失敗があってもジョブ自体は成功扱いにする (部分成功を許容)
     # ただし全滅なら非ゼロで終了
-    if failed > 0 and success == 0 and skipped == 0:
+    if counters["failed"] > 0 and counters["success"] == 0 and counters["skipped"] == 0:
         sys.exit(3)
 
 
