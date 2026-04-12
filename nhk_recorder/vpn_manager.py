@@ -73,7 +73,15 @@ def connect(config_path: Path, wait_sec: int = 30) -> bool:
             pass
         time.sleep(1)
 
-    logger.warning("VPN 接続タイムアウト (%ds)", wait_sec)
+    # デバッグ用: openvpn ログの末尾を出力
+    try:
+        if LOG_FILE.exists():
+            tail = LOG_FILE.read_text(errors="replace").splitlines()[-15:]
+            logger.warning("VPN 接続タイムアウト (%ds), openvpn ログ末尾:", wait_sec)
+            for line in tail:
+                logger.warning("  openvpn> %s", line.rstrip())
+    except OSError:
+        logger.warning("VPN 接続タイムアウト (%ds), ログ読取失敗", wait_sec)
     disconnect()
     return False
 
