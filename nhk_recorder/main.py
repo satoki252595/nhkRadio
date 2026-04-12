@@ -379,7 +379,20 @@ def main() -> None:
     if not vpn_servers:
         logger.error("VPN Gate サーバー取得失敗")
         sys.exit(2)
-    logger.info("VPN Gate: %d 台のサーバーを取得", len(vpn_servers))
+
+    # private (一般ユーザー提供) サーバーを優先して並べる。
+    # public-vpn-* (筑波大 SoftEther 公式) は高スコアだが出口エリアが
+    # JP23/JP17/JP1 等に偏る。private サーバーは全国に分散しているため
+    # JP27 (大阪=ABC) や JP13 (東京=LFR/TBS) に当たる確率が高い。
+    import random
+    private = [s for s in vpn_servers if not s.hostname.startswith("public-vpn-")]
+    public = [s for s in vpn_servers if s.hostname.startswith("public-vpn-")]
+    random.shuffle(private)  # private 内はランダムで area 多様性を確保
+    vpn_servers = private + public
+    logger.info(
+        "VPN Gate: %d 台 (private %d + public %d)",
+        len(vpn_servers), len(private), len(public),
+    )
 
     counters = {"success": 0, "failed": 0, "skipped": 0}
     counters_lock = threading.Lock()
