@@ -36,22 +36,22 @@ def connect(config_path: Path, wait_sec: int = 45) -> bool:
         _current_proc = subprocess.Popen(
             cmd,
             stdin=subprocess.DEVNULL,
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.PIPE,
+            stdout=subprocess.PIPE,   # openvpn は stdout にログ出力する
+            stderr=subprocess.STDOUT,  # stderr も stdout に統合
         )
     except (OSError, subprocess.SubprocessError) as e:
         logger.error("openvpn 起動失敗: %s", e)
         return False
 
-    # stderr を非同期で読むスレッド
+    # stdout を非同期で読むスレッド
     output_lines: list[str] = []
     connected_event = threading.Event()
     error_event = threading.Event()
 
     def _reader():
-        assert _current_proc is not None and _current_proc.stderr is not None
+        assert _current_proc is not None and _current_proc.stdout is not None
         try:
-            for raw_line in _current_proc.stderr:
+            for raw_line in _current_proc.stdout:
                 line = raw_line.decode(errors="replace").rstrip()
                 output_lines.append(line)
                 if "Initialization Sequence Completed" in line:
