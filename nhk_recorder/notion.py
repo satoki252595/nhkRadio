@@ -295,6 +295,9 @@ def _find_duplicates(
         norm_new = _normalize_title(program.title)
         matching = []
         for page in results:
+            # archived ページは重複扱いしない (archive を「削除」として使う運用のため)
+            if page.get("archived") or page.get("in_trash"):
+                continue
             props = page.get("properties", {})
             title_arr = props.get("番組名", {}).get("title", [])
             existing_title = title_arr[0]["plain_text"] if title_arr else ""
