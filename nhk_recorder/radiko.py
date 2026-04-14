@@ -23,13 +23,21 @@ AUTH1_URL = "https://radiko.jp/v2/api/auth1"
 AUTH2_URL = "https://radiko.jp/v2/api/auth2"
 STATION_LIST_URL = "https://radiko.jp/v3/station/list/{area_id}.xml"
 PROGRAM_DATE_URL = "http://radiko.jp/v3/program/date/{date}/{area_id}.xml"
-# Radiko タイムフリー (放送後の番組を任意の時間範囲で取得)
-# live と同じ smartstream playlist URL に ft/to クエリを付けるだけで timefree になる。
-# ft/to は YYYYMMDDhhmmss (JST)。番組終了後〜7日以内の番組に限る。
-TIMEFREE_URL_TEMPLATE = (
-    "https://f-radiko.smartstream.ne.jp/{station_id}/_definst_/simul-stream.stream/playlist.m3u8"
-    "?ft={ft}&to={to}"
-)
+
+# Radiko タイムフリー (放送後 7 日以内の番組を任意の時間範囲で取得)
+#
+# 重要: 以前使っていた `f-radiko.smartstream.ne.jp/.../simul-stream.stream/playlist.m3u8`
+# は **ライブ専用** で、`ft`/`to` クエリを付けても無視されてライブストリームを返す。
+# 実際のタイムフリー CDN は `tf-f-rpaa-radiko.smartstream.ne.jp/tf/playlist.m3u8` で、
+# 必須クエリパラメータは下記の通り (yt-dlp 2026.04 extractor を参考):
+#   - station_id: 局 ID (JOAK-FM, ABC 等)
+#   - start_at, ft:  開始時刻 (YYYYMMDDhhmmss)  ← start_at と ft 両方必要
+#   - end_at,   to:  終了時刻 (YYYYMMDDhhmmss)  ← end_at と to 両方必要
+#   - l=15, type=b, lsid=<32hex>: 固定値/ランダム
+#
+# ヘッダー: X-Radiko-AuthToken + X-Radiko-AreaId (両方必要)
+TIMEFREE_BASE_URL = "https://tf-f-rpaa-radiko.smartstream.ne.jp/tf/playlist.m3u8"
+STATION_STREAM_URL = "https://radiko.jp/v3/station/stream/pc_html5/{station_id}.xml"
 
 
 @dataclass
@@ -208,6 +216,76 @@ def fetch_programs(area_id: str, date: str) -> list[RadikoProgram]:
     return programs
 
 
+def _fetch_timefree_segments(
+    auth: RadikoAuth,
+    station_id: str,
+    start_at: str,
+    end_at_full: str,
+) -> tuple[list[str], bytes | None]:
+    """start_at から 15 秒分の medialist を取得してセグメントバイナリを返す。
+
+    Radiko の medialist は 1 回に 3 セグメント = 15 秒分しか返さない sliding
+    window。start_at を 15 秒刻みで進めて呼ぶことで全期間をカバーする。
+
+    Returns:
+        (segment_url_list, concatenated_binary) または ([], None) on error
+    """
+    import random as _random
+    from urllib.parse import urlencode
+
+    h = {
+        "X-Radiko-AuthToken": auth.token,
+        "X-Radiko-AreaId": auth.area_id,
+    }
+
+    lsid = "".join(_random.choices("0123456789abcdef", k=32))
+    query = urlencode({
+        "station_id": station_id,
+        "l": "15",
+        "lsid": lsid,
+        "type": "b",
+        "start_at": start_at,
+        "ft": start_at,
+        "end_at": end_at_full,
+        "to": end_at_full,
+    })
+    playlist_url = f"{TIMEFREE_BASE_URL}?{query}"
+
+    try:
+        r = httpx.get(playlist_url, headers=h, timeout=15)
+        if r.status_code != 200:
+            return [], None
+        mlist_urls = [l for l in r.text.splitlines() if l.startswith("http")]
+        if not mlist_urls:
+            return [], None
+        medialist_url = mlist_urls[0]
+        r2 = httpx.get(medialist_url, headers=h, timeout=15)
+        if r2.status_code != 200:
+            return [], None
+        segments = [l for l in r2.text.splitlines() if l.startswith("http") and ".aac" in l]
+        return segments, None
+    except httpx.RequestError:
+        return [], None
+
+
+def _download_segment(url: str, auth: RadikoAuth, retries: int = 3) -> bytes | None:
+    """セグメントをダウンロードする (簡易リトライ付き)。"""
+    h = {
+        "X-Radiko-AuthToken": auth.token,
+        "X-Radiko-AreaId": auth.area_id,
+    }
+    for _ in range(retries):
+        try:
+            r = httpx.get(url, headers=h, timeout=15)
+            if r.status_code == 200:
+                return r.content
+        except httpx.RequestError:
+            pass
+        import time as _t
+        _t.sleep(0.3)
+    return None
+
+
 def download_timefree(
     auth: RadikoAuth,
     station_id: str,
@@ -215,75 +293,132 @@ def download_timefree(
     end_time: datetime,
     output_path: Path,
     ffmpeg_path: str = "ffmpeg",
+    parallel: int = 8,
 ) -> bool:
     """Radiko タイムフリー API で放送済み番組をダウンロードする。
 
-    Note: Radiko 側の HLS 配信は timefree でも 1x realtime が上限 (chunklist
-    window が時間とともに進むため、並列セグメント取得しても加速できない)。
-    長時間番組は呼び出し側で並列 (threading) 起動して同時ダウンロードする。
-    各スレッドが独立した ffmpeg プロセスを起動すれば並列 DL できる。
+    実装方式:
+        Radiko の medialist は 1 リクエスト 3 セグメント = 15 秒分しか返さない
+        sliding window であり、ffmpeg で HLS VOD 扱いさせると error 183 で
+        parse 失敗する。対策として **start_at を 15 秒刻みで進めて medialist
+        を複数回 fetch → 各 segment を並列 DL → 連結 → ffmpeg で remux** する。
+
+        並列度 8 で約 8-15x realtime の実効速度が出る。
 
     Returns:
         成功なら True
     """
     import subprocess
+    from concurrent.futures import ThreadPoolExecutor
 
     output_path.parent.mkdir(parents=True, exist_ok=True)
-    ft = start_time.astimezone(JST).strftime("%Y%m%d%H%M%S")
-    to = end_time.astimezone(JST).strftime("%Y%m%d%H%M%S")
-    duration_sec = int((end_time - start_time).total_seconds())
-    stream_url = TIMEFREE_URL_TEMPLATE.format(station_id=station_id, ft=ft, to=to)
+    start_dt = start_time.astimezone(JST)
+    end_dt = end_time.astimezone(JST)
+    duration_sec = int((end_dt - start_dt).total_seconds())
+    end_at_full = end_dt.strftime("%Y%m%d%H%M%S")
 
     logger.info(
-        "Radiko timefree DL: %s ft=%s to=%s (%d秒) -> %s",
-        station_id, ft, to, duration_sec, output_path.name,
+        "Radiko timefree DL: %s %s-%s (%d秒) -> %s",
+        station_id,
+        start_dt.strftime("%Y-%m-%dT%H:%M:%S"),
+        end_dt.strftime("%H:%M:%S"),
+        duration_sec,
+        output_path.name,
     )
 
-    # `-t duration_sec` で明示的に録音時間を指定する必要がある (EXT-X-ENDLIST が
-    # 付かないため ffmpeg が live 扱いし、そのままだと永遠に読み続ける)。
+    # 15 秒刻みの start_at リストを生成
+    STEP = 15
+    steps: list[str] = []
+    cur = start_dt
+    while cur < end_dt:
+        steps.append(cur.strftime("%Y%m%d%H%M%S"))
+        cur += timedelta(seconds=STEP)
+    logger.info("timefree window 数: %d (各 %d 秒)", len(steps), STEP)
+
+    # 各 step の medialist を並列 fetch → セグメント URL リストを組み立てる
+    def _fetch_one(start_at: str) -> tuple[int, list[str]]:
+        segs, _ = _fetch_timefree_segments(auth, station_id, start_at, end_at_full)
+        return (int(start_at), segs)
+
+    step_segments: dict[int, list[str]] = {}
+    with ThreadPoolExecutor(max_workers=parallel) as pool:
+        for key, segs in pool.map(_fetch_one, steps):
+            step_segments[key] = segs
+
+    # 時刻順にセグメント URL を連結 (重複除外)
+    seen: set[str] = set()
+    ordered_segs: list[str] = []
+    for key in sorted(step_segments):
+        for url in step_segments[key]:
+            # URL の末尾 .aac ファイル名で重複判定
+            name = url.split("/")[-1].split("?")[0]
+            if name in seen:
+                continue
+            seen.add(name)
+            ordered_segs.append(url)
+
+    if not ordered_segs:
+        logger.error("セグメント取得失敗: 対象範囲のセグメントが0件")
+        return False
+    logger.info("合計セグメント数: %d (重複除外後)", len(ordered_segs))
+
+    # 各セグメントを並列 DL → バイナリ配列 (idx 順)
+    seg_bytes: list[bytes | None] = [None] * len(ordered_segs)
+
+    def _dl(idx: int) -> tuple[int, bytes | None]:
+        return idx, _download_segment(ordered_segs[idx], auth)
+
+    with ThreadPoolExecutor(max_workers=parallel) as pool:
+        for idx, data in pool.map(_dl, range(len(ordered_segs))):
+            seg_bytes[idx] = data
+
+    missing = sum(1 for b in seg_bytes if not b)
+    if missing > 0:
+        logger.warning("セグメント欠損: %d / %d", missing, len(ordered_segs))
+    valid_bytes = [b for b in seg_bytes if b]
+    if not valid_bytes:
+        logger.error("全セグメント取得失敗")
+        return False
+
+    # バイナリ連結 → 一時 AAC ファイル
+    tmp_aac = output_path.with_suffix(".aac.tmp")
+    total = 0
+    with open(tmp_aac, "wb") as f:
+        for b in valid_bytes:
+            f.write(b)
+            total += len(b)
+    logger.info("連結完了: %d bytes", total)
+
+    # ffmpeg で AAC → M4A にリミックス (moov atom 付与)
     cmd = [
         ffmpeg_path, "-y",
-        "-headers", f"X-Radiko-AuthToken: {auth.token}",
-        "-i", stream_url,
-        "-t", str(duration_sec),
+        "-i", str(tmp_aac),
         "-c", "copy",
         str(output_path),
     ]
-    # 番組長 + 180s バッファ (ネットワーク遅延対策)
-    grace_sec = duration_sec + 180
-
     try:
-        proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    except FileNotFoundError:
-        logger.error("ffmpeg が見つかりません: %s", ffmpeg_path)
+        proc = subprocess.run(cmd, capture_output=True, timeout=300)
+    except (FileNotFoundError, subprocess.TimeoutExpired) as e:
+        logger.error("ffmpeg リミックス失敗: %s", e)
+        tmp_aac.unlink(missing_ok=True)
         return False
+    tmp_aac.unlink(missing_ok=True)
 
-    try:
-        _, stderr = proc.communicate(timeout=grace_sec)
-        if proc.returncode == 0:
-            logger.info("timefree DL 完了: %s", output_path.name)
-            return True
-        if output_path.exists() and output_path.stat().st_size > 0:
-            logger.warning(
-                "ffmpeg 非0終了 (code=%d) だが出力あり、部分保存: %s",
-                proc.returncode, output_path.name,
-            )
-            return True
+    if proc.returncode != 0:
         logger.error(
-            "ffmpeg エラー (code=%d): %s",
-            proc.returncode, stderr.decode(errors="replace")[-500:],
+            "ffmpeg リミックス非0終了 (code=%d): %s",
+            proc.returncode, proc.stderr.decode(errors="replace")[-400:],
         )
         return False
-    except subprocess.TimeoutExpired:
-        logger.warning("timefree DL 時間超過 (%ds), SIGTERM: %s", grace_sec, output_path.name)
-        proc.terminate()
-        try:
-            proc.communicate(timeout=15)
-        except subprocess.TimeoutExpired:
-            proc.kill()
-            proc.communicate()
-        if output_path.exists() and output_path.stat().st_size > 0:
-            return True
+
+    if not (output_path.exists() and output_path.stat().st_size > 0):
+        logger.error("出力ファイルが生成されない")
         return False
+
+    logger.info(
+        "timefree DL 完了: %s (%.1f MB)",
+        output_path.name, output_path.stat().st_size / 1024 / 1024,
+    )
+    return True
 
 
