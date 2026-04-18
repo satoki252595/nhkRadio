@@ -6,6 +6,8 @@ requires-python = ">=3.10"
 dependencies = [
     "httpx",
     "pyyaml",
+    "yt-dlp",
+    "pycryptodomex",
 ]
 
 [project.optional-dependencies]
@@ -13,6 +15,11 @@ dev = ["pytest"]
 
 [tool.setuptools.packages.find]
 include = ["nhk_recorder*"]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.0.3",
+]
 
 [project.scripts]
 nhk-rec = "nhk_recorder.main:main"

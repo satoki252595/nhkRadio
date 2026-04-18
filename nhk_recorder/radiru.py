@@ -1,0 +1,448 @@
+"""NHK らじる★らじる 聴き逃し (on-demand) クライアント。
+
+Radiko タイムフリー は権利保護のため NHK の多くの番組を「配信停止」扱いとし、
+アクセスすると「大変申し訳ありませんが、現在お聞きいただいているこの番組は
+配信を停止しております」という 15 秒アナウンスのループ音源が返ってくる
+(2026-04-14 のインシデント: ラジオビジネス英語 Lesson(10), 名演奏ライブラリー,
+ニュースで学ぶ現代英語 の 3 件が全て配信停止アナウンスに置換されていた)。
+
+NHK 本家番組は Radiko ではなく、NHK が直接提供する「聴き逃し配信」
+(radiru on-demand) からダウンロードする。
+
+特徴:
+- 日本国外 IP からも取得可能 (VPN 不要)
+- 配信停止の心配なし (NHK 直営なので権利処理済み)
+- 配信期間は放送後 1 週間が多い (番組により変動)
+- m3u8 を ffmpeg で remux するだけ (Radiko のような認証・アセンブリ不要)
+
+API エンドポイント (2024-06 リニューアル後、非公式ながら公式 Web が利用):
+- new_arrivals: 新着エピソード一覧
+  https://www.nhk.or.jp/radio-api/app/v1/web/ondemand/corners/new_arrivals
+- series: 指定シリーズの配信中エピソード一覧 + stream_url
+  https://www.nhk.or.jp/radio-api/app/v1/web/ondemand/series
+      ?site_id={series_site_id}&corner_site_id={corner_site_id}
+
+series_site_id は NHK API v3 の `radioSeriesId` と同値 (例: 368315KKP8 =
+ラジオビジネス英語) なので、既存の購読シリーズ ID をそのまま流用できる。
+"""
+from __future__ import annotations
+
+import logging
+import re
+import shutil
+import subprocess
+from dataclasses import dataclass
+from datetime import datetime, timedelta, timezone
+from pathlib import Path
+
+import httpx
+
+logger = logging.getLogger(__name__)
+
+JST = timezone(timedelta(hours=9))
+
+NEW_ARRIVALS_URL = (
+    "https://www.nhk.or.jp/radio-api/app/v1/web/ondemand/corners/new_arrivals"
+)
+SERIES_URL = "https://www.nhk.or.jp/radio-api/app/v1/web/ondemand/series"
+
+
+@dataclass
+class RadiruEpisode:
+    series_site_id: str
+    corner_site_id: str
+    program_title: str
+    start_time: datetime
+    end_time: datetime
+    stream_url: str
+
+
+def _parse_aa_time_range(aa_contents_id: str) -> tuple[datetime, datetime] | None:
+    """aa_contents_id の末尾フィールドから (start, end) を取り出す。
+
+    aa_contents_id フォーマット例:
+        "[radio]vod;ラジオビジネス英語 Lesson (10);r3,130;2026041467875;
+         2026-04-14T23:20:00+09:00_2026-04-14T23:35:00+09:00"
+    """
+    parts = aa_contents_id.split(";")
+    if len(parts) < 5:
+        return None
+    time_part = parts[-1]
+    if "_" not in time_part:
+        return None
+    a, b = time_part.split("_", 1)
+    try:
+        return datetime.fromisoformat(a), datetime.fromisoformat(b)
+    except ValueError:
+        return None
+
+
+def fetch_series_episodes(
+    series_site_id: str,
+    corner_site_id: str = "01",
+    timeout: float = 30.0,
+) -> list[RadiruEpisode]:
+    """指定シリーズの聴き逃しエピソード一覧を取得する。"""
+    try:
+        r = httpx.get(
+            SERIES_URL,
+            params={
+                "site_id": series_site_id,
+                "corner_site_id": corner_site_id,
+            },
+            timeout=timeout,
+        )
+        r.raise_for_status()
+        data = r.json()
+    except (httpx.RequestError, httpx.HTTPStatusError) as e:
+        logger.warning(
+            "radiru series fetch 失敗 (%s/%s): %s",
+            series_site_id, corner_site_id, e,
+        )
+        return []
+
+    episodes: list[RadiruEpisode] = []
+    for ep in data.get("episodes", []):
+        times = _parse_aa_time_range(ep.get("aa_contents_id", ""))
+        if not times:
+            continue
+        stream_url = ep.get("stream_url", "")
+        if not stream_url:
+            continue
+        episodes.append(
+            RadiruEpisode(
+                series_site_id=series_site_id,
+                corner_site_id=corner_site_id,
+                program_title=ep.get("program_title", ""),
+                start_time=times[0],
+                end_time=times[1],
+                stream_url=stream_url,
+            )
+        )
+    return episodes
+
+
+def _discover_corners(series_site_id: str, timeout: float = 30.0) -> list[str]:
+    """new_arrivals を走査して指定シリーズで使われている corner_site_id を列挙する。
+
+    殆どの単発番組は corner_site_id=="01" で取得できるが、長時間番組
+    (Ｎらじ等) は複数 corner (ニュース・特集・コーナー別) で配信されるため
+    "01" のみでは取りこぼす。
+    """
+    try:
+        r = httpx.get(NEW_ARRIVALS_URL, timeout=timeout)
+        r.raise_for_status()
+        data = r.json()
+    except (httpx.RequestError, httpx.HTTPStatusError) as e:
+        logger.debug("radiru new_arrivals fetch 失敗: %s", e)
+        return []
+
+    corners: list[str] = []
+    seen: set[str] = set()
+    for c in data.get("corners", []):
+        if c.get("series_site_id") != series_site_id:
+            continue
+        cid = str(c.get("corner_site_id", ""))
+        if cid and cid not in seen:
+            seen.add(cid)
+            corners.append(cid)
+    return corners
+
+
+def find_episode(
+    series_site_id: str,
+    start_time: datetime,
+    tolerance_sec: int = 120,
+    preferred_corner: str = "01",
+    expected_title: str = "",
+) -> RadiruEpisode | None:
+    """指定シリーズ・開始時刻のエピソードを探す。
+
+    対応戦略:
+    1. まず corner_site_id="01" で検索 (大半の番組はここでヒット)
+    2. 見つからない場合、new_arrivals を走査して該当シリーズの他 corner を
+       全て試す (N らじ等の複数 corner 番組向け)
+    3. 完全一致を優先し、±tolerance_sec 以内の最近傍で妥協する (NHK の :03
+       秒オフセットを吸収)
+    4. 時刻一致が無くても expected_title が指定されていれば、
+       同一シリーズ内で**正規化タイトル完全一致**のエピソードを採用する。
+       これは再放送枠 (例: 名演奏ライブラリー 日曜原放送 → 火曜再放送)
+       を対象枠の時刻で保存できるようにするための fallback。
+       "Lesson (9)" と "Lesson (10)" のような異なるエピソードは正規化後も
+       別タイトルなので誤マッチしない。
+
+    Returns:
+        マッチしたエピソード、または None (配信期間切れ/未公開)
+    """
+    target = start_time.astimezone(JST)
+
+    # 全 corner のエピソードを一度収集してから時刻 → タイトルの 2 段検索を掛ける。
+    tried_corners: list[str] = [preferred_corner]
+    all_episodes: list[RadiruEpisode] = list(
+        fetch_series_episodes(series_site_id, preferred_corner)
+    )
+
+    best = _best_match(all_episodes, target, tolerance_sec)
+    if best is not None:
+        return best
+
+    for cid in _discover_corners(series_site_id):
+        if cid in tried_corners:
+            continue
+        tried_corners.append(cid)
+        extra = fetch_series_episodes(series_site_id, cid)
+        all_episodes.extend(extra)
+        best = _best_match(extra, target, tolerance_sec)
+        if best is not None:
+            return best
+
+    if expected_title:
+        title_hit = _match_by_title(all_episodes, expected_title)
+        if title_hit is not None:
+            logger.info(
+                "radiru タイトル一致で解決 (再放送扱い): series=%s 枠=%s "
+                "実エピソード=%s (%s)",
+                series_site_id, target.isoformat(),
+                title_hit.program_title, title_hit.start_time.isoformat(),
+            )
+            return title_hit
+
+    logger.info(
+        "radiru エピソード未発見: series=%s start=%s title=%r "
+        "(tried corners: %s, episodes: %d)",
+        series_site_id, target.isoformat(),
+        expected_title[:40], tried_corners, len(all_episodes),
+    )
+    return None
+
+
+def _normalize_title_strict(title: str) -> str:
+    """radiru タイトル比較用の正規化 (エピソード番号は保持する)。
+
+    schedule_verify._normalize_title は回数マーカー "(9)/(10)/Lesson(9)" を
+    剥がすため、本件 (再放送の同一コンテンツ判定) には使えない。
+    - NHK キャッシュ "ラジオビジネス英語 Ｌｅｓｓｏｎ（１０）"
+    - radiru  "ラジオビジネス英語 Lesson (10)"
+    を同一と見なし、
+    - radiru Lesson (9)
+    とは**別物**と見なす必要があるため、ここでは:
+        1. 全角英数 → 半角
+        2. 局名プレフィックス [NHK FM…] を除去
+        3. 連続空白を単一半角空白に圧縮
+    **までしか行わず**、回数表記はそのまま比較対象に残す。
+    """
+    import re
+    if not title:
+        return ""
+    # 先頭の [局名] を除去
+    t = re.sub(r"^\[[^\]]+\]\s*", "", title)
+    # 全角英数・括弧を半角に
+    out: list[str] = []
+    for ch in t:
+        code = ord(ch)
+        if 0xFF21 <= code <= 0xFF3A or 0xFF41 <= code <= 0xFF5A or 0xFF10 <= code <= 0xFF19:
+            out.append(chr(code - 0xFEE0))
+        elif ch == "（":
+            out.append("(")
+        elif ch == "）":
+            out.append(")")
+        else:
+            out.append(ch)
+    t = "".join(out)
+    # 連続空白 (全角含む) を単一半角空白に
+    t = re.sub(r"[\s　]+", " ", t).strip()
+    # 括弧まわりのスペースを除去 ("Lesson (10)" と "Lesson(10)" を同一視)
+    t = re.sub(r"\s*([()])\s*", r"\1", t)
+    return t
+
+
+def _match_by_title(
+    episodes: list[RadiruEpisode], expected_title: str,
+) -> RadiruEpisode | None:
+    """同一シリーズ内で正規化タイトル完全一致のエピソードを返す。"""
+    norm_target = _normalize_title_strict(expected_title)
+    if not norm_target:
+        return None
+    for ep in episodes:
+        if _normalize_title_strict(ep.program_title) == norm_target:
+            return ep
+    return None
+
+
+def _best_match(
+    episodes: list[RadiruEpisode],
+    target: datetime,
+    tolerance_sec: int,
+) -> RadiruEpisode | None:
+    best: RadiruEpisode | None = None
+    best_diff = tolerance_sec + 1
+    for ep in episodes:
+        diff = abs((ep.start_time - target).total_seconds())
+        if diff == 0:
+            return ep
+        if diff <= tolerance_sec and diff < best_diff:
+            best = ep
+            best_diff = diff
+    return best
+
+
+def download_ondemand(
+    stream_url: str,
+    output_path: Path,
+    ffmpeg_path: str = "ffmpeg",
+    timeout_sec: int = 1800,
+) -> bool:
+    """聴き逃し m3u8 を yt-dlp で M4A に保存する。
+
+    **なぜ yt-dlp か**: ffmpeg の HLS demuxer 経由だと、一部番組 (115 分クラス
+    の音楽番組、例: 2026-04-12 名演奏ライブラリー コルトー) で
+    `Multiple RDBs per frame with CRC is not implemented` が発生し、**24 秒で
+    途中停止**する。これは ffmpeg 8.1 の AAC デコーダがこの RDB 変種を扱えない
+    ため。一方 yt-dlp は native HLS downloader で各セグメントを個別 HTTP
+    フェッチして ADTS 連結するだけなので ffmpeg の AAC デコーダを介さず、
+    全番組で安定動作する (実測: 115 分番組を 41 MB / 113 分で取得成功)。
+
+    フォールバック: yt-dlp が未インストールなら ffmpeg に落とす (短い番組は
+    これで通ることが多いため)。
+    """
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    logger.info("radiru DL: %s → %s", stream_url[:80], output_path.name)
+
+    ytdlp_bin = shutil.which("yt-dlp")
+    if ytdlp_bin:
+        if _try_ytdlp(ytdlp_bin, stream_url, output_path, timeout_sec):
+            logger.info(
+                "radiru DL 完了 (yt-dlp): %s (%.1f MB)",
+                output_path.name, output_path.stat().st_size / 1024 / 1024,
+            )
+            return True
+        logger.warning("yt-dlp 失敗、ffmpeg フォールバック試行")
+
+    # Fallback: ffmpeg direct HLS. 上述の Multiple RDBs 問題で長尺番組は
+    # 失敗するが、短い番組 (通常の語学・ニュース 15 分枠) は通ることが多い。
+    copy_cmd = [
+        ffmpeg_path, "-y",
+        "-i", stream_url,
+        "-c", "copy",
+        "-bsf:a", "aac_adtstoasc",
+        str(output_path),
+    ]
+    if _try_ffmpeg(copy_cmd, output_path, timeout_sec):
+        logger.info(
+            "radiru DL 完了 (ffmpeg copy): %s (%.1f MB)",
+            output_path.name, output_path.stat().st_size / 1024 / 1024,
+        )
+        return True
+
+    logger.error(
+        "radiru DL 完全失敗 (yt-dlp/ffmpeg 両方): %s", output_path.name,
+    )
+    return False
+
+
+def _try_ytdlp(
+    ytdlp_bin: str, stream_url: str, output_path: Path, timeout_sec: int,
+) -> bool:
+    """yt-dlp で HLS を取得し M4A で保存する。
+
+    yt-dlp はデフォルトで拡張子を自動付与するため、`-o <path_without_ext>`
+    で拡張子を指定しない形式で渡し、実際の出力は `<path>.mp4` か `.m4a`
+    で生成される。取得後に期待パスへ rename する。
+    """
+    # yt-dlp は拡張子をコンテナから決めるので、出力名を拡張子抜きにする
+    tmp_base = output_path.with_suffix("")
+
+    # 過去の失敗録音ファイルが残っていると、yt-dlp が生成した別拡張子の
+    # 正常ファイルを見落として古いファイルを「produced」と誤認する。
+    # 走る前に候補拡張子を全て削除する。
+    for ext in (".m4a", ".mp4", ".aac", ".mp4.part", ".part"):
+        stale = Path(f"{tmp_base}{ext}")
+        stale.unlink(missing_ok=True)
+
+    cmd = [
+        ytdlp_bin,
+        "--no-progress",
+        "--hls-prefer-native",
+        "-o", f"{tmp_base}.%(ext)s",
+        stream_url,
+    ]
+    try:
+        proc = subprocess.run(cmd, capture_output=True, timeout=timeout_sec)
+    except (FileNotFoundError, subprocess.TimeoutExpired) as e:
+        logger.warning("yt-dlp 実行失敗: %s", e)
+        return False
+    if proc.returncode != 0:
+        logger.warning(
+            "yt-dlp 非 0 終了 (code=%d): %s",
+            proc.returncode, proc.stderr.decode(errors="replace")[-300:],
+        )
+        return False
+
+    # yt-dlp が生成した実ファイル (.mp4 / .m4a / .aac) を探す
+    produced: Path | None = None
+    for ext in (".m4a", ".mp4", ".aac"):
+        cand = Path(f"{tmp_base}{ext}")
+        if cand.exists() and cand.stat().st_size > 100_000:
+            produced = cand
+            break
+    if not produced:
+        logger.warning("yt-dlp 出力ファイル不見当 (base=%s)", tmp_base)
+        return False
+
+    if produced != output_path:
+        try:
+            produced.rename(output_path)
+        except OSError as e:
+            logger.warning("yt-dlp 出力 rename 失敗: %s", e)
+            return False
+
+    duration = _probe_duration(output_path)
+    if duration is not None and duration < 60.0:
+        logger.warning(
+            "yt-dlp 出力の実尺が短すぎる (%.1f 秒)", duration,
+        )
+        return False
+    return True
+
+
+def _try_ffmpeg(cmd: list, output_path: Path, timeout_sec: int) -> bool:
+    """ffmpeg を実行し、出力が「妥当」なら True を返す (フォールバック用)。"""
+    try:
+        proc = subprocess.run(cmd, capture_output=True, timeout=timeout_sec)
+    except (FileNotFoundError, subprocess.TimeoutExpired) as e:
+        logger.error("ffmpeg 実行失敗: %s", e)
+        return False
+    if proc.returncode != 0:
+        logger.warning(
+            "ffmpeg 非 0 終了 (code=%d): %s",
+            proc.returncode, proc.stderr.decode(errors="replace")[-300:],
+        )
+        return False
+    if not (output_path.exists() and output_path.stat().st_size > 100_000):
+        logger.warning("ffmpeg 出力サイズ過小")
+        return False
+    duration = _probe_duration(output_path)
+    if duration is not None and duration < 60.0:
+        logger.warning("ffmpeg 出力の実尺が短すぎる (%.1f 秒)", duration)
+        return False
+    return True
+
+
+def _probe_duration(path: Path) -> float | None:
+    """ffprobe で duration を秒数で取得する。失敗したら None。"""
+    try:
+        proc = subprocess.run(
+            ["ffprobe", "-v", "error",
+             "-show_entries", "format=duration",
+             "-of", "default=noprint_wrappers=1:nokey=1",
+             str(path)],
+            capture_output=True, timeout=30, text=True,
+        )
+    except (FileNotFoundError, subprocess.TimeoutExpired):
+        return None
+    if proc.returncode != 0:
+        return None
+    try:
+        return float(proc.stdout.strip())
+    except ValueError:
+        return None

@@ -18,11 +18,53 @@ import sys
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
-from .api import fetch_programs
+from .api import Program, fetch_programs
 from .config import load_config
 from . import radiko
 
 JST = timezone(timedelta(hours=9))
+
+
+def _load_cached_nhk(path: Path) -> list:
+    """既存 programs-*.json から NHK r1/r3 エントリのみ復元する (フォールバック用)。
+
+    NHK API v3 は過去日付 (概ね 3 日以上前) を 400 で拒否することがあり、
+    その場合 API からは NHK データが取得できない。そのまま書き出すと
+    NHK 番組が欠落した JSON で上書きされてしまうため、既存キャッシュの
+    NHK 部分だけを取り込んで「Radiko 最新 + NHK キャッシュ」のマージ結果
+    を保存する。
+    """
+    if not path.exists():
+        return []
+    try:
+        with open(path, encoding="utf-8") as f:
+            data = json.load(f)
+    except (OSError, json.JSONDecodeError):
+        return []
+    result: list = []
+    for p in data.get("programs", []):
+        if p.get("service") not in ("r1", "r3"):
+            continue
+        try:
+            result.append(
+                Program(
+                    id=p.get("id", ""),
+                    service=p.get("service", ""),
+                    title=p.get("title", ""),
+                    subtitle=p.get("subtitle", ""),
+                    content=p.get("content", ""),
+                    start_time=datetime.fromisoformat(p["start_time"]),
+                    end_time=datetime.fromisoformat(p["end_time"]),
+                    series_id=p.get("series_id", ""),
+                    series_name=p.get("series_name", ""),
+                    episode_name=p.get("episode_name", ""),
+                    genre=p.get("genre", []) or [],
+                    area=p.get("area", "") or "",
+                )
+            )
+        except (KeyError, ValueError):
+            continue
+    return result
 
 # NHKのradiko同時配信局 (NHKと重複するため優先度を下げる)
 NHK_SIMULCAST_STATIONS = {"JOBK", "JOAK", "JOBK-FM", "JOAK-FM"}
@@ -388,9 +430,22 @@ def main():
     total_deduped = 0
     for i in range(start_offset, end_offset):
         target = (base_date + timedelta(days=i)).strftime("%Y-%m-%d")
-        logger.info("番組表取得: %s", target)
+        is_past = i < 0
+        logger.info("番組表取得: %s%s", target, " (past day)" if is_past else "")
         programs = fetch_programs(config, target)
-        total_programs += len(programs)
+        nhk_count = len(programs)
+        total_programs += nhk_count
+
+        # 過去日は NHK API v3 が 400 を返すことがあり、その場合は
+        # 既存キャッシュから NHK 部分を継承して保持する (null 上書き防止)。
+        if is_past and nhk_count == 0:
+            existing_nhk = _load_cached_nhk(output_dir / f"programs-{target}.json")
+            if existing_nhk:
+                logger.info(
+                    "NHK API が過去日 %s を返さず、既存キャッシュから %d 件を継承",
+                    target, len(existing_nhk),
+                )
+                programs.extend(existing_nhk)
 
         # Radiko番組も追加取得 (認証エリア + 追加エリア)
         if radiko_auth:
@@ -414,8 +469,15 @@ def main():
         if deduped_count > 0:
             logger.info("重複排除: %d件 → %d件 (%d件削除)", before_dedupe, len(programs), deduped_count)
 
-        # 番組リストをJSON保存 (未来分のみ、過去分はシリーズ蓄積のみ)
-        if i >= 0:
+        # 番組リストをJSON保存。
+        # 過去日も最新 Radiko スケジュール (差し替え反映済み) で再書き込みする。
+        # これにより当日中にスケジュール変更があった番組がキャッシュに反映され、
+        # 翌朝の録音ジョブが正しいタイトルで判定できる。
+        # NHK 側は is_past かつ API 失敗時に既存キャッシュから継承済み。
+        if not programs:
+            # 完全に空になった場合は既存を上書きしない (安全側)
+            logger.warning("番組 0 件、書き出しスキップ: %s", target)
+        else:
             programs_file = output_dir / f"programs-{target}.json"
             with open(programs_file, "w", encoding="utf-8") as f:
                 json.dump(

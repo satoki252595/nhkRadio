@@ -27,12 +27,14 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 from . import radiko as radiko_mod
+from . import radiru as radiru_mod
 from . import vpn_manager
 from .api import Program, fetch_programs
 from .config import Config, load_config
 from .matcher import filter_by_series, filter_programs
 from .notion import upload_recording
 from .recorder import make_output_path
+from .schedule_verify import build_schedule_index, verify_program
 from .vpngate import fetch_jp_servers
 
 JST = timezone(timedelta(hours=9))
@@ -128,6 +130,81 @@ def _service_to_station(
     return None
 
 
+def _matched_keywords(program: Program, keywords: list[str]) -> list[str]:
+    search_text = f"{program.title} {program.subtitle} {program.content}"
+    return [kw for kw in keywords if kw in search_text]
+
+
+def _upload_to_notion(
+    program: Program,
+    output_path: Path,
+    config: Config,
+    keywords: list[str],
+) -> bool:
+    """録音ファイルを Notion にアップする (Notion 未設定なら True を返す)。"""
+    logger = logging.getLogger(__name__)
+    if not (config.notion_token and config.notion_database_id):
+        return True
+    matched_kw = _matched_keywords(program, keywords)
+    try:
+        return bool(upload_recording(config, program, output_path, matched_kw))
+    except Exception as e:
+        logger.error("Notion アップロード失敗: %s - %s", program.title[:50], e)
+        return False
+
+
+def _download_nhk_via_radiru(
+    program: Program,
+    config: Config,
+    keywords: list[str],
+    counters: dict,
+    counters_lock: threading.Lock,
+) -> bool:
+    """NHK 番組を らじる★らじる 聴き逃し API で取得して Notion にアップする。
+
+    radiru に該当エピソードが無い場合は False を返す (呼び出し側でスキップ)。
+    Radiko へのフォールバックは行わない (Radiko 経由は NHK 配信停止で
+    アナウンス音源しか取れないため)。
+    """
+    logger = logging.getLogger(__name__)
+    if not program.series_id:
+        logger.debug("series_id 未設定 (%s)、radiru 取得スキップ", program.title[:30])
+        return False
+
+    episode = radiru_mod.find_episode(
+        program.series_id, program.start_time,
+        expected_title=program.title,  # 再放送枠で時刻不一致時のタイトル fallback 用
+    )
+    if not episode:
+        return False
+
+    output_path = make_output_path(config.output_dir, program)
+    logger.info(
+        "→ radiru DL: [%s] %s (%s)",
+        program.service, program.title[:50], episode.program_title[:40],
+    )
+    ok = radiru_mod.download_ondemand(
+        episode.stream_url, output_path, config.ffmpeg_path,
+    )
+    if not ok:
+        logger.error("radiru DL 失敗: %s", program.title[:50])
+        return False
+
+    uploaded = _upload_to_notion(program, output_path, config, keywords)
+    with counters_lock:
+        if uploaded:
+            counters["success"] += 1
+            counters["via_radiru"] = counters.get("via_radiru", 0) + 1
+        else:
+            counters["failed"] += 1
+
+    try:
+        output_path.unlink(missing_ok=True)
+    except OSError:
+        pass
+    return uploaded
+
+
 def _download_and_upload(
     program: Program,
     station_id: str,
@@ -137,10 +214,14 @@ def _download_and_upload(
     counters: dict,
     counters_lock: threading.Lock,
 ) -> None:
-    """1 番組を DL して Notion にアップする (スレッド worker)。"""
+    """1 番組を Radiko タイムフリーで DL して Notion にアップする (民放向け)。
+
+    NHK 番組はこのパスに来ない (Phase 1 で radiru 経由で処理、radiru に
+    無ければ丸ごとスキップ)。
+    """
     output_path = make_output_path(config.output_dir, program)
     logger = logging.getLogger(__name__)
-    logger.info("→ DL: [%s→%s] %s", program.service, station_id, program.title[:50])
+    logger.info("→ Radiko DL: [%s→%s] %s", program.service, station_id, program.title[:50])
 
     ok = radiko_mod.download_timefree(
         auth, station_id,
@@ -153,24 +234,13 @@ def _download_and_upload(
             counters["failed"] += 1
         return
 
-    if config.notion_token and config.notion_database_id:
-        search_text = f"{program.title} {program.subtitle} {program.content}"
-        matched_kw = [kw for kw in keywords if kw in search_text]
-        try:
-            uploaded = upload_recording(config, program, output_path, matched_kw)
-        except Exception as e:
-            logger.error("Notion アップロード失敗: %s - %s", program.title[:50], e)
-            uploaded = False
-        with counters_lock:
-            if uploaded:
-                counters["success"] += 1
-            else:
-                counters["failed"] += 1
-    else:
-        with counters_lock:
+    uploaded = _upload_to_notion(program, output_path, config, keywords)
+    with counters_lock:
+        if uploaded:
             counters["success"] += 1
+        else:
+            counters["failed"] += 1
 
-    # 完了後にファイル削除
     try:
         output_path.unlink(missing_ok=True)
     except OSError:
@@ -184,11 +254,14 @@ def _run_one_pass(
     keywords: list[str],
     counters: dict,
     counters_lock: threading.Lock,
+    verify_schedule: bool = True,
 ) -> list[Program]:
     """現在の VPN セッションで取得可能な番組を並列 DL し、残りを返す。
 
     Args:
         pending: まだ DL できていない番組
+        verify_schedule: True の場合、録音直前に Radiko 最新スケジュールで
+            予定タイトルとクロスチェックし、差し替えられた番組を弾く。
 
     Returns:
         この pass で DL できなかった (次 VPN で再試行する) 番組のリスト
@@ -202,6 +275,22 @@ def _run_one_pass(
         "area=%s で聴取可能: NHK AM=%s FM=%s + Radiko %d 局",
         auth.area_id, nhk_am, nhk_fm, len(area_stations),
     )
+
+    # Radiko 最新スケジュールでキャッシュ JSON をクロスチェック。
+    # 同日に番組が差し替えられたケース (例: 2026-04-14 の「放送していない
+    # 番組を録音」) はキャッシュと乖離するためここで検出する。
+    schedule_index: dict = {}
+    if verify_schedule and pending:
+        target_dates = sorted({
+            _broadcast_date(p.start_time.astimezone(JST)) for p in pending
+        })
+        try:
+            schedule_index = build_schedule_index(auth.area_id, target_dates)
+        except Exception as e:
+            logger.warning(
+                "Radiko スケジュール取得失敗、検証をスキップ: %s", e,
+            )
+            schedule_index = {}
 
     # このパスで DL 可能 / 不可能 を判定
     to_download: list[tuple[Program, str]] = []
@@ -233,6 +322,29 @@ def _run_one_pass(
         if p.service.startswith("radiko:") and station_id not in area_stations:
             remaining.append(p)
             continue
+
+        # Radiko 最新スケジュールとクロスチェック
+        # NHK 本家 (r1/r3) は NHK 同時配信局 (JOAK/JOBK/-FM) の Radiko 側
+        # スケジュールを参照する (同じ放送内容が流れる)。
+        if verify_schedule and schedule_index:
+            verify_station = station_id
+            actual = verify_program(p, verify_station, schedule_index)
+            if not actual.ok:
+                logger.warning(
+                    "スケジュール不一致で録音スキップ: [%s] %s %s-%s 予定=%r 実際=%r (%s)",
+                    p.service,
+                    p.start_time.strftime("%Y-%m-%d"),
+                    p.start_time.strftime("%H:%M"),
+                    p.end_time.strftime("%H:%M"),
+                    p.title[:50],
+                    actual.actual_title[:50],
+                    actual.reason,
+                )
+                with counters_lock:
+                    counters["mismatch"] = counters.get("mismatch", 0) + 1
+                # 不一致は次の area でも同じ結果 (Radiko データは area 非依存の
+                # 時間軸) なので remaining には残さず破棄する。
+                continue
 
         to_download.append((p, station_id))
 
@@ -290,6 +402,11 @@ def main() -> None:
     parser.add_argument(
         "--dry-run", action="store_true",
         help="DL せず対象番組一覧のみ表示",
+    )
+    parser.add_argument(
+        "--no-verify-schedule", action="store_true",
+        help="Radiko 最新スケジュールでのクロスチェックを無効にする "
+             "(デフォルト: 有効。差し替え番組の誤録音を防止)",
     )
     args = parser.parse_args()
 
@@ -373,7 +490,64 @@ def main() -> None:
         logger.info("対象番組なし、終了")
         return
 
+    counters = {
+        "success": 0, "failed": 0, "skipped": 0,
+        "mismatch": 0, "radiru_missing": 0, "via_radiru": 0,
+    }
+    counters_lock = threading.Lock()
+
+    # ================================================================
+    # Phase 1: NHK 本家 (r1/r3) は らじる★らじる 聴き逃し経由でのみ取得する。
+    # Radiko タイムフリーは NHK の多くの番組を「配信停止」扱いとし、
+    # アクセスすると「大変申し訳ありませんが…配信を停止しております」という
+    # アナウンス音源に置換される (2026-04-14 インシデントの真因)。
+    # radiru に該当エピソードが無ければ録音せずスキップ (Radiko フォール
+    # バックは配信停止アナウンスの元凶なので行わない)。
+    # ================================================================
+    nhk_programs = [p for p in matched if p.service in ("r1", "r3")]
+    radiko_pending = [p for p in matched if p.service not in ("r1", "r3")]
+
+    now_jst = datetime.now(JST)
+    if nhk_programs:
+        logger.info(
+            "=== Phase 1: NHK %d 件を radiru 聴き逃しで取得 (VPN 不要) ===",
+            len(nhk_programs),
+        )
+        for p in nhk_programs:
+            if p.end_time > now_jst:
+                logger.info(
+                    "未放送スキップ: [%s] %s %s",
+                    p.service, p.start_time.strftime("%Y-%m-%d %H:%M"),
+                    p.title[:50],
+                )
+                with counters_lock:
+                    counters["skipped"] += 1
+                continue
+            ok = _download_nhk_via_radiru(
+                p, config, keywords, counters, counters_lock,
+            )
+            if not ok:
+                logger.warning(
+                    "radiru 未収録でスキップ (再放送/配信期間切れ等): [%s] %s %s",
+                    p.service, p.start_time.strftime("%Y-%m-%d %H:%M"),
+                    p.title[:50],
+                )
+                with counters_lock:
+                    counters["radiru_missing"] += 1
+
+    if not radiko_pending:
+        logger.info("民放 0 件、VPN ループをスキップ")
+        _report_and_exit(counters, 0, logger)
+        return
+
+    # ================================================================
+    # Phase 2: 民放番組 (radiko:XXX) → Radiko タイムフリー
     # マルチ VPN パス: 異なる area に順次接続して取得可能な分を DL
+    # ================================================================
+    logger.info(
+        "=== Phase 2: Radiko タイムフリーで民放 %d 件を取得 ===",
+        len(radiko_pending),
+    )
     logger.info("VPN Gate サーバーリスト取得中...")
     vpn_servers = fetch_jp_servers(limit=50)
     if not vpn_servers:
@@ -394,10 +568,7 @@ def main() -> None:
         len(vpn_servers), len(private), len(public),
     )
 
-    counters = {"success": 0, "failed": 0, "skipped": 0}
-    counters_lock = threading.Lock()
-
-    pending: list[Program] = list(matched)
+    pending: list[Program] = list(radiko_pending)
     attempted_areas: set[str] = set()
     vpn_config_path = Path(args.vpn_config)
 
@@ -446,11 +617,21 @@ def main() -> None:
             # このエリアで取れる番組を全部 DL
             pending = _run_one_pass(
                 pending, auth, config, keywords, counters, counters_lock,
+                verify_schedule=not args.no_verify_schedule,
             )
         finally:
             vpn_manager.disconnect()
 
-    # 最終レポート
+    _report_and_exit(counters, len(pending), logger, pending)
+
+
+def _report_and_exit(
+    counters: dict,
+    remaining_count: int,
+    logger: logging.Logger,
+    pending: list[Program] | None = None,
+) -> None:
+    """最終レポートを出して、全滅していれば非ゼロで終了する。"""
     if pending:
         logger.warning("取得できなかった番組 (%d 件):", len(pending))
         for p in pending:
@@ -464,11 +645,17 @@ def main() -> None:
             )
 
     logger.info(
-        "=== 完了: 成功 %d / 失敗 %d / 未放送スキップ %d / 未カバー %d ===",
-        counters["success"], counters["failed"], counters["skipped"], len(pending),
+        "=== 完了: 成功 %d (うち radiru %d) / 失敗 %d / "
+        "radiru 未収録 %d / 未放送スキップ %d / 差替スキップ %d / 未カバー %d ===",
+        counters["success"],
+        counters.get("via_radiru", 0),
+        counters["failed"],
+        counters.get("radiru_missing", 0),
+        counters["skipped"],
+        counters["mismatch"],
+        remaining_count,
     )
 
-    # 全滅なら非ゼロで終了
     if (
         counters["success"] == 0
         and counters["failed"] > 0

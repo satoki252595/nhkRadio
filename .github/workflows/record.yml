@@ -40,7 +40,12 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y ffmpeg openvpn
 
       - name: Install Python dependencies
-        run: pip install httpx pyyaml
+        # yt-dlp は NHK らじる★らじる の HLS 取得用。ffmpeg の AAC デコーダが
+        # 一部番組 (115 分の音楽番組など) で Multiple RDBs + CRC を扱えず
+        # 途中停止するため、代替として yt-dlp の native HLS downloader を使う。
+        # pycryptodomex は AES-128 暗号化された HLS セグメントの復号に必須
+        # (未インストールだと yt-dlp が ffmpeg に委譲してしまい同じ問題が再発する)。
+        run: pip install httpx pyyaml yt-dlp pycryptodomex
 
       - name: Verify sudo without password
         run: sudo -n true
