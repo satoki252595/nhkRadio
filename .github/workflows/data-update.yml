@@ -55,6 +55,15 @@ jobs:
           cp -f data/programs-latest.json web/static/data/
           cp -f data/programs-*.json web/static/data/ 2>/dev/null || true
 
+      - name: Disconnect VPN
+        if: always()
+        run: |
+          sudo pkill -f openvpn || true
+          # ルーティングが戻るのを少し待つ
+          sleep 3
+          # github.com への到達確認
+          curl -sSfI --max-time 10 https://github.com > /dev/null
+
       - name: Commit updated data
         run: |
           git config user.name "github-actions[bot]"
