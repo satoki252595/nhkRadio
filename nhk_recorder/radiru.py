@@ -46,10 +46,31 @@ NEW_ARRIVALS_URL = (
 )
 SERIES_URL = "https://www.nhk.or.jp/radio-api/app/v1/web/ondemand/series"
 
-# vod-stream.nhk.jp CDN は素の curl/yt-dlp UA を 403 で弾くため、
-# ブラウザ風 User-Agent と NHK ラジオサイトの Referer を付与する。
-# (2026-05 観測: ヘッダ無しだとシリーズ JSON は 200 で取れるのに
-#  ストリーム本体だけ 403 が返る)
+# vod-stream.nhk.jp の HLS playlist は API が返す stream_url そのものではなく、
+# 末尾の ".m4a" を取り除いて "/index.m3u8" を足したパスにある。
+# yt-dlp 公式 NHK extractor (yt_dlp/extractor/nhk.py) と同じ変換を行う:
+#     audio_path = remove_end(stream_url, ".m4a")
+#     playlist  = f"{audio_path}/index.m3u8"
+# API が ".m4a" 付きを返すバージョンと付かないバージョンの両方が観測されているので
+# rstrip("/") + remove_end(".m4a") の両方を行ってから "/index.m3u8" を付ける。
+# (2026-05 観測: API が ".m4a" 抜きの URL を返すようになり、その URL を素のまま
+#  叩くと vod-stream.nhk.jp が 403 を返して radiru DL が全件失敗していた)
+
+
+def _to_m3u8_url(stream_url: str) -> str:
+    """API の stream_url を実際にダウンロード可能な HLS playlist URL に変換する。"""
+    if stream_url.endswith(".m3u8"):
+        return stream_url
+    base = stream_url
+    if base.endswith(".m4a"):
+        base = base[:-4]
+    return base.rstrip("/") + "/index.m3u8"
+
+
+# vod-stream.nhk.jp CDN への保険として、ブラウザ風 User-Agent と
+# NHK ラジオサイトの Referer を付与する (yt-dlp 公式 extractor は
+# 設定していないが、CDN が将来 UA チェックを足したときの防御として
+# 残しておく)。
 _BROWSER_UA = (
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
     "AppleWebKit/537.36 (KHTML, like Gecko) "
@@ -417,11 +438,15 @@ def download_ondemand(
     これで通ることが多いため)。
     """
     output_path.parent.mkdir(parents=True, exist_ok=True)
-    logger.info("radiru DL: %s → %s", stream_url, output_path.name)
+    playlist_url = _to_m3u8_url(stream_url)
+    logger.info(
+        "radiru DL: %s (api=%s) → %s",
+        playlist_url, stream_url, output_path.name,
+    )
 
     ytdlp_bin = shutil.which("yt-dlp")
     if ytdlp_bin:
-        if _try_ytdlp(ytdlp_bin, stream_url, output_path, timeout_sec):
+        if _try_ytdlp(ytdlp_bin, playlist_url, output_path, timeout_sec):
             logger.info(
                 "radiru DL 完了 (yt-dlp): %s (%.1f MB)",
                 output_path.name, output_path.stat().st_size / 1024 / 1024,
@@ -435,7 +460,7 @@ def download_ondemand(
         ffmpeg_path, "-y",
         "-user_agent", _BROWSER_UA,
         "-headers", f"Referer: {_REFERER}\r\n",
-        "-i", stream_url,
+        "-i", playlist_url,
         "-c", "copy",
         "-bsf:a", "aac_adtstoasc",
         str(output_path),

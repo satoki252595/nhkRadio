@@ -319,6 +319,42 @@ def test_find_episode_lenient_title_does_not_mismatch_close_episodes():
     assert ep is None
 
 
+def test_to_m3u8_url_strips_m4a_and_appends_index():
+    """API が ".m4a" 付き URL を返すケース (yt-dlp 公式 extractor 互換)。"""
+    src = (
+        "https://vod-stream.nhk.jp/radioondemand/r/QM16JZPN81/"
+        "s/stream_QM16JZPN81_04f3025.m4a"
+    )
+    assert radiru._to_m3u8_url(src) == (
+        "https://vod-stream.nhk.jp/radioondemand/r/QM16JZPN81/"
+        "s/stream_QM16JZPN81_04f3025/index.m3u8"
+    )
+
+
+def test_to_m3u8_url_appends_index_when_no_extension():
+    """API が拡張子無しの URL を返すケース (2026-05 観測の実例)。"""
+    src = (
+        "https://vod-stream.nhk.jp/radioondemand/r/QM16JZPN81/"
+        "s/stream_QM16JZPN81_04f3025"
+    )
+    assert radiru._to_m3u8_url(src) == (
+        "https://vod-stream.nhk.jp/radioondemand/r/QM16JZPN81/"
+        "s/stream_QM16JZPN81_04f3025/index.m3u8"
+    )
+
+
+def test_to_m3u8_url_passes_through_existing_m3u8():
+    """既に ".m3u8" で終わる URL はそのまま返す (誤って /index.m3u8 を二重に付けない)。"""
+    src = "https://vod-stream.nhk.jp/foo/bar/playlist.m3u8"
+    assert radiru._to_m3u8_url(src) == src
+
+
+def test_to_m3u8_url_handles_trailing_slash():
+    """末尾スラッシュ付きの URL でも /index.m3u8 を一つだけ付ける。"""
+    src = "https://vod-stream.nhk.jp/foo/bar/"
+    assert radiru._to_m3u8_url(src) == "https://vod-stream.nhk.jp/foo/bar/index.m3u8"
+
+
 def test_fetch_series_episodes_handles_invalid_json():
     """JSON 以外 (HTML エラーページ等) が返ってきても例外を投げず空リスト。"""
 
