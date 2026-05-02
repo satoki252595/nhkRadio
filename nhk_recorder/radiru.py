@@ -82,7 +82,12 @@ def fetch_series_episodes(
     corner_site_id: str = "01",
     timeout: float = 30.0,
 ) -> list[RadiruEpisode]:
-    """指定シリーズの聴き逃しエピソード一覧を取得する。"""
+    """指定シリーズの聴き逃しエピソード一覧を取得する。
+
+    JSON 以外の応答 (HTML エラー等) が返った場合は空リストを返す
+    (例外を握りつぶして処理を続行する。NHK 側の一時的な不調でも
+    他シリーズの取得は止めない方針)。
+    """
     try:
         r = httpx.get(
             SERIES_URL,
@@ -94,7 +99,7 @@ def fetch_series_episodes(
         )
         r.raise_for_status()
         data = r.json()
-    except (httpx.RequestError, httpx.HTTPStatusError) as e:
+    except (httpx.RequestError, httpx.HTTPStatusError, ValueError) as e:
         logger.warning(
             "radiru series fetch 失敗 (%s/%s): %s",
             series_site_id, corner_site_id, e,
@@ -102,12 +107,17 @@ def fetch_series_episodes(
         return []
 
     episodes: list[RadiruEpisode] = []
-    for ep in data.get("episodes", []):
+    raw_episodes = data.get("episodes", []) or []
+    skipped_no_time = 0
+    skipped_no_url = 0
+    for ep in raw_episodes:
         times = _parse_aa_time_range(ep.get("aa_contents_id", ""))
         if not times:
+            skipped_no_time += 1
             continue
         stream_url = ep.get("stream_url", "")
         if not stream_url:
+            skipped_no_url += 1
             continue
         episodes.append(
             RadiruEpisode(
@@ -118,6 +128,13 @@ def fetch_series_episodes(
                 end_time=times[1],
                 stream_url=stream_url,
             )
+        )
+    if raw_episodes and not episodes:
+        logger.warning(
+            "radiru series 応答にエピソードはあるが全件スキップ "
+            "(%s/%s): raw=%d no_time=%d no_url=%d",
+            series_site_id, corner_site_id,
+            len(raw_episodes), skipped_no_time, skipped_no_url,
         )
     return episodes
 
@@ -155,28 +172,30 @@ def find_episode(
     tolerance_sec: int = 120,
     preferred_corner: str = "01",
     expected_title: str = "",
+    brute_force_corner_max: int = 30,
 ) -> RadiruEpisode | None:
     """指定シリーズ・開始時刻のエピソードを探す。
 
-    対応戦略:
-    1. まず corner_site_id="01" で検索 (大半の番組はここでヒット)
-    2. 見つからない場合、new_arrivals を走査して該当シリーズの他 corner を
-       全て試す (N らじ等の複数 corner 番組向け)
-    3. 完全一致を優先し、±tolerance_sec 以内の最近傍で妥協する (NHK の :03
-       秒オフセットを吸収)
-    4. 時刻一致が無くても expected_title が指定されていれば、
-       同一シリーズ内で**正規化タイトル完全一致**のエピソードを採用する。
-       これは再放送枠 (例: 名演奏ライブラリー 日曜原放送 → 火曜再放送)
-       を対象枠の時刻で保存できるようにするための fallback。
-       "Lesson (9)" と "Lesson (10)" のような異なるエピソードは正規化後も
-       別タイトルなので誤マッチしない。
+    対応戦略 (順に試行):
+    1. corner_site_id="01" で時刻一致検索 (大半の番組はここでヒット)
+    2. new_arrivals 走査で発見した他 corner で時刻一致検索
+       (N らじ等の複数 corner 番組向け)
+    3. corner_site_id="01" がエピソード 0 件のとき、"02".."30" を順次
+       ブルートフォース試行 (語学・音楽番組で "01" 以外のコーナーに
+       割り当てられているケースを救済)
+    4. 全 corner で集めたエピソードに対し、expected_title による
+       タイトルマッチで救済:
+         a. 正規化タイトル完全一致 (例: 再放送枠の枠時刻違い吸収)
+         b. NHK 側のシリーズ名プレフィックスを除いた末尾一致
+            (radiru が "Lesson (10)" だけ返すケースを救済)
+       "Lesson (9)" と "Lesson (10)" のような異なるエピソードは
+       正規化後も別タイトルなので誤マッチしない。
 
     Returns:
-        マッチしたエピソード、または None (配信期間切れ/未公開)
+        マッチしたエピソード、または None (配信期間切れ/未公開/識別不能)
     """
     target = start_time.astimezone(JST)
 
-    # 全 corner のエピソードを一度収集してから時刻 → タイトルの 2 段検索を掛ける。
     tried_corners: list[str] = [preferred_corner]
     all_episodes: list[RadiruEpisode] = list(
         fetch_series_episodes(series_site_id, preferred_corner)
@@ -196,6 +215,28 @@ def find_episode(
         if best is not None:
             return best
 
+    # corner "01" 不発 + new_arrivals 不発の場合のブルートフォース。
+    # 語学番組や週末番組は new_arrivals にエントリされない (ピックアップ
+    # されない) ことがあり、その場合は "02".."30" を直接叩いて拾う。
+    if not all_episodes:
+        for i in range(2, brute_force_corner_max + 1):
+            cid = f"{i:02d}"
+            if cid in tried_corners:
+                continue
+            tried_corners.append(cid)
+            extra = fetch_series_episodes(series_site_id, cid)
+            if not extra:
+                continue
+            logger.info(
+                "radiru ブルートフォースで発見: series=%s corner=%s episodes=%d",
+                series_site_id, cid, len(extra),
+            )
+            all_episodes.extend(extra)
+            best = _best_match(extra, target, tolerance_sec)
+            if best is not None:
+                return best
+            break
+
     if expected_title:
         title_hit = _match_by_title(all_episodes, expected_title)
         if title_hit is not None:
@@ -207,12 +248,35 @@ def find_episode(
             )
             return title_hit
 
-    logger.info(
-        "radiru エピソード未発見: series=%s start=%s title=%r "
-        "(tried corners: %s, episodes: %d)",
-        series_site_id, target.isoformat(),
-        expected_title[:40], tried_corners, len(all_episodes),
-    )
+        title_hit = _match_by_title_lenient(all_episodes, expected_title)
+        if title_hit is not None:
+            logger.info(
+                "radiru タイトル末尾一致で解決 (シリーズ名プレフィックス差異): "
+                "series=%s 枠=%s NHKタイトル=%r radiruタイトル=%r (%s)",
+                series_site_id, target.isoformat(),
+                expected_title[:60], title_hit.program_title,
+                title_hit.start_time.isoformat(),
+            )
+            return title_hit
+
+    if all_episodes:
+        sample = [
+            (ep.program_title[:60], ep.start_time.isoformat())
+            for ep in all_episodes[:5]
+        ]
+        logger.warning(
+            "radiru エピソード未発見 (候補あり): series=%s target=%s "
+            "title=%r tried_corners=%s episodes=%d sample=%s",
+            series_site_id, target.isoformat(),
+            expected_title[:60], tried_corners, len(all_episodes), sample,
+        )
+    else:
+        logger.warning(
+            "radiru エピソード未発見 (候補なし): series=%s target=%s "
+            "title=%r tried_corners=%s",
+            series_site_id, target.isoformat(),
+            expected_title[:60], tried_corners,
+        )
     return None
 
 
@@ -265,6 +329,42 @@ def _match_by_title(
         return None
     for ep in episodes:
         if _normalize_title_strict(ep.program_title) == norm_target:
+            return ep
+    return None
+
+
+def _match_by_title_lenient(
+    episodes: list[RadiruEpisode], expected_title: str,
+) -> RadiruEpisode | None:
+    """シリーズ名プレフィックスの差異を吸収するタイトル末尾一致。
+
+    NHK 番組表 v3 と radiru の program_title でシリーズ名の付き方が
+    異なるケースを救済する:
+        NHK    = "ラジオビジネス英語 Lesson(10)"
+        radiru = "Lesson(10)"  ← 番組表側のシリーズ名が付かない
+
+    安全条件として「半角スペース区切りの完全な末尾一致」を要求する。
+    これにより "Lesson(1)" と "Lesson(10)" のような部分文字列の
+    誤マッチは発生しない (空白で区切られた完全な単語境界での比較)。
+
+    Returns:
+        該当エピソード、または None。
+    """
+    norm_target = _normalize_title_strict(expected_title)
+    if not norm_target:
+        return None
+
+    for ep in episodes:
+        ep_norm = _normalize_title_strict(ep.program_title)
+        if not ep_norm:
+            continue
+        if ep_norm == norm_target:
+            return ep
+        # NHK タイトルが radiru タイトルを末尾に含む (一般的なケース)
+        if norm_target.endswith(" " + ep_norm):
+            return ep
+        # 逆向き: radiru タイトルが NHK タイトルを末尾に含む (稀)
+        if ep_norm.endswith(" " + norm_target):
             return ep
     return None
 
