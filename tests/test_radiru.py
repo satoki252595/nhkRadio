@@ -241,3 +241,96 @@ def test_find_episode_tries_alternate_corners_when_01_empty():
     # 01 → new_arrivals → 26 の順でアクセスされたこと
     corner_ids = [c[1].get("corner_site_id") for c in calls if "corner_site_id" in c[1]]
     assert corner_ids == ["01", "26"]
+
+
+def test_find_episode_brute_force_corner_when_new_arrivals_silent():
+    """new_arrivals に該当シリーズが無くても "02..30" のブルートフォースで救済される。"""
+    def fake_get(url, params=None, timeout=None):
+        if "new_arrivals" in url:
+            # 該当シリーズについて何も返さない (語学番組などで頻発)
+            return _FakeResp({"corners": []})
+        cid = (params or {}).get("corner_site_id", "01")
+        if cid == "07":
+            return _FakeResp(_fake_series([
+                _episode("Lang Lesson", "2026-04-14T11:20:00+09:00",
+                         "2026-04-14T11:35:00+09:00"),
+            ]))
+        return _FakeResp(_fake_series([]))
+
+    with patch.object(httpx, "get", side_effect=fake_get):
+        ep = radiru.find_episode(
+            "X", datetime(2026, 4, 14, 11, 20, tzinfo=JST),
+        )
+    assert ep is not None
+    assert ep.program_title == "Lang Lesson"
+
+
+def test_find_episode_lenient_title_match_drops_series_prefix():
+    """radiru の program_title にシリーズ名プレフィックスが付かないケースを救済する。
+
+    実例: NHK 番組表 = "ラジオビジネス英語 Lesson(10)" / radiru = "Lesson (10)"
+    末尾完全一致なので Lesson(1) と Lesson(10) の誤マッチは起きない。
+    """
+    payload = _fake_series([
+        _episode(
+            "Lesson (10)",  # ← シリーズ名プレフィックスなし
+            "2026-04-14T11:20:00+09:00", "2026-04-14T11:35:00+09:00",
+            "https://vod/lesson10.m3u8",
+        ),
+    ])
+
+    def fake_get(url, params=None, timeout=None):
+        if "new_arrivals" in url:
+            return _FakeResp({"corners": []})
+        return _FakeResp(payload)
+
+    with patch.object(httpx, "get", side_effect=fake_get):
+        ep = radiru.find_episode(
+            "368315KKP8",
+            # 23:20 の再放送枠を狙う (radiru は 11:20 の本放送のみ収録)
+            datetime(2026, 4, 14, 23, 20, tzinfo=JST),
+            expected_title="ラジオビジネス英語　Ｌｅｓｓｏｎ（１０）",
+        )
+    assert ep is not None
+    assert ep.stream_url == "https://vod/lesson10.m3u8"
+
+
+def test_find_episode_lenient_title_does_not_mismatch_close_episodes():
+    """末尾一致は完全な空白区切りで行うので Lesson(1) と Lesson(10) は誤マッチしない。"""
+    payload = _fake_series([
+        _episode(
+            "Lesson (1)",
+            "2026-04-01T11:20:00+09:00", "2026-04-01T11:35:00+09:00",
+            "https://vod/lesson1.m3u8",
+        ),
+    ])
+
+    def fake_get(url, params=None, timeout=None):
+        if "new_arrivals" in url:
+            return _FakeResp({"corners": []})
+        return _FakeResp(payload)
+
+    with patch.object(httpx, "get", side_effect=fake_get):
+        ep = radiru.find_episode(
+            "368315KKP8",
+            datetime(2026, 4, 14, 23, 20, tzinfo=JST),
+            expected_title="ラジオビジネス英語 Lesson (10)",
+        )
+    assert ep is None
+
+
+def test_fetch_series_episodes_handles_invalid_json():
+    """JSON 以外 (HTML エラーページ等) が返ってきても例外を投げず空リスト。"""
+
+    class _BadResp:
+        status_code = 200
+
+        def raise_for_status(self):
+            pass
+
+        def json(self):
+            raise ValueError("Expecting value")
+
+    with patch.object(httpx, "get", return_value=_BadResp()):
+        eps = radiru.fetch_series_episodes("X")
+    assert eps == []

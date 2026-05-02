@@ -171,10 +171,20 @@ def _download_nhk_via_radiru(
         logger.debug("series_id 未設定 (%s)、radiru 取得スキップ", program.title[:30])
         return False
 
-    episode = radiru_mod.find_episode(
-        program.series_id, program.start_time,
-        expected_title=program.title,  # 再放送枠で時刻不一致時のタイトル fallback 用
-    )
+    # find_episode 内で予期せぬ例外が起きた場合も Phase 1 全体を止めず
+    # 次の番組に進めるよう、ここで安全網を張る (例: NHK API 仕様変更で
+    # 想定外の応答が来た場合等)。
+    try:
+        episode = radiru_mod.find_episode(
+            program.series_id, program.start_time,
+            expected_title=program.title,  # 再放送枠で時刻不一致時のタイトル fallback 用
+        )
+    except Exception as e:
+        logger.warning(
+            "radiru find_episode 例外 (%s/%s): %s",
+            program.series_id, program.title[:40], e,
+        )
+        return False
     if not episode:
         return False
 
