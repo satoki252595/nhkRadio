@@ -46,6 +46,17 @@ NEW_ARRIVALS_URL = (
 )
 SERIES_URL = "https://www.nhk.or.jp/radio-api/app/v1/web/ondemand/series"
 
+# vod-stream.nhk.jp CDN は素の curl/yt-dlp UA を 403 で弾くため、
+# ブラウザ風 User-Agent と NHK ラジオサイトの Referer を付与する。
+# (2026-05 観測: ヘッダ無しだとシリーズ JSON は 200 で取れるのに
+#  ストリーム本体だけ 403 が返る)
+_BROWSER_UA = (
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+    "AppleWebKit/537.36 (KHTML, like Gecko) "
+    "Chrome/124.0.0.0 Safari/537.36"
+)
+_REFERER = "https://www.nhk.or.jp/radio/"
+
 
 @dataclass
 class RadiruEpisode:
@@ -406,7 +417,7 @@ def download_ondemand(
     これで通ることが多いため)。
     """
     output_path.parent.mkdir(parents=True, exist_ok=True)
-    logger.info("radiru DL: %s → %s", stream_url[:80], output_path.name)
+    logger.info("radiru DL: %s → %s", stream_url, output_path.name)
 
     ytdlp_bin = shutil.which("yt-dlp")
     if ytdlp_bin:
@@ -422,6 +433,8 @@ def download_ondemand(
     # 失敗するが、短い番組 (通常の語学・ニュース 15 分枠) は通ることが多い。
     copy_cmd = [
         ffmpeg_path, "-y",
+        "-user_agent", _BROWSER_UA,
+        "-headers", f"Referer: {_REFERER}\r\n",
         "-i", stream_url,
         "-c", "copy",
         "-bsf:a", "aac_adtstoasc",
@@ -463,6 +476,8 @@ def _try_ytdlp(
         ytdlp_bin,
         "--no-progress",
         "--hls-prefer-native",
+        "--user-agent", _BROWSER_UA,
+        "--referer", _REFERER,
         "-o", f"{tmp_base}.%(ext)s",
         stream_url,
     ]
