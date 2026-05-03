@@ -10,7 +10,10 @@ NHK 本家番組は Radiko ではなく、NHK が直接提供する「聴き逃�
 (radiru on-demand) からダウンロードする。
 
 特徴:
-- 日本国外 IP からも取得可能 (VPN 不要)
+- API (radio-api/series, new_arrivals) は日本国外 IP でも取得可能
+- ストリーム配信 (vod-stream.nhk.jp) は **日本国内 IP 限定** で、国外から
+  m3u8 を叩くと HTTP 403 Forbidden が返る。GitHub Actions などのクラウド
+  ランナーから取得する場合は VPN で日本 IP に乗せ替える必要がある。
 - 配信停止の心配なし (NHK 直営なので権利処理済み)
 - 配信期間は放送後 1 週間が多い (番組により変動)
 - m3u8 を ffmpeg で remux するだけ (Radiko のような認証・アセンブリ不要)

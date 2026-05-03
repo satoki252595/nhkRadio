@@ -159,17 +159,24 @@ def _download_nhk_via_radiru(
     keywords: list[str],
     counters: dict,
     counters_lock: threading.Lock,
-) -> bool:
+) -> str:
     """NHK 番組を らじる★らじる 聴き逃し API で取得して Notion にアップする。
 
-    radiru に該当エピソードが無い場合は False を返す (呼び出し側でスキップ)。
     Radiko へのフォールバックは行わない (Radiko 経由は NHK 配信停止で
     アナウンス音源しか取れないため)。
+
+    Returns:
+        - "uploaded": ダウンロード + Notion アップ成功 (or Notion 未設定)
+        - "missing": 該当エピソードが radiru API に存在しない (永久スキップ)
+        - "dl_failed": エピソードは存在するが m3u8 取得に失敗 (例: 国外 IP に
+          よる 403)。VPN を張り替えてリトライする価値あり。
+        - "no_series_id": program に series_id が無い (永久スキップ)
+        - "upload_failed": DL は成功したが Notion アップロードに失敗
     """
     logger = logging.getLogger(__name__)
     if not program.series_id:
         logger.debug("series_id 未設定 (%s)、radiru 取得スキップ", program.title[:30])
-        return False
+        return "no_series_id"
 
     # find_episode 内で予期せぬ例外が起きた場合も Phase 1 全体を止めず
     # 次の番組に進めるよう、ここで安全網を張る (例: NHK API 仕様変更で
@@ -184,9 +191,11 @@ def _download_nhk_via_radiru(
             "radiru find_episode 例外 (%s/%s): %s",
             program.series_id, program.title[:40], e,
         )
-        return False
+        # 一時的なネットワーク不調や API 揺らぎの可能性があるので、
+        # "dl_failed" 扱いにして次の VPN パスでリトライさせる。
+        return "dl_failed"
     if not episode:
-        return False
+        return "missing"
 
     output_path = make_output_path(config.output_dir, program)
     logger.info(
@@ -198,21 +207,21 @@ def _download_nhk_via_radiru(
     )
     if not ok:
         logger.error("radiru DL 失敗: %s", program.title[:50])
-        return False
+        return "dl_failed"
 
     uploaded = _upload_to_notion(program, output_path, config, keywords)
+    try:
+        output_path.unlink(missing_ok=True)
+    except OSError:
+        pass
+
     with counters_lock:
         if uploaded:
             counters["success"] += 1
             counters["via_radiru"] = counters.get("via_radiru", 0) + 1
         else:
             counters["failed"] += 1
-
-    try:
-        output_path.unlink(missing_ok=True)
-    except OSError:
-        pass
-    return uploaded
+    return "uploaded" if uploaded else "upload_failed"
 
 
 def _download_and_upload(
@@ -255,6 +264,60 @@ def _download_and_upload(
         output_path.unlink(missing_ok=True)
     except OSError:
         pass
+
+
+def _run_radiru_pass(
+    pending: list[Program],
+    config: Config,
+    keywords: list[str],
+    counters: dict,
+    counters_lock: threading.Lock,
+) -> list[Program]:
+    """現 VPN セッションで NHK 番組を radiru 経由で DL する。
+
+    NHK の m3u8 配信 (vod-stream.nhk.jp) は日本国内 IP 限定で、国外 IP からは
+    HTTP 403 が返る。よって本処理は VPN 接続中 (日本 IP) でのみ意味を持つ。
+
+    Returns:
+        この VPN パスで DL できなかった番組 (次の VPN で再試行)。
+        "missing" / "no_series_id" / "uploaded" / "upload_failed" は
+        いずれも次パスで再試行しない (永久確定) のでリストから除外する。
+    """
+    logger = logging.getLogger(__name__)
+    remaining: list[Program] = []
+    now = datetime.now(JST)
+
+    for p in pending:
+        if p.end_time > now:
+            logger.info(
+                "未放送スキップ: [%s] %s %s",
+                p.service, p.start_time.strftime("%Y-%m-%d %H:%M"),
+                p.title[:50],
+            )
+            with counters_lock:
+                counters["skipped"] += 1
+            continue
+
+        status = _download_nhk_via_radiru(
+            p, config, keywords, counters, counters_lock,
+        )
+        if status == "dl_failed":
+            # 国外 IP (VPN 切断 or area 不一致) で 403 の可能性が高い。
+            # 次の VPN サーバーで再試行する。
+            remaining.append(p)
+            continue
+        if status == "missing" or status == "no_series_id":
+            logger.warning(
+                "radiru 未収録でスキップ (再放送/配信期間切れ等): [%s] %s %s",
+                p.service, p.start_time.strftime("%Y-%m-%d %H:%M"),
+                p.title[:50],
+            )
+            with counters_lock:
+                counters["radiru_missing"] += 1
+            continue
+        # "uploaded" / "upload_failed" はカウンタ更新済み、次パス不要
+
+    return remaining
 
 
 def _run_one_pass(
@@ -507,57 +570,25 @@ def main() -> None:
     counters_lock = threading.Lock()
 
     # ================================================================
-    # Phase 1: NHK 本家 (r1/r3) は らじる★らじる 聴き逃し経由でのみ取得する。
+    # NHK 本家 (r1/r3) は らじる★らじる 聴き逃し経由でのみ取得する。
     # Radiko タイムフリーは NHK の多くの番組を「配信停止」扱いとし、
     # アクセスすると「大変申し訳ありませんが…配信を停止しております」という
     # アナウンス音源に置換される (2026-04-14 インシデントの真因)。
-    # radiru に該当エピソードが無ければ録音せずスキップ (Radiko フォール
-    # バックは配信停止アナウンスの元凶なので行わない)。
+    #
+    # ただし NHK の m3u8 ストリーム (vod-stream.nhk.jp) は **日本国内 IP 限定**
+    # で、Azure runner などの国外 IP からは HTTP 403 が返るため、radiru
+    # ダウンロードも VPN ループ内 (日本 IP に乗せ替えた状態) で行う必要がある。
     # ================================================================
-    nhk_programs = [p for p in matched if p.service in ("r1", "r3")]
-    radiko_pending = [p for p in matched if p.service not in ("r1", "r3")]
-
-    now_jst = datetime.now(JST)
-    if nhk_programs:
-        logger.info(
-            "=== Phase 1: NHK %d 件を radiru 聴き逃しで取得 (VPN 不要) ===",
-            len(nhk_programs),
-        )
-        for p in nhk_programs:
-            if p.end_time > now_jst:
-                logger.info(
-                    "未放送スキップ: [%s] %s %s",
-                    p.service, p.start_time.strftime("%Y-%m-%d %H:%M"),
-                    p.title[:50],
-                )
-                with counters_lock:
-                    counters["skipped"] += 1
-                continue
-            ok = _download_nhk_via_radiru(
-                p, config, keywords, counters, counters_lock,
-            )
-            if not ok:
-                logger.warning(
-                    "radiru 未収録でスキップ (再放送/配信期間切れ等): [%s] %s %s",
-                    p.service, p.start_time.strftime("%Y-%m-%d %H:%M"),
-                    p.title[:50],
-                )
-                with counters_lock:
-                    counters["radiru_missing"] += 1
-
-    if not radiko_pending:
-        logger.info("民放 0 件、VPN ループをスキップ")
-        _report_and_exit(counters, 0, logger)
-        return
-
-    # ================================================================
-    # Phase 2: 民放番組 (radiko:XXX) → Radiko タイムフリー
-    # マルチ VPN パス: 異なる area に順次接続して取得可能な分を DL
-    # ================================================================
+    nhk_pending: list[Program] = [p for p in matched if p.service in ("r1", "r3")]
+    radiko_pending: list[Program] = [p for p in matched if p.service not in ("r1", "r3")]
     logger.info(
-        "=== Phase 2: Radiko タイムフリーで民放 %d 件を取得 ===",
-        len(radiko_pending),
+        "対象内訳: NHK (radiru 経由) %d 件 / 民放 (Radiko 経由) %d 件",
+        len(nhk_pending), len(radiko_pending),
     )
+
+    # ================================================================
+    # マルチ VPN パス: 各セッションで NHK (radiru) → 民放 (Radiko) の順に DL
+    # ================================================================
     logger.info("VPN Gate サーバーリスト取得中...")
     vpn_servers = fetch_jp_servers(limit=50)
     if not vpn_servers:
@@ -578,25 +609,25 @@ def main() -> None:
         len(vpn_servers), len(private), len(public),
     )
 
-    pending: list[Program] = list(radiko_pending)
-    attempted_areas: set[str] = set()
+    attempted_radiko_areas: set[str] = set()
     vpn_config_path = Path(args.vpn_config)
 
     for attempt_idx, server in enumerate(vpn_servers, start=1):
-        if not pending:
+        if not nhk_pending and not radiko_pending:
             logger.info("全番組 DL 完了、VPN ループ終了")
             break
         if attempt_idx > args.max_vpn_attempts:
             logger.warning(
-                "VPN 最大試行回数 %d に到達、残り %d 番組未取得",
-                args.max_vpn_attempts, len(pending),
+                "VPN 最大試行回数 %d に到達、残り NHK %d / 民放 %d 件未取得",
+                args.max_vpn_attempts, len(nhk_pending), len(radiko_pending),
             )
             break
 
         logger.info(
-            "=== VPN 試行 %d/%d: %s (IP=%s score=%d) ===",
+            "=== VPN 試行 %d/%d: %s (IP=%s score=%d) [pending NHK %d / 民放 %d] ===",
             attempt_idx, args.max_vpn_attempts,
             server.hostname, server.ip, server.score,
+            len(nhk_pending), len(radiko_pending),
         )
 
         # Config を書き出し
@@ -612,26 +643,37 @@ def main() -> None:
             continue
 
         try:
-            # Radiko auth で実 area 取得
+            # 1) NHK radiru: 日本 IP でさえあれば area に依存しないので、
+            #    Radiko auth より先に処理する (Radiko 認証失敗で session を
+            #    捨ててしまうのを避ける)。
+            if nhk_pending:
+                logger.info("--- radiru で NHK %d 件を取得 ---", len(nhk_pending))
+                nhk_pending = _run_radiru_pass(
+                    nhk_pending, config, keywords, counters, counters_lock,
+                )
+
+            # 2) 民放 Radiko: area 多様性のためエリア重複は skip
+            if not radiko_pending:
+                continue
             auth = radiko_mod.authenticate()
             if not auth:
-                logger.warning("Radiko 認証失敗、次へ")
+                logger.warning("Radiko 認証失敗、Radiko パートはスキップ")
                 continue
             logger.info("area=%s (%s) に接続", auth.area_id, auth.area_name)
-
-            if auth.area_id in attempted_areas:
-                logger.info("既に試したエリア、次へ (area=%s)", auth.area_id)
+            if auth.area_id in attempted_radiko_areas:
+                logger.info(
+                    "既に試した area=%s、Radiko パートはスキップ", auth.area_id,
+                )
                 continue
-            attempted_areas.add(auth.area_id)
-
-            # このエリアで取れる番組を全部 DL
-            pending = _run_one_pass(
-                pending, auth, config, keywords, counters, counters_lock,
+            attempted_radiko_areas.add(auth.area_id)
+            radiko_pending = _run_one_pass(
+                radiko_pending, auth, config, keywords, counters, counters_lock,
                 verify_schedule=not args.no_verify_schedule,
             )
         finally:
             vpn_manager.disconnect()
 
+    pending = nhk_pending + radiko_pending
     _report_and_exit(counters, len(pending), logger, pending)
 
 
