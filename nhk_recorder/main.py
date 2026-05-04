@@ -32,7 +32,7 @@ from . import vpn_manager
 from .api import Program, fetch_programs
 from .config import Config, load_config
 from .matcher import filter_by_series, filter_programs
-from .notion import upload_recording
+from .notion import _find_duplicates, upload_recording
 from .recorder import make_output_path
 from .schedule_verify import build_schedule_index, verify_program
 from .vpngate import fetch_jp_servers
@@ -133,6 +133,27 @@ def _service_to_station(
 def _matched_keywords(program: Program, keywords: list[str]) -> list[str]:
     search_text = f"{program.title} {program.subtitle} {program.content}"
     return [kw for kw in keywords if kw in search_text]
+
+
+def _is_already_uploaded(program: Program, config: Config) -> bool:
+    """Notion DB に同じ番組が既登録なら True (DL 自体不要)。
+
+    NHK r3 (vod-stream.nhk.jp の m3u8) は yt-dlp フォールバックで
+    1 番組あたり 17〜39 分かかる。重複番組を捨てるためだけに DL を
+    走らせると 6 件中 3 件重複するケースで 1 時間以上失う (2026-05-04
+    の 2 時間ロングランの主因)。VPN ループ突入前にバッチで既登録判定し、
+    DL 対象から除外する。Notion 未設定時は常に False。
+    """
+    if not (config.notion_token and config.notion_database_id):
+        return False
+    try:
+        return bool(_find_duplicates(
+            config.notion_token, config.notion_database_id, program,
+        ))
+    except Exception:
+        # Notion 側の一時的不調なら DL は実施し、後段の upload_recording
+        # 内の二重チェックに委ねる (defense in depth)。
+        return False
 
 
 def _upload_to_notion(
@@ -543,6 +564,33 @@ def main() -> None:
         logger.info("サイマル重複排除: %d → %d 件", before_dedup, len(matched))
 
     matched.sort(key=lambda p: p.start_time)
+
+    # Notion 既登録フィルタ (DL 前)
+    # ダウンロード後に upload_recording 内で重複検知すると、最大 30 分以上の
+    # radiru DL が無駄になる。VPN ループ突入前にバッチクエリで除外する。
+    already_uploaded = 0
+    if not args.dry_run and config.notion_token and config.notion_database_id:
+        not_yet: list[Program] = []
+        for p in matched:
+            if _is_already_uploaded(p, config):
+                logger.info(
+                    "Notion 既登録スキップ: [%s] %s %s-%s %s",
+                    p.service,
+                    p.start_time.strftime("%Y-%m-%d"),
+                    p.start_time.strftime("%H:%M"),
+                    p.end_time.strftime("%H:%M"),
+                    p.title[:50],
+                )
+                already_uploaded += 1
+            else:
+                not_yet.append(p)
+        if already_uploaded:
+            logger.info(
+                "Notion 既登録フィルタ: %d 件除外、残り %d 件を DL 対象",
+                already_uploaded, len(not_yet),
+            )
+        matched = not_yet
+
     logger.info("=== 対象番組 (%d 件) ===", len(matched))
     for p in matched:
         logger.info(
@@ -566,6 +614,7 @@ def main() -> None:
     counters = {
         "success": 0, "failed": 0, "skipped": 0,
         "mismatch": 0, "radiru_missing": 0, "via_radiru": 0,
+        "already_uploaded": already_uploaded,
     }
     counters_lock = threading.Lock()
 
@@ -698,10 +747,12 @@ def _report_and_exit(
 
     logger.info(
         "=== 完了: 成功 %d (うち radiru %d) / 失敗 %d / "
-        "radiru 未収録 %d / 未放送スキップ %d / 差替スキップ %d / 未カバー %d ===",
+        "既登録 %d / radiru 未収録 %d / 未放送スキップ %d / "
+        "差替スキップ %d / 未カバー %d ===",
         counters["success"],
         counters.get("via_radiru", 0),
         counters["failed"],
+        counters.get("already_uploaded", 0),
         counters.get("radiru_missing", 0),
         counters["skipped"],
         counters["mismatch"],
