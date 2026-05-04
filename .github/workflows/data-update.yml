@@ -14,6 +14,12 @@ on:
 permissions:
   contents: write  # data/*.json を自動コミット
 
+# scheduled cron と手動 dispatch が重なると、git push 同士が衝突して
+# 片方が落ちる。直列化して常に最新状態を維持する。
+concurrency:
+  group: data-update
+  cancel-in-progress: false
+
 jobs:
   update-data:
     runs-on: ubuntu-latest
@@ -23,6 +29,7 @@ jobs:
       - uses: actions/setup-python@v6
         with:
           python-version: '3.12'
+          cache: 'pip'
 
       - name: Install openvpn
         run: sudo apt-get update && sudo apt-get install -y openvpn
@@ -36,15 +43,29 @@ jobs:
         run: python -m nhk_recorder.vpngate vpn.ovpn
 
       - name: Connect to VPN Gate
+        id: vpn_connect
         if: github.event_name == 'schedule' || inputs.include_radiko
         uses: kota65535/github-openvpn-connect-action@v3
         with:
           config_file: vpn.ovpn
+        # VPN 失敗を fatal にしない (NHK 部分だけでも更新したいため)。
+        # 後続 step は steps.vpn_connect.outcome を見て --include-radiko を
+        # 出し分けることで、国外 IP のまま Radiko を取りに行く事故を防ぐ。
         continue-on-error: true
 
       - name: Generate data files (NHK + Radiko)
-        # JP13=東京, JP27=大阪 両方の番組表を取得してシリーズ一覧を充実
-        run: python -m nhk_recorder.data_export --days 7 --past-days 7 --output-dir ./data --include-radiko --radiko-areas JP13,JP27
+        # JP13=東京, JP27=大阪 両方の番組表を取得してシリーズ一覧を充実。
+        # VPN 接続失敗 or 手動 dispatch で include_radiko=false の場合は
+        # NHK のみを取得し、Radiko 部分はスキップする (誤データ commit 防止)。
+        run: |
+          ARGS="--days 7 --past-days 7 --output-dir ./data"
+          if [ "${{ steps.vpn_connect.outcome }}" = "success" ]; then
+            ARGS="$ARGS --include-radiko --radiko-areas JP13,JP27"
+            echo "VPN OK: NHK + Radiko を取得"
+          else
+            echo "VPN 未接続 (outcome=${{ steps.vpn_connect.outcome }}): NHK のみ取得、Radiko スキップ"
+          fi
+          python -m nhk_recorder.data_export $ARGS
         env:
           NHK_API_KEY: ${{ secrets.NHK_API_KEY }}
 
