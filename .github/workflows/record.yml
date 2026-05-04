@@ -23,6 +23,18 @@ on:
         type: string
         default: '15'
 
+# checkout と Python 実行のみで、Notion / NHK API は env 経由なので
+# token への書き込み権限は不要。デフォルトの read-write-all を絞る。
+permissions:
+  contents: read
+
+# scheduled cron と手動 dispatch が重なると VPN・Notion・録音ファイルを
+# 奪い合うため直列化する。前のジョブを殺すと中途半端な状態で Notion に
+# 残るので cancel-in-progress: false。
+concurrency:
+  group: nhk-recorder
+  cancel-in-progress: false
+
 jobs:
   download:
     runs-on: ubuntu-latest
@@ -35,6 +47,7 @@ jobs:
       - uses: actions/setup-python@v6
         with:
           python-version: '3.12'
+          cache: 'pip'
 
       - name: Install ffmpeg and openvpn
         run: sudo apt-get update && sudo apt-get install -y ffmpeg openvpn
@@ -53,7 +66,7 @@ jobs:
       - name: Download timefree recordings (multi-VPN-pass)
         run: |
           ARGS="--subscriptions data/subscriptions.json --days ${{ inputs.days || '1' }}"
-          ARGS="$ARGS --max-vpn-attempts ${{ inputs.max_vpn_attempts || '10' }}"
+          ARGS="$ARGS --max-vpn-attempts ${{ inputs.max_vpn_attempts || '15' }}"
           if [ -n "${{ inputs.target_date }}" ]; then
             ARGS="$ARGS --target-date ${{ inputs.target_date }}"
           fi
