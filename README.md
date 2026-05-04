@@ -12,6 +12,270 @@ NHKラジオの番組表を取得し、キーワード(例: 落語/英語)にマ
 - GitHub Actions + GitHub Pages で無料運用
 - **モダンなWebUI (SvelteKit)** で番組選択・購読管理
 
+## アーキテクチャ
+
+このプロジェクトは「**ブラウザで購読を選び、GitHub Actions が代理で録音し、Notion に貯める**」という疎結合な3層構造で動く。
+ローカル PC は不要で、サーバーも持たない (GitHub Pages + Actions + Notion で完結)。
+
+### システム全体像
+
+```mermaid
+flowchart LR
+  subgraph User["👤 ユーザー (ブラウザ)"]
+    UI["SvelteKit WebUI<br/>番組選択 / 購読管理"]
+    LS["localStorage<br/>(PAT / owner / repo)"]
+  end
+
+  subgraph GH["🐙 GitHub (Repo + Actions + Pages)"]
+    Repo[("data/*.json<br/>subscriptions.json<br/>series.json<br/>programs-YYYY-MM-DD.json")]
+    Pages["GitHub Pages<br/>(WebUI ホスト)"]
+    WF1["⏰ data-update.yml<br/>毎日 04:30 JST"]
+    WF2["⏰ record.yml<br/>毎日 06:00 JST"]
+    WF3["🚀 deploy-pages.yml<br/>web/ or data/ push 時"]
+  end
+
+  subgraph Ext["☁ 外部サービス"]
+    NHKAPI["NHK 番組表 API v3<br/>(メタデータのみ)"]
+    Radiru["らじる★らじる<br/>聴き逃し HLS<br/>(NHK 本家、日本IP必須)"]
+    Radiko["Radiko タイムフリー<br/>(民放、日本IP必須)"]
+    VPNGate["VPN Gate<br/>(日本サーバー一覧)"]
+    Notion[("Notion DB<br/>音声 + メタ情報")]
+  end
+
+  UI -- "1) シリーズ購読を編集" --> LS
+  UI -- "2) PAT で push/pull" --> Repo
+  Pages -- "WebUI 配信" --> UI
+  Repo -- "static data 同期" --> Pages
+
+  WF1 -- "番組表を毎日生成" --> Repo
+  WF1 --> NHKAPI
+  WF1 --> Radiko
+  WF1 -- "VPN 接続" --> VPNGate
+
+  WF2 -- "subscriptions.json を読む" --> Repo
+  WF2 --> NHKAPI
+  WF2 -- "VPN 接続" --> VPNGate
+  WF2 -- "NHK 番組" --> Radiru
+  WF2 -- "民放番組" --> Radiko
+  WF2 -- "音声 + メタ" --> Notion
+
+  WF3 -- "build & deploy" --> Pages
+```
+
+### コンポーネント責務マップ
+
+```mermaid
+flowchart TB
+  subgraph py["📦 nhk_recorder/ (Python)"]
+    direction TB
+    Main["main.py<br/>エントリ / multi-VPN-pass オーケストレータ"]
+    Cfg["config.py<br/>.env + config.yaml ローダ"]
+    API["api.py<br/>NHK 番組表 API v3 クライアント"]
+    Match["matcher.py<br/>series_id / keyword フィルタ"]
+    Radiru["radiru.py<br/>NHK 聴き逃し HLS DL<br/>(yt-dlp + ffmpeg)"]
+    Radiko["radiko.py<br/>Radiko タイムフリー DL<br/>(2段階認証 + 並列 HLS)"]
+    Verify["schedule_verify.py<br/>差し替え検知<br/>(Jaccard 類似度 < 0.30)"]
+    VPNMan["vpn_manager.py<br/>OpenVPN 起動/停止"]
+    VPNGate["vpngate.py<br/>VPN サーバー選定"]
+    Rec["recorder.py<br/>出力パス命名"]
+    Notion["notion.py<br/>multipart upload + DB 行作成"]
+    Export["data_export.py<br/>WebUI 用 JSON 生成"]
+
+    Main --> Cfg
+    Main --> API
+    Main --> Match
+    Main --> VPNMan
+    VPNMan --> VPNGate
+    Main --> Radiru
+    Main --> Radiko
+    Main --> Verify
+    Verify --> Radiko
+    Main --> Rec
+    Main --> Notion
+    Export --> API
+    Export --> Radiko
+  end
+
+  subgraph web["🌐 web/ (SvelteKit + TypeScript)"]
+    direction TB
+    Routes["src/routes/<br/>/ , /schedule , /subscriptions"]
+    Stores["src/lib/stores/<br/>subscriptions store<br/>(localStorage 永続化)"]
+    Sync["src/lib/sync/github.ts<br/>GitHub Contents API<br/>(PUT/GET)"]
+    Static["static/data/<br/>(series.json / programs-*.json)"]
+    Routes --> Stores
+    Routes --> Sync
+    Routes --> Static
+  end
+```
+
+### 録音実行フロー (`record.yml` / `python -m nhk_recorder`)
+
+NHK は `radiru` 経由、民放は `radiko` 経由で取得元を**完全分離**する。
+VPN を張り直して別 area の民放を取りに行く **multi-pass 方式** が核心。
+
+```mermaid
+sequenceDiagram
+  autonumber
+  participant Cron as ⏰ GitHub Actions<br/>(record.yml)
+  participant Main as main.py
+  participant Sub as data/subscriptions.json
+  participant Cache as data/programs-YYYY-MM-DD.json
+  participant VPN as VPN Gate + OpenVPN
+  participant Radiru as らじる★らじる
+  participant Radiko as Radiko タイムフリー
+  participant FF as ffmpeg / yt-dlp
+  participant N as Notion API
+
+  Cron->>Main: 06:00 JST 起動 (前日分対象)
+  Main->>Sub: series_ids / keywords 読込
+  Main->>Cache: 番組メタを全件ロード
+  Main->>Main: filter_by_series + filter_programs<br/>+ dedupe (NHK本家 vs radiko:JOBK)
+
+  loop multi-VPN-pass (最大15回)
+    Main->>VPN: 日本 IP の OpenVPN 接続
+    Note over Main,VPN: 接続失敗 → 次サーバーへ
+
+    rect rgb(240, 248, 255)
+      Note over Main,Radiru: Phase 1: NHK (r1/r3)
+      Main->>Radiru: find_episode(series_id, start_time)
+      Radiru-->>Main: m3u8 stream URL
+      Main->>FF: yt-dlp で HLS DL → M4A
+      FF-->>Main: 音声ファイル
+    end
+
+    rect rgb(255, 250, 240)
+      Note over Main,Radiko: Phase 2: 民放 (出口IPの area のみ)
+      Main->>Radiko: auth1 → auth2 (X-Radiko-AuthToken)
+      Main->>Radiko: 最新番組表で差し替え検知<br/>(verify_program: Jaccard < 0.30 ならスキップ)
+      Main->>Radiko: 15秒 sliding window 並列 DL (8並列)
+      Radiko-->>Main: AAC セグメント
+      Main->>FF: 連結 → M4A remux
+    end
+
+    Main->>N: file_upload (>20MB は multipart)
+    Main->>N: pages.create (DB 行作成)
+    Main->>VPN: 切断 (pkill openvpn)
+    Note over Main: pending が空 or 上限到達で終了
+  end
+```
+
+### 番組データ更新フロー (`data-update.yml` / `python -m nhk_recorder.data_export`)
+
+毎日早朝に番組表を再生成し、自動コミットする。WebUI が参照する static データはここで作られる。
+
+```mermaid
+sequenceDiagram
+  autonumber
+  participant Cron as ⏰ GitHub Actions<br/>(data-update.yml)
+  participant Export as data_export.py
+  participant VPN as VPN Gate
+  participant NHK as NHK API v3
+  participant RK as Radiko 番組表
+  participant Repo as Repo (data/, web/static/data/)
+  participant Pages as deploy-pages.yml
+
+  Cron->>VPN: VPN Gate から JP サーバー取得 + 接続
+  Cron->>Export: --days 7 --past-days 7<br/>--include-radiko --radiko-areas JP13,JP27
+
+  loop 14日分 (過去7 + 未来7)
+    Export->>NHK: papiPgDateRadio (r1/r3)
+    NHK-->>Export: 番組メタ
+    Note over Export,NHK: 過去3日以上は 400 → 既存キャッシュから継承
+    Export->>RK: 番組表 (JP13 東京 / JP27 大阪)
+    RK-->>Export: 民放番組メタ
+    Export->>Export: dedupe (r1/r3 vs radiko:JOBK)
+  end
+
+  Export->>Repo: programs-YYYY-MM-DD.json (各日)
+  Export->>Repo: programs-latest.json (今日のエイリアス)
+  Export->>Repo: series.json (蓄積型: first_seen/last_seen)
+  Cron->>Repo: web/static/data/ にコピー
+  Cron->>VPN: 切断 → github.com 到達確認
+  Cron->>Repo: git commit & push<br/>"chore: update programs data"
+  Repo->>Pages: data/ 変更で deploy-pages 自動トリガー
+```
+
+### WebUI ↔ GitHub 同期フロー
+
+ユーザーは PC を起動しなくてよい。ブラウザで購読を編集し、PAT 経由で `data/subscriptions.json` を直接コミットする。
+
+```mermaid
+sequenceDiagram
+  autonumber
+  actor User as 👤 ユーザー
+  participant UI as WebUI (SvelteKit)
+  participant LS as localStorage
+  participant Store as subscriptions store
+  participant Sync as sync/github.ts
+  participant GH as GitHub Contents API
+  participant Repo as data/subscriptions.json
+
+  User->>UI: シリーズ一覧から「購読」クリック
+  UI->>Store: writable.update()
+  Store->>LS: nhk_subscriptions に永続化
+
+  User->>UI: ⚙ 同期設定<br/>(PAT / owner / repo を入力)
+  UI->>LS: 接続情報を保存 (ブラウザ内のみ)
+
+  alt ☁ GitHubへプッシュ
+    UI->>Sync: push(subscriptions)
+    Sync->>GH: GET 既存 sha
+    Sync->>GH: PUT contents (base64, sha)
+    GH->>Repo: chore(subscriptions): update from web UI
+  else ⬇ GitHubから取得
+    UI->>Sync: pull()
+    Sync->>GH: GET contents
+    GH-->>Sync: base64 → JSON
+    Sync->>Store: ローカル状態を上書き
+    Store->>LS: 永続化
+  end
+
+  Note over Repo: 次回 record.yml 実行で<br/>新しい購読リストが反映される
+```
+
+### モジュール責務早見表
+
+| レイヤ | モジュール / ファイル | 責務 | 主要な入出力 |
+|---|---|---|---|
+| CLI | [nhk_recorder/main.py](nhk_recorder/main.py) | エントリポイント・multi-VPN-pass オーケストレーション | CLI フラグ → 録音 → Notion |
+| 設定 | [nhk_recorder/config.py](nhk_recorder/config.py) | `.env` + `config.yaml` ロード | 環境変数 → `Config` |
+| メタ取得 | [nhk_recorder/api.py](nhk_recorder/api.py) | NHK 番組表 API v3 クライアント | date/service/area → `Program[]` |
+| フィルタ | [nhk_recorder/matcher.py](nhk_recorder/matcher.py) | series_id / keyword マッチ | `Program[]` → 対象 `Program[]` |
+| NHK 取得 | [nhk_recorder/radiru.py](nhk_recorder/radiru.py) | 聴き逃し HLS から M4A 取得 (yt-dlp 優先) | series_site_id + start_time → m4a |
+| 民放 取得 | [nhk_recorder/radiko.py](nhk_recorder/radiko.py) | 2段階認証 + 並列 HLS タイムフリー DL | station_id + 時刻範囲 → m4a |
+| 差し替え検知 | [nhk_recorder/schedule_verify.py](nhk_recorder/schedule_verify.py) | Radiko 最新表とキャッシュ比較 (Jaccard) | 録音前のスキップ判定 |
+| VPN | [nhk_recorder/vpn_manager.py](nhk_recorder/vpn_manager.py) / [vpngate.py](nhk_recorder/vpngate.py) | OpenVPN 起動・停止、VPN Gate サーバー選定 | サーバーリスト → 接続/切断 |
+| 録音 | [nhk_recorder/recorder.py](nhk_recorder/recorder.py) | 出力パス命名 (`YYYYMMDD_HHMM_service_area_title.m4a`) | `Program` → ファイルパス |
+| アップロード | [nhk_recorder/notion.py](nhk_recorder/notion.py) | Notion file_upload (multipart) + DB 行作成 | m4a + メタ → DB ページ |
+| WebUI 用 JSON | [nhk_recorder/data_export.py](nhk_recorder/data_export.py) | NHK + Radiko を結合し programs/series JSON 生成 | `data/*.json` |
+| WebUI ルーティング | [web/src/routes/](web/src/routes/) | `/`, `/schedule`, `/subscriptions` ページ | SvelteKit SSG |
+| WebUI 状態 | [web/src/lib/stores/](web/src/lib/stores/) | 購読 store (localStorage 永続化) | ブラウザ内永続化 |
+| WebUI 同期 | [web/src/lib/sync/](web/src/lib/sync/) | GitHub Contents API クライアント | PAT で `subscriptions.json` PUT/GET |
+| 録音 ワークフロー | [.github/workflows/record.yml](.github/workflows/record.yml) | 毎日 06:00 JST 録音実行 | 前日分の音声を Notion へ |
+| データ ワークフロー | [.github/workflows/data-update.yml](.github/workflows/data-update.yml) | 毎日 04:30 JST 番組表更新 + 自動コミット | `data/` 配下 |
+| デプロイ ワークフロー | [.github/workflows/deploy-pages.yml](.github/workflows/deploy-pages.yml) | `web/` or `data/` 変更で Pages デプロイ | GitHub Pages |
+
+### データストア / スキーマ
+
+| 場所 | 形式 | 生成主体 | 参照主体 |
+|---|---|---|---|
+| `data/subscriptions.json` | `{ series_ids[], keywords[] }` | WebUI (PAT 経由) / 手動 | `record.yml` |
+| `data/programs-YYYY-MM-DD.json` | `{ date, area, programs[] }` | `data-update.yml` | `record.yml` / WebUI |
+| `data/programs-latest.json` | 今日分のエイリアス | `data-update.yml` | WebUI トップ |
+| `data/series.json` | 蓄積型シリーズ一覧 (`first_seen`/`last_seen`) | `data-update.yml` | WebUI 購読画面 |
+| `recordings/` | `.m4a` (gitignore) | `record.yml` (一時) | アップロード後削除 |
+| Notion DB | 番組名・チャンネル・放送日・時間帯・録音時間・キーワード・音声ファイル | `record.yml` | モバイル/Web の Notion |
+| ブラウザ localStorage | `nhk_subscriptions` + GitHub 接続情報 | WebUI | WebUI |
+
+### 設計上の重要ポイント
+
+- **VPN は GitHub Actions 内で完結**: `radiru` の m3u8 (`vod-stream.nhk.jp`) も Radiko も日本 IP 必須。Actions ランナーは国外なので、`vpn_manager.py` が OpenVPN を起動して経路を上書きする。
+- **取得元の完全分離**: NHK は `radiru` のみ、民放は `radiko` のみ (Radiko の NHK 同時配信枠は配信停止アナウンスで上書きされる事故があるため、絶対に Radiko に落とさない)。
+- **multi-VPN-pass による area カバー**: Radiko は出口 IP の area しか取れないため、別 VPN サーバー (= 別 area) で接続し直して未取得の局を順に拾う。1 ループで最大 15 回まで張り直す。
+- **yt-dlp 優先 + ffmpeg フォールバック**: 長尺音楽番組などで ffmpeg の AAC デコーダが Multiple RDBs を扱えず途中停止する事故があるため、HLS は基本 yt-dlp の native downloader を使い、AES-128 復号には `pycryptodomex` が必須。
+- **差し替え検知**: 早朝のキャッシュ (`programs-YYYY-MM-DD.json`) と録音直前の Radiko 最新表をタイトル文字 bigram の Jaccard 類似度で比較し、0.30 を下回ったら録音をスキップ (緊急特別番組・スポーツ延長を弾く)。回数マーカーは正規化で吸収。
+- **サーバーレス購読同期**: 購読リストはブラウザの localStorage と GitHub リポジトリの 2 箇所のみ。中間サービス (DB / API サーバー) は不要。
+
 ## 必要なもの
 
 - Python 3.10+
