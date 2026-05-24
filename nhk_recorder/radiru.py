@@ -425,9 +425,16 @@ def download_ondemand(
     stream_url: str,
     output_path: Path,
     ffmpeg_path: str = "ffmpeg",
-    timeout_sec: int = 1800,
+    timeout_sec: int = 600,
 ) -> bool:
     """聴き逃し m3u8 を yt-dlp で M4A に保存する。
+
+    Note on timeout_sec=600 (10 min):
+        旧値 1800s (30 min) は HLS stall 時に 1 件あたり 30 分待つことになり、
+        6 件で 3 時間消費して GitHub Actions runner が preemption されやすかった
+        (2026-05-23 incident: 1h11m で job cancel)。実測の正常 DL 速度は 5〜10x
+        realtime (2 時間番組を 15〜25 分) なので、10 分超過は明らかに stall。
+        fail-fast して次の VPN サーバー (= 別 area) で retry した方が速い。
 
     **なぜ yt-dlp か**: ffmpeg の HLS demuxer 経由だと、一部番組 (115 分クラス
     の音楽番組、例: 2026-04-12 名演奏ライブラリー コルトー) で

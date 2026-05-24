@@ -29,7 +29,8 @@ jobs:
 
       - uses: actions/setup-node@v6
         with:
-          node-version: '20'
+          # Node 20 は 2026-04 で EOL。Active LTS の 24 に更新。
+          node-version: '24'
           cache: 'npm'
           cache-dependency-path: web/package-lock.json
 
