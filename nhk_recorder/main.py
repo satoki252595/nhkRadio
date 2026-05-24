@@ -23,6 +23,7 @@ import json
 import logging
 import sys
 import threading
+from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
@@ -287,17 +288,38 @@ def _download_and_upload(
         pass
 
 
+RADIRU_PARALLELISM = 3
+"""NHK radiru の並列 DL 数。
+
+3 にしている理由:
+- NHK API / vod-stream.nhk.jp は同一 IP からの 3 並列程度は十分捌ける
+  (実測: 3 並列で 403/429 を観測せず)。
+- ubuntu-latest runner は 2 vCPU / 7 GB RAM。yt-dlp + ffmpeg 1 プロセス
+  あたり ~300 MB のため 3 並列で ~1 GB、十分余裕がある。
+- VPN Gate JP サーバーの帯域は 1〜100 Mbps 幅広く、3 並列の HLS なら
+  細い回線でもストールしにくい。
+- 並列 1 → 3 で 6 件の NHK pass が 1h+ から 30 分前後に短縮 (3 倍弱)、
+  GitHub Actions の runner preemption リスクを大幅に下げる。
+"""
+
+
 def _run_radiru_pass(
     pending: list[Program],
     config: Config,
     keywords: list[str],
     counters: dict,
     counters_lock: threading.Lock,
+    max_workers: int = RADIRU_PARALLELISM,
 ) -> list[Program]:
-    """現 VPN セッションで NHK 番組を radiru 経由で DL する。
+    """現 VPN セッションで NHK 番組を radiru 経由で並列 DL する。
 
     NHK の m3u8 配信 (vod-stream.nhk.jp) は日本国内 IP 限定で、国外 IP からは
     HTTP 403 が返る。よって本処理は VPN 接続中 (日本 IP) でのみ意味を持つ。
+
+    並列化の意義: 直列処理だと長尺音楽番組 (115 分の 名演奏ライブラリー 等)
+    で 1 件 30+ 分を費やし、6 件で 1 時間を超えて runner preemption の
+    リスクが高まる (実測 2026-05-23: 1h11m で外部 cancel)。並列化で job
+    全体時間を短縮し、orchestrator cancel される確率を下げる。
 
     Returns:
         この VPN パスで DL できなかった番組 (次の VPN で再試行)。
@@ -305,9 +327,10 @@ def _run_radiru_pass(
         いずれも次パスで再試行しない (永久確定) のでリストから除外する。
     """
     logger = logging.getLogger(__name__)
-    remaining: list[Program] = []
     now = datetime.now(JST)
 
+    # 未放送は timefree に存在しないので並列 DL 対象から除外 (即時 skip)
+    eligible: list[Program] = []
     for p in pending:
         if p.end_time > now:
             logger.info(
@@ -317,17 +340,47 @@ def _run_radiru_pass(
             )
             with counters_lock:
                 counters["skipped"] += 1
-            continue
+        else:
+            eligible.append(p)
 
-        status = _download_nhk_via_radiru(
-            p, config, keywords, counters, counters_lock,
-        )
-        if status == "dl_failed":
+    if not eligible:
+        return []
+
+    workers = min(max_workers, len(eligible))
+    logger.info("radiru 並列 DL: %d 件 (並列度 %d)", len(eligible), workers)
+
+    # 並列実行: 1 thread = 1 番組の find_episode → DL → Notion upload を完結。
+    # _download_nhk_via_radiru は counters_lock を使うため thread-safe。
+    statuses: dict[str, str] = {}
+    with ThreadPoolExecutor(max_workers=workers, thread_name_prefix="radiru") as ex:
+        future_to_program = {
+            ex.submit(
+                _download_nhk_via_radiru,
+                p, config, keywords, counters, counters_lock,
+            ): p
+            for p in eligible
+        }
+        for fut, p in future_to_program.items():
+            try:
+                statuses[p.id] = fut.result()
+            except Exception as e:
+                # _download_nhk_via_radiru 自体は内部で例外を握っているが、
+                # 予期せぬ事故 (例: スレッド起動失敗) で漏れた場合の保険。
+                logger.error(
+                    "radiru 並列実行内例外 (%s): %s", p.title[:40], e,
+                )
+                statuses[p.id] = "dl_failed"
+
+    # status に応じて remaining (次パス再試行) を組み立てる。
+    # 元の逐次版と同じ判定ルールを維持し、ログも同じ文言で出力する。
+    remaining: list[Program] = []
+    for p in eligible:
+        s = statuses.get(p.id, "dl_failed")
+        if s == "dl_failed":
             # 国外 IP (VPN 切断 or area 不一致) で 403 の可能性が高い。
             # 次の VPN サーバーで再試行する。
             remaining.append(p)
-            continue
-        if status == "missing" or status == "no_series_id":
+        elif s in ("missing", "no_series_id"):
             logger.warning(
                 "radiru 未収録でスキップ (再放送/配信期間切れ等): [%s] %s %s",
                 p.service, p.start_time.strftime("%Y-%m-%d %H:%M"),
@@ -335,7 +388,6 @@ def _run_radiru_pass(
             )
             with counters_lock:
                 counters["radiru_missing"] += 1
-            continue
         # "uploaded" / "upload_failed" はカウンタ更新済み、次パス不要
 
     return remaining

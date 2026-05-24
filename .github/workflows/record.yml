@@ -65,7 +65,10 @@ jobs:
 
       - name: Download timefree recordings (multi-VPN-pass)
         run: |
-          ARGS="--subscriptions data/subscriptions.json --days ${{ inputs.days || '1' }}"
+          # schedule 実行時のフォールバックは 2 日分。前日 cron が runner
+          # preemption 等で失敗した場合、翌日 cron が自動 retry する
+          # (pre-dedup フィルタで既登録の再 DL は走らないので無駄なし)。
+          ARGS="--subscriptions data/subscriptions.json --days ${{ inputs.days || '2' }}"
           ARGS="$ARGS --max-vpn-attempts ${{ inputs.max_vpn_attempts || '15' }}"
           if [ -n "${{ inputs.target_date }}" ]; then
             ARGS="$ARGS --target-date ${{ inputs.target_date }}"
