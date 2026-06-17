@@ -1,22 +1,52 @@
 {
   "date": "2026-06-16",
   "area": "270",
-  "updated_at": "2026-06-17T05:28:23.989561+09:00",
+  "updated_at": "2026-06-18T05:15:54.297103+09:00",
   "programs": [
     {
-      "id": "MRO-13481206",
-      "service": "radiko:MRO",
-      "title": "[MROラジオ] Energy Music",
+      "id": "CBC-13481090",
+      "service": "radiko:CBC",
+      "title": "[CBCラジオ] 梓夕子のモーニング歌謡曲",
+      "subtitle": "梓夕子",
+      "content": "歌を通して、すてきな人との出逢いを…。心と心のふれあいを…。\n\n毎日が始まる朝のひととき、演歌・歌謡曲の名曲と共に、リスナーの皆さんへ元気をお届けします。\n\nあなたと一緒にすてきな番組にしていきたいと願いつつ、あなたが聴きたい曲をお送りします。\n\nその歌にまつわる思い出などのおたよりも、お待ちしております。\n\n番組へのおたよりは こちら\n\nFAXは 052-263-6800 まで",
+      "start_time": "2026-06-16T05:00:00+09:00",
+      "end_time": "2026-06-16T05:20:00+09:00",
+      "duration_sec": 1200,
+      "series_id": "rdk_b6db90c4ab56",
+      "series_name": "梓夕子のモーニング歌謡曲",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
+    },
+    {
+      "id": "TOKAIRADIO-13468379",
+      "service": "radiko:TOKAIRADIO",
+      "title": "[TOKAI RADIO] first touch",
+      "subtitle": "",
+      "content": "◆世の光\n◆心のともしび\n\nTOKAI RADIOのハッシュタグは「#TOKAIRADIO」\nTOKAI RADIO公式X（旧twitter）アカウントは「@tokairadio」",
+      "start_time": "2026-06-16T05:00:00+09:00",
+      "end_time": "2026-06-16T06:00:00+09:00",
+      "duration_sec": 3600,
+      "series_id": "rdk_66411e52b4d9",
+      "series_name": "first touch",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
+    },
+    {
+      "id": "GBS-13462972",
+      "service": "radiko:GBS",
+      "title": "[ぎふチャン] たっぷり歌謡曲",
       "subtitle": "",
       "content": "",
       "start_time": "2026-06-16T05:00:00+09:00",
-      "end_time": "2026-06-16T05:15:00+09:00",
-      "duration_sec": 900,
-      "series_id": "rdk_98bc3d3a8941",
-      "series_name": "Energy Music",
+      "end_time": "2026-06-16T05:45:00+09:00",
+      "duration_sec": 2700,
+      "series_id": "rdk_3447d8b87774",
+      "series_name": "たっぷり歌謡曲",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
       "id": "RN1-13481428",
@@ -31,7 +61,7 @@
       "series_name": "番組休止中",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
       "id": "RN2-13481417",
@@ -46,22 +76,37 @@
       "series_name": "放送休止中",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
-      "id": "HELLOFIVE-13466294",
-      "service": "radiko:HELLOFIVE",
-      "title": "[エフエム石川] Memories＆Discoveries",
-      "subtitle": "早見沙織",
-      "content": "【4時台】\n◇Today's Playlist\n大阪出身のシンガーソングライター、「がらり」さんが選曲する、\n『まどろみを漂う』！\n\n【5時台】\n◇Classic Playlist\n音楽之友社の中沢十志幸さんが、\n『梅雨空を吹き飛ばす元気が出る音楽』というテーマで選曲。\n\n第一線で活躍するミュージシャン、著名クリエイター、文化人が、それぞれのリコメンド楽曲で素敵な音楽空間をプロデュース。\n懐かしさを感じるナンバー、新たな出会いとなるようなナンバー等、幅広い世代に、時代を超えた邦・洋楽の名曲をお届け！\n\n番組Webサイト：https://jfn-pods.com/program/27337\nメッセージフォーム：https://form.jfn.co.jp/memories/message",
+      "id": "ZIP-FM-13481153",
+      "service": "radiko:ZIP-FM",
+      "title": "[ZIP-FM] MUSIC FLOW",
+      "subtitle": "",
+      "content": "ノンDJ&ピュア・ミュージック・プログラム【MUSIC FLOW】\n\n♪オンエア曲目は、こちらでチェック♪\n\n＊過去1週間前まで表示\n\n番組Xでリクエスト受付中！\n\nときどき、中の人がつぶやくかも。",
       "start_time": "2026-06-16T05:00:00+09:00",
-      "end_time": "2026-06-16T05:54:00+09:00",
-      "duration_sec": 3240,
-      "series_id": "rdk_ea831632fb03",
-      "series_name": "Memories＆Discoveries",
+      "end_time": "2026-06-16T06:00:00+09:00",
+      "duration_sec": 3600,
+      "series_id": "rdk_01792b3c8f94",
+      "series_name": "MUSIC FLOW",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
+    },
+    {
+      "id": "FMAICHI-13467941",
+      "service": "radiko:FMAICHI",
+      "title": "[FM AICHI] monthly album recommend",
+      "subtitle": "山内智貴",
+      "content": "◆早起きで音楽好きなあなたにFM AICHIオススメのアルバムを紹介！◆\n\nXハッシュタグは「#エフエムアイチ」\nXアカウントは「@FMAICHI」",
+      "start_time": "2026-06-16T05:00:00+09:00",
+      "end_time": "2026-06-16T06:00:00+09:00",
+      "duration_sec": 3600,
+      "series_id": "rdk_ff3f8505ce0e",
+      "series_name": "monthly album recommend",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
     },
     {
       "id": "MAJAL-13458511",
@@ -76,7 +121,7 @@
       "series_name": "※配信は終了しました MUSIC AWARDS JAPAN 2026 AUDIO LIVE supported by Spotify",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
       "id": "JOCK-13495547",
@@ -91,7 +136,7 @@
       "series_name": "マイあさ！ 火曜５時台 ニュース・気象情報／たより岩手・大分／何の日／帯状疱疹",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
       "id": "JOAK-FM-13495197",
@@ -106,7 +151,7 @@
       "series_name": "古楽の楽しみ アレッサンドロ・スカルラッティの作品さまざま",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
       "id": "TBS-13468235",
@@ -507,21 +552,6 @@
       "area": "JP27"
     },
     {
-      "id": "MRO-13481207",
-      "service": "radiko:MRO",
-      "title": "[MROラジオ] 心のともしび",
-      "subtitle": "坪井木の実",
-      "content": "",
-      "start_time": "2026-06-16T05:15:00+09:00",
-      "end_time": "2026-06-16T05:20:00+09:00",
-      "duration_sec": 300,
-      "series_id": "rdk_4cd3726915cd",
-      "series_name": "心のともしび",
-      "episode_name": "",
-      "genre": [],
-      "area": "JP17"
-    },
-    {
       "id": "MBS-13472960",
       "service": "radiko:MBS",
       "title": "[MBSラジオ] 健やかインフォメーション",
@@ -567,19 +597,19 @@
       "area": "JP27"
     },
     {
-      "id": "MRO-13481208",
-      "service": "radiko:MRO",
-      "title": "[MROラジオ] ドクターごとうの熱血訪問クリニック",
-      "subtitle": "五島朋幸",
-      "content": "",
+      "id": "CBC-13481091",
+      "service": "radiko:CBC",
+      "title": "[CBCラジオ] 朝からいいことマルシェ",
+      "subtitle": "",
+      "content": "CBCラジオe！マルシェ開店しました！皆様の生活がより豊かになる商品を取扱っております。\n\nごゆっくりお買い物をお楽しみください！\n\nお電話でのご注文はこちら！\n\n通話料無料 0120-505-724\n\n受付時間 午前9時～午後9時\n\n※月曜～木曜は午前5時～午後9時",
       "start_time": "2026-06-16T05:20:00+09:00",
       "end_time": "2026-06-16T05:30:00+09:00",
       "duration_sec": 600,
-      "series_id": "rdk_1baec0dc6a51",
-      "series_name": "ドクターごとうの熱血訪問クリニック",
+      "series_id": "rdk_509a83c8a314",
+      "series_name": "朝からいいことマルシェ",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
       "id": "JORF-13421741",
@@ -597,19 +627,19 @@
       "area": "JP13"
     },
     {
-      "id": "MRO-13481209",
-      "service": "radiko:MRO",
-      "title": "[MROラジオ] 大島由香里 BRAND-NEW MORNING",
-      "subtitle": "大島由香里 岩崎良美",
+      "id": "CBC-13481092",
+      "service": "radiko:CBC",
+      "title": "[CBCラジオ] 大島由香里 BRAND-NEW MORNING",
+      "subtitle": "大島由香里",
       "content": "",
       "start_time": "2026-06-16T05:30:00+09:00",
       "end_time": "2026-06-16T06:30:00+09:00",
       "duration_sec": 3600,
-      "series_id": "rdk_84898037881e",
+      "series_id": "rdk_b4c5208d778d",
       "series_name": "大島由香里 BRAND-NEW MORNING",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
       "id": "JORF-13421742",
@@ -687,6 +717,21 @@
       "area": "JP27"
     },
     {
+      "id": "GBS-13462973",
+      "service": "radiko:GBS",
+      "title": "[ぎふチャン] イトーとスドーのモノ申し隊！",
+      "subtitle": "",
+      "content": "",
+      "start_time": "2026-06-16T05:45:00+09:00",
+      "end_time": "2026-06-16T06:00:00+09:00",
+      "duration_sec": 900,
+      "series_id": "rdk_4005463cdc5d",
+      "series_name": "イトーとスドーのモノ申し隊！",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
+    },
+    {
       "id": "YFM-13481016",
       "service": "radiko:YFM",
       "title": "[ＦＭヨコハマ] Buy Now",
@@ -747,21 +792,6 @@
       "area": "JP27"
     },
     {
-      "id": "HELLOFIVE-13466295",
-      "service": "radiko:HELLOFIVE",
-      "title": "[エフエム石川] 快適生活ラジオショッピング",
-      "subtitle": "",
-      "content": "快適生活ラジオショッピング\n\n電話：0120-40-1475",
-      "start_time": "2026-06-16T05:54:00+09:00",
-      "end_time": "2026-06-16T06:00:00+09:00",
-      "duration_sec": 360,
-      "series_id": "rdk_bd50c5837b29",
-      "series_name": "快適生活ラジオショッピング",
-      "episode_name": "",
-      "genre": [],
-      "area": "JP17"
-    },
-    {
       "id": "r1-270-2026061688875",
       "service": "r1",
       "title": "気象情報（関西）",
@@ -789,7 +819,7 @@
       "series_name": "気象情報（東海・北陸）",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
       "id": "JOAK-FM-13495198",
@@ -804,7 +834,7 @@
       "series_name": "気象情報（関東甲信越）",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
       "id": "JORF-13421743",
@@ -867,19 +897,64 @@
       "area": "JP27"
     },
     {
-      "id": "HELLOFIVE-13466296",
-      "service": "radiko:HELLOFIVE",
-      "title": "[エフエム石川] ONE MORNING",
-      "subtitle": "ユージ / 吉田明世 ゲスト: 神庭亮介（ダイヤモンド・ライフ 編集長）",
-      "content": "＜今朝のワンコメは「気持ちの切り替え」について伺います！\n6時台に元川悦子さんによるW杯現地リポート。\n7時台は「副業詐欺」最前線、また、「建設費高騰」の原因と今後にフォーカス。\n今朝も「BEST HITS REQUEST」、お待ちしています！！\n詳しくはワンモの公式Xをチェック！＞\n\n日替わりのリスナーアンケート＜ワンコメ・ワンジャッジ＞\n今朝のワンコメは、「気持ちの切り替え」について伺います。\n\n⇨投票は★ONE MORNING 公式Xで実施！★また「#ワンモ」であなたの声=ワンコメを募集中です！\n\nタレントの\"ユージ\"とフリーアナウンサーの\"吉田明世\"がお届けする「ONE MORNING」。\n今日も一緒に素敵な1日をスタートさせましょう！\n\nみなさんからの「BEST HITS REQUEST」もHPから募集中！！\n採用された方には番組オリジナルステッカーをプレゼントしています。\n\n＊時間多少前後する場合があります。\nまた、内容も一部変更となる場合があります＊\n\n▽06:15〜 【 ワンコメ・ワンジャッジ 】\n今朝のワンコメは「気持ちの切り替え」について伺います。\n\n番組がピックアップしたニュースやトピックスについての\nアナタの意見＝ワンコメをお聞かせください。\n「ONE MORNING」公式Xや番組メッセージフォームからお願いします！\nXでは「ワンジャッジ」も実施中！\n7時台、8時台でも随所で紹介していきます。\n\n▽06:49〜 【 快適生活ラジオショッピング 】\n快適生活ラジオショッピング\n\n▽06:55〜 【 MY OLYMPIC 】\nトップアスリートたちが出演！ 日本各地で開催される競技会などを通して、かつての名選手から将来有望なオリンピック代表選手のタマゴまで選手を紹介。\n\n▽07:00〜 【 MORNING HEADLINE 】\n全国のお天気と最新のHEADLINE NEWSをお届け。\n今朝の気になるニュースについて、\nダイヤモンド・ライフ編集長の【 神庭亮介 】さんが解説します。\n\n▽07:10〜 【 リポビタンD TREND NET 】\nネットニュースの内側にいるプロフェッショナルが話題のニュースを解説。\n本日はダイヤモンド・ライフ編集長の【 神庭亮介 】さん。\n今朝は「副業詐欺」の最前線に迫ります。\n\n▽07:19〜 【 KUMON 笑顔100点満点♪ 】\n「子どもの頃、KUMONやってました！」「今、子どもが通っています！」\n…というパパやママのリアルな声をお届けします。\n\n▽07:20〜 【 ONE MORE NEWS 】\nここ1ヶ月ほどのニュースの中から、\n気になるものを“もう1つ”ピックアップ！\n今回は、「建設費高騰」の原因と今後にフォーカス。\n\n本日のゲスト： 神庭亮介（ダイヤモンド・ライフ 編集長）\n\n番組Webサイト：https://www.tfm.co.jp/one/\nメッセージフォーム：https://www.tfm.co.jp/one/form/\n\nXハッシュタグは「#ワンモ」\nXアカウントは「@ONEMORNING_1」",
+      "id": "TOKAIRADIO-13468380",
+      "service": "radiko:TOKAIRADIO",
+      "title": "[TOKAI RADIO] 河村通夫の大自然まるかじりライフ",
+      "subtitle": "河村通夫",
+      "content": "TOKAI RADIOのハッシュタグは「#TOKAIRADIO」\nTOKAI RADIOの公式X（旧twitter）アカウントは「@tokairadio」",
       "start_time": "2026-06-16T06:00:00+09:00",
-      "end_time": "2026-06-16T07:30:00+09:00",
-      "duration_sec": 5400,
-      "series_id": "rdk_208408cebb0f",
-      "series_name": "ONE MORNING",
+      "end_time": "2026-06-16T06:10:00+09:00",
+      "duration_sec": 600,
+      "series_id": "rdk_a83c33a9d2a8",
+      "series_name": "河村通夫の大自然まるかじりライフ",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
+    },
+    {
+      "id": "GBS-13462974",
+      "service": "radiko:GBS",
+      "title": "[ぎふチャン] クラシック・スタイル",
+      "subtitle": "",
+      "content": "",
+      "start_time": "2026-06-16T06:00:00+09:00",
+      "end_time": "2026-06-16T06:10:00+09:00",
+      "duration_sec": 600,
+      "series_id": "rdk_3654587597bb",
+      "series_name": "クラシック・スタイル",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
+    },
+    {
+      "id": "ZIP-FM-13481154",
+      "service": "radiko:ZIP-FM",
+      "title": "[ZIP-FM] MORNING BOOOOOOST",
+      "subtitle": "荒戸完",
+      "content": "おはようございます。荒戸完です。\n\nZIPPIEからのメッセージお待ちしています。\n\n番組X(@boooooost_zip)\n\nハッシュタグ⇒#モーブー\n\n8:00 TOYO TIRES THE FOCUS - DIGGIN’ THE ROUTE-《Fri:TOYO TIRES》\n\n≪SHORT PROGRAM≫\n\n7:27 WORLD POP EYE (Mon-Fri:カノークス)\n\n7:32 SPORTS TIPS (Mon-Fri:トヨタ紡織)\n\n7:37 Grow Up! (Tue:HB-101)\n\n7:37 CIRCLE CIRCLE (Wed:INOAC)\n\n7:37 Life Goes On (Fri:林テレンプ)\n\n7:45 CONNECT LINE (Mon-Fri:名鉄グループ)\n\n8:31 NAVI NAVI NAVIGATION (Fri:Honda Cars 愛知)",
+      "start_time": "2026-06-16T06:00:00+09:00",
+      "end_time": "2026-06-16T09:00:00+09:00",
+      "duration_sec": 10800,
+      "series_id": "rdk_a7b7ad96053f",
+      "series_name": "MORNING BOOOOOOST",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
+    },
+    {
+      "id": "FMAICHI-13467942",
+      "service": "radiko:FMAICHI",
+      "title": "[FM AICHI] ONE MORNING AICHI",
+      "subtitle": "重田優平",
+      "content": "◆朝一番に必要なトピックスをコンパクトにお届け。◆\n\nメッセージ・リクエストはこちら\n\nXハッシュタグは「#ワンモ807」\nXアカウントは「@onemorning807」",
+      "start_time": "2026-06-16T06:00:00+09:00",
+      "end_time": "2026-06-16T08:00:00+09:00",
+      "duration_sec": 7200,
+      "series_id": "rdk_07fa2fc67d53",
+      "series_name": "ONE MORNING AICHI",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
     },
     {
       "id": "JOCK-13495549",
@@ -894,7 +969,7 @@
       "series_name": "マイあさ！ 火曜６時台前半 ニュース・気象情報／大相撲パリ公演／きょうは何の日",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
       "id": "JOAK-FM-13495199",
@@ -909,7 +984,7 @@
       "series_name": "エンジョイ・シンプル・イングリッシュ「空飛ぶ布団 前編」",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
       "id": "QRR-13473478",
@@ -1254,6 +1329,36 @@
       "area": "JP27"
     },
     {
+      "id": "TOKAIRADIO-13468381",
+      "service": "radiko:TOKAIRADIO",
+      "title": "[TOKAI RADIO] RUSH HOUR!",
+      "subtitle": "",
+      "content": "TOKAI RADIOのハッシュタグは「#TOKAIRADIO」\nTOKAI RADIOの公式X（旧twitter）アカウントは「@tokairadio」",
+      "start_time": "2026-06-16T06:10:00+09:00",
+      "end_time": "2026-06-16T06:25:00+09:00",
+      "duration_sec": 900,
+      "series_id": "rdk_5789702d60cb",
+      "series_name": "RUSH HOUR!",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
+    },
+    {
+      "id": "GBS-13462975",
+      "service": "radiko:GBS",
+      "title": "[ぎふチャン] 世の光",
+      "subtitle": "",
+      "content": "",
+      "start_time": "2026-06-16T06:10:00+09:00",
+      "end_time": "2026-06-16T06:15:00+09:00",
+      "duration_sec": 300,
+      "series_id": "rdk_5b916a4b899a",
+      "series_name": "世の光",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
+    },
+    {
       "id": "r3-270-2026061667867",
       "service": "r3",
       "title": "基礎英語　レベル１（５２）",
@@ -1273,6 +1378,21 @@
       "area": "NHK"
     },
     {
+      "id": "GBS-13462976",
+      "service": "radiko:GBS",
+      "title": "[ぎふチャン] モーニング・スタイル",
+      "subtitle": "",
+      "content": "",
+      "start_time": "2026-06-16T06:15:00+09:00",
+      "end_time": "2026-06-16T06:20:00+09:00",
+      "duration_sec": 300,
+      "series_id": "rdk_72ef6425758b",
+      "series_name": "モーニング・スタイル",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
+    },
+    {
       "id": "KBS-13468643",
       "service": "radiko:KBS",
       "title": "[KBS京都ラジオ] S-PERK!",
@@ -1286,6 +1406,21 @@
       "episode_name": "",
       "genre": [],
       "area": "JP27"
+    },
+    {
+      "id": "GBS-13462977",
+      "service": "radiko:GBS",
+      "title": "[ぎふチャン] 岡村孝子 あの頃ミュージック",
+      "subtitle": "岡村孝子",
+      "content": "番組へのメッセージはこちら\ntakako@24.am\nXハッシュタグは「#岡村孝子」「#あの頃ミュージック」\nXアカウントは「@anokoromusic」\"",
+      "start_time": "2026-06-16T06:20:00+09:00",
+      "end_time": "2026-06-16T06:30:00+09:00",
+      "duration_sec": 600,
+      "series_id": "rdk_97908c6d6311",
+      "series_name": "岡村孝子 あの頃ミュージック",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
     },
     {
       "id": "CRK-13472768",
@@ -1318,6 +1453,21 @@
       "area": "NHK"
     },
     {
+      "id": "TOKAIRADIO-13468382",
+      "service": "radiko:TOKAIRADIO",
+      "title": "[TOKAI RADIO] before G",
+      "subtitle": "DALE",
+      "content": "TOKAI RADIOのハッシュタグは「#TOKAIRADIO」\nTOKAI RADIOの公式X（旧twitter）アカウントは「@tokairadio」",
+      "start_time": "2026-06-16T06:25:00+09:00",
+      "end_time": "2026-06-16T06:30:00+09:00",
+      "duration_sec": 300,
+      "series_id": "rdk_2381ffe31ac6",
+      "series_name": "before G",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
+    },
+    {
       "id": "JOCK-13495550",
       "service": "radiko:JOCK",
       "title": "[NHK AM（名古屋）] ニュース・気象情報（東海・北陸）",
@@ -1330,7 +1480,7 @@
       "series_name": "ニュース・気象情報（東海・北陸）",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
       "id": "JOAK-13495256",
@@ -1386,19 +1536,49 @@
       "area": "NHK"
     },
     {
-      "id": "MRO-13481210",
-      "service": "radiko:MRO",
-      "title": "[MROラジオ] こころの謡箱",
-      "subtitle": "",
+      "id": "CBC-13481093",
+      "service": "radiko:CBC",
+      "title": "[CBCラジオ] CBCラジオ ＃プラス！",
+      "subtitle": "西村俊仁 石坂美咲",
+      "content": "時事からエンタメまで、あなたの朝にプラスになる情報をお届けする生活情報番組。\n\n個性豊かなCBCアナウンサーとパーソナリティ、そして「プラスドリちゃん」でお届けします。\n\nあなたの朝に情報をプラス！元気をプラス！\n\n番組記事を読む→こちら\n\n番組へのおたよりは こちら\n\nFAXは 052-263-6800 まで",
+      "start_time": "2026-06-16T06:30:00+09:00",
+      "end_time": "2026-06-16T09:00:00+09:00",
+      "duration_sec": 9000,
+      "series_id": "rdk_b2f4db0920ac",
+      "series_name": "CBCラジオ ＃プラス！",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
+    },
+    {
+      "id": "TOKAIRADIO-13468383",
+      "service": "radiko:TOKAIRADIO",
+      "title": "[TOKAI RADIO] GRooVE929 (1)",
+      "subtitle": "DALE",
+      "content": "□6:30～TODAY'S GRooVin' TOPICS\n◆□7:00～\n◆NEWS\n◆Dig One\n◆WEATHER INFORMATION\n◆TRAFFIC INFORMATION\n◆下川みくにのMIRAIにエール！\n◆TRAFFIC INFORMATION\n◆東桜World Topics\n\n□8:00～\n◆NEWS\n◆TRAFFIC INFORMATION\n◆Expert Express\n◆ジャパネットたかたラジオショッピング\n◆WEATHER INFORMATION\n◆TRAFFIC INFORMATION\n◆武田鉄矢・今朝の三枚おろし\n\n番組へのメッセージは【コチラ】\n番組ハッシュタグは「#グルーヴ929」\n番組公式Xアカウントは「@groove929」\nTOKAI RADIOのハッシュタグは「#TOKAIRADIO」\nTOKAI RADIO公式X（旧twitter）アカウントは「@tokairadio」",
+      "start_time": "2026-06-16T06:30:00+09:00",
+      "end_time": "2026-06-16T07:00:00+09:00",
+      "duration_sec": 1800,
+      "series_id": "rdk_f35668566cb5",
+      "series_name": "GRooVE929",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
+    },
+    {
+      "id": "GBS-13462978",
+      "service": "radiko:GBS",
+      "title": "[ぎふチャン] 平工靖也のおはようございマッスル！",
+      "subtitle": "平工靖也",
       "content": "",
       "start_time": "2026-06-16T06:30:00+09:00",
       "end_time": "2026-06-16T06:35:00+09:00",
       "duration_sec": 300,
-      "series_id": "rdk_2c83910a92da",
-      "series_name": "こころの謡箱",
+      "series_id": "rdk_c3bdf42bf87f",
+      "series_name": "平工靖也のおはようございマッスル！",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
       "id": "JOCK-13495551",
@@ -1413,7 +1593,7 @@
       "series_name": "ラジオ体操",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
       "id": "TBS-13468236",
@@ -1506,19 +1686,19 @@
       "area": "JP27"
     },
     {
-      "id": "MRO-13481211",
-      "service": "radiko:MRO",
-      "title": "[MROラジオ] 大自然丸かじりライフ",
-      "subtitle": "河村通夫 若杉佳子",
+      "id": "GBS-13462979",
+      "service": "radiko:GBS",
+      "title": "[ぎふチャン] ＴＵＮＥ ＢＯＸ",
+      "subtitle": "",
       "content": "",
       "start_time": "2026-06-16T06:35:00+09:00",
       "end_time": "2026-06-16T06:45:00+09:00",
       "duration_sec": 600,
-      "series_id": "rdk_3e0b1ca26945",
-      "series_name": "大自然丸かじりライフ",
+      "series_id": "rdk_92465ed2ab76",
+      "series_name": "ＴＵＮＥ ＢＯＸ",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
       "id": "r1-270-2026061667762",
@@ -1552,7 +1732,7 @@
       "series_name": "マイあさ！ 火曜６時台後半 ニュース・気象情報／教員不足解消のために必要なこと",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
       "id": "LFR-13473387",
@@ -1589,19 +1769,19 @@
       "area": "NHK"
     },
     {
-      "id": "MRO-13481212",
-      "service": "radiko:MRO",
-      "title": "[MROラジオ] ピックアップラジオショッピング",
+      "id": "GBS-13462980",
+      "service": "radiko:GBS",
+      "title": "[ぎふチャン] サウンドトラック・モーニング",
       "subtitle": "",
       "content": "",
       "start_time": "2026-06-16T06:45:00+09:00",
       "end_time": "2026-06-16T07:00:00+09:00",
       "duration_sec": 900,
-      "series_id": "rdk_30f822375780",
-      "series_name": "ピックアップラジオショッピング",
+      "series_id": "rdk_4654ab328481",
+      "series_name": "サウンドトラック・モーニング",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
       "id": "OBC-13463973",
@@ -1691,7 +1871,7 @@
       "series_name": "気象情報（東海・北陸）",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
       "id": "JOAK-13495259",
@@ -1754,19 +1934,34 @@
       "area": "JP13"
     },
     {
-      "id": "MRO-13481213",
-      "service": "radiko:MRO",
-      "title": "[MROラジオ] あさ＊ダッシュ!",
-      "subtitle": "谷川恵一",
-      "content": "7:02頃 MRO Morning News\n7:10 お早う!ニュースネットワーク\n7:30頃 MRO Morning News\n7:35頃 天気予報\n7:40頃 交通情報\n7:55 MRO Music Power Box\n8:00 日本全国8時です\n8:15 まごころで健康を アルプモーニングスマイル\n8:25頃 MRO Morning News\n8:30頃 天気予報\n8:35頃 交通情報\n8:40頃 北國新聞 きょうのイチ押し\n8:50 武田鉄矢 今朝の三枚おろし\n9:05頃 今日は何の日\n9:10頃 あんたさんどう思うけ～\n9:30頃 今夜の一品\n9:51 黒木瞳のあさナビ\n10:00頃 MRO News&Weather\n10:05頃 いしかわお天気ネット\n10:10頃 ねたのたね\n10:35頃 きょうの誕生日\n11:00頃 MRO News&Weather\n11:05頃 ランチリクエスト\n11:15頃 はぴねすくらぶラジオショッピング\n11:25頃 交通情報",
+      "id": "TOKAIRADIO-13468383",
+      "service": "radiko:TOKAIRADIO",
+      "title": "[TOKAI RADIO] GRooVE929 (2)",
+      "subtitle": "DALE",
+      "content": "□6:30～TODAY'S GRooVin' TOPICS\n◆□7:00～\n◆NEWS\n◆Dig One\n◆WEATHER INFORMATION\n◆TRAFFIC INFORMATION\n◆下川みくにのMIRAIにエール！\n◆TRAFFIC INFORMATION\n◆東桜World Topics\n\n□8:00～\n◆NEWS\n◆TRAFFIC INFORMATION\n◆Expert Express\n◆ジャパネットたかたラジオショッピング\n◆WEATHER INFORMATION\n◆TRAFFIC INFORMATION\n◆武田鉄矢・今朝の三枚おろし\n\n番組へのメッセージは【コチラ】\n番組ハッシュタグは「#グルーヴ929」\n番組公式Xアカウントは「@groove929」\nTOKAI RADIOのハッシュタグは「#TOKAIRADIO」\nTOKAI RADIO公式X（旧twitter）アカウントは「@tokairadio」",
       "start_time": "2026-06-16T07:00:00+09:00",
-      "end_time": "2026-06-16T07:10:00+09:00",
-      "duration_sec": 600,
-      "series_id": "rdk_66d9c266e0dc",
-      "series_name": "あさ＊ダッシュ!",
+      "end_time": "2026-06-16T08:00:00+09:00",
+      "duration_sec": 3600,
+      "series_id": "rdk_f35668566cb5",
+      "series_name": "GRooVE929",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
+    },
+    {
+      "id": "GBS-13462981",
+      "service": "radiko:GBS",
+      "title": "[ぎふチャン] 小沢典子のたっぷりモーニング",
+      "subtitle": "小沢典子",
+      "content": "【主なコーナー】\n▽鉄道運行情報\n▽朝一番！NEWSヘッドライン\n▽きょうの天気\n▽おはようニューモラル\n▽道路交通情報（一宮・岐阜センター）\n▽易八大のきょうの運勢\n\n番組へのメッセージはこちら\n\npuri@zf-web.com\nXハッシュタグは「#小沢典子」\nXアカウントは「@tappuriozawa」\"",
+      "start_time": "2026-06-16T07:00:00+09:00",
+      "end_time": "2026-06-16T08:00:00+09:00",
+      "duration_sec": 3600,
+      "series_id": "rdk_271bd094d784",
+      "series_name": "小沢典子のたっぷりモーニング",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
     },
     {
       "id": "JOCK-13495554",
@@ -1781,7 +1976,7 @@
       "series_name": "マイあさ！ ▽ＮＨＫけさのニュース",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
       "id": "JOAK-FM-13495204",
@@ -1796,7 +1991,7 @@
       "series_name": "マイあさ！ ▽ＮＨＫけさのニュース",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
       "id": "QRR-13473479",
@@ -2013,21 +2208,6 @@
       "area": "NHK"
     },
     {
-      "id": "MRO-13481214",
-      "service": "radiko:MRO",
-      "title": "[MROラジオ] お早う!ニュースネットワーク",
-      "subtitle": "飯田浩司 新行市佳 片岡剛士",
-      "content": "",
-      "start_time": "2026-06-16T07:10:00+09:00",
-      "end_time": "2026-06-16T07:25:00+09:00",
-      "duration_sec": 900,
-      "series_id": "rdk_51ee7ca5c3a5",
-      "series_name": "お早う!ニュースネットワーク",
-      "episode_name": "",
-      "genre": [],
-      "area": "JP17"
-    },
-    {
       "id": "r1-270-2026061688900",
       "service": "r1",
       "title": "ニュース・気象情報（関西）",
@@ -2055,7 +2235,7 @@
       "series_name": "開始アナウンス",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
       "id": "JOCK-13495555",
@@ -2070,7 +2250,7 @@
       "series_name": "ニュース・気象情報（東海・北陸）",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
       "id": "JOAK-FM-13495205",
@@ -2085,7 +2265,7 @@
       "series_name": "ニュース・気象情報（関東）",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
       "id": "r1-270-2026061667767",
@@ -2124,21 +2304,6 @@
       "area": "NHK"
     },
     {
-      "id": "MRO-13481215",
-      "service": "radiko:MRO",
-      "title": "[MROラジオ] あさ＊ダッシュ!",
-      "subtitle": "谷川恵一",
-      "content": "7:30頃 MRO Morning News\n7:35頃 天気予報\n7:40頃 交通情報\n7:55 MRO Music Power Box\n8:00 日本全国8時です\n8:15 まごころで健康を アルプモーニングスマイル\n8:25頃 MRO Morning News\n8:30頃 天気予報\n8:35頃 交通情報\n8:40頃 北國新聞 きょうのイチ押し\n8:50 武田鉄矢 今朝の三枚おろし\n9:05頃 今日は何の日\n9:10頃 あんたさんどう思うけ～\n9:30頃 今夜の一品\n9:51 黒木瞳のあさナビ\n10:00頃 MRO News&Weather\n10:05頃 いしかわお天気ネット\n10:10頃 ねたのたね\n10:35頃 きょうの誕生日\n11:00頃 MRO News&Weather\n11:05頃 ランチリクエスト\n11:15頃 はぴねすくらぶラジオショッピング\n11:25頃 交通情報",
-      "start_time": "2026-06-16T07:25:00+09:00",
-      "end_time": "2026-06-16T07:55:00+09:00",
-      "duration_sec": 1800,
-      "series_id": "rdk_66d9c266e0dc",
-      "series_name": "あさ＊ダッシュ!",
-      "episode_name": "",
-      "genre": [],
-      "area": "JP17"
-    },
-    {
       "id": "RN1-13481430",
       "service": "radiko:RN1",
       "title": "[ラジオNIKKEI第1] ミュージックアプリ",
@@ -2151,7 +2316,7 @@
       "series_name": "ミュージックアプリ",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
       "id": "JOCK-13495556",
@@ -2166,22 +2331,7 @@
       "series_name": "マイあさ！ 火曜７時台 多様な性と生きる／ここに注目！小澤解説委員／気象情報",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
-    },
-    {
-      "id": "HELLOFIVE-13466297",
-      "service": "radiko:HELLOFIVE",
-      "title": "[エフエム石川] OH! HAPPY MORNING",
-      "subtitle": "井門宗之 / 森藤恵美",
-      "content": "あたり前の日常の中にこそ、ハッピーが詰まっている！\nハピモニでは、リスナーの方々と一緒に、幸せになるヒントを探していきます！\nどうか今日が、ハッピーな一日となりますように♪\n\n番組Webサイト：https://jfn-pods.com/program/27266\nメッセージフォーム：https://form.jfn.co.jp/happy/message\n\nXハッシュタグは「#ハピモニ」\nXアカウントは「@hapimoni」",
-      "start_time": "2026-06-16T07:30:00+09:00",
-      "end_time": "2026-06-16T07:50:00+09:00",
-      "duration_sec": 1200,
-      "series_id": "rdk_3fa2f2435cbe",
-      "series_name": "OH! HAPPY MORNING",
-      "episode_name": "",
-      "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
       "id": "KISSFMKOBE-13467112",
@@ -2244,21 +2394,6 @@
       "area": "NHK"
     },
     {
-      "id": "HELLOFIVE-13466298",
-      "service": "radiko:HELLOFIVE",
-      "title": "[エフエム石川] ウエザー・インフォメーション",
-      "subtitle": "",
-      "content": "---",
-      "start_time": "2026-06-16T07:50:00+09:00",
-      "end_time": "2026-06-16T07:55:00+09:00",
-      "duration_sec": 300,
-      "series_id": "rdk_dbec68c1282e",
-      "series_name": "ウエザー・インフォメーション",
-      "episode_name": "",
-      "genre": [],
-      "area": "JP17"
-    },
-    {
       "id": "JOCK-13495557",
       "service": "radiko:JOCK",
       "title": "[NHK AM（名古屋）] 気象情報・ニュース（東海・北陸）",
@@ -2271,7 +2406,7 @@
       "series_name": "気象情報・ニュース（東海・北陸）",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
       "id": "JOAK-13495263",
@@ -2289,21 +2424,6 @@
       "area": "JP13"
     },
     {
-      "id": "MRO-13481216",
-      "service": "radiko:MRO",
-      "title": "[MROラジオ] MRO Music Power Box",
-      "subtitle": "",
-      "content": "",
-      "start_time": "2026-06-16T07:55:00+09:00",
-      "end_time": "2026-06-16T08:00:00+09:00",
-      "duration_sec": 300,
-      "series_id": "rdk_2e0b7074711a",
-      "series_name": "MRO Music Power Box",
-      "episode_name": "",
-      "genre": [],
-      "area": "JP17"
-    },
-    {
       "id": "RN1-13481432",
       "service": "radiko:RN1",
       "title": "[ラジオNIKKEI第1] 光とともに",
@@ -2316,22 +2436,7 @@
       "series_name": "光とともに",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
-    },
-    {
-      "id": "HELLOFIVE-13466299",
-      "service": "radiko:HELLOFIVE",
-      "title": "[エフエム石川] 北國新聞ニュース",
-      "subtitle": "",
-      "content": "---",
-      "start_time": "2026-06-16T07:55:00+09:00",
-      "end_time": "2026-06-16T08:00:00+09:00",
-      "duration_sec": 300,
-      "series_id": "rdk_4be79b75c449",
-      "series_name": "北國新聞ニュース",
-      "episode_name": "",
-      "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
       "id": "JOCK-13495558",
@@ -2346,7 +2451,7 @@
       "series_name": "交通情報（東海３県）",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
       "id": "JOAK-13495264",
@@ -2364,19 +2469,34 @@
       "area": "JP13"
     },
     {
-      "id": "MRO-13481217",
-      "service": "radiko:MRO",
-      "title": "[MROラジオ] 日本全国8時です",
-      "subtitle": "森本毅郎 遠藤泰子 酒井綱一郎",
-      "content": "",
+      "id": "TOKAIRADIO-13468383",
+      "service": "radiko:TOKAIRADIO",
+      "title": "[TOKAI RADIO] GRooVE929 (3)",
+      "subtitle": "DALE",
+      "content": "□6:30～TODAY'S GRooVin' TOPICS\n◆□7:00～\n◆NEWS\n◆Dig One\n◆WEATHER INFORMATION\n◆TRAFFIC INFORMATION\n◆下川みくにのMIRAIにエール！\n◆TRAFFIC INFORMATION\n◆東桜World Topics\n\n□8:00～\n◆NEWS\n◆TRAFFIC INFORMATION\n◆Expert Express\n◆ジャパネットたかたラジオショッピング\n◆WEATHER INFORMATION\n◆TRAFFIC INFORMATION\n◆武田鉄矢・今朝の三枚おろし\n\n番組へのメッセージは【コチラ】\n番組ハッシュタグは「#グルーヴ929」\n番組公式Xアカウントは「@groove929」\nTOKAI RADIOのハッシュタグは「#TOKAIRADIO」\nTOKAI RADIO公式X（旧twitter）アカウントは「@tokairadio」",
       "start_time": "2026-06-16T08:00:00+09:00",
-      "end_time": "2026-06-16T08:15:00+09:00",
-      "duration_sec": 900,
-      "series_id": "rdk_318d08cb70c8",
-      "series_name": "日本全国8時です",
+      "end_time": "2026-06-16T09:00:00+09:00",
+      "duration_sec": 3600,
+      "series_id": "rdk_f35668566cb5",
+      "series_name": "GRooVE929",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
+    },
+    {
+      "id": "GBS-13462982",
+      "service": "radiko:GBS",
+      "title": "[ぎふチャン] 小沢典子のたっぷりモーニング",
+      "subtitle": "小沢典子",
+      "content": "【主なコーナー】\n▽新聞チェック\n▽防災ひとくちメモ\n▽道路交通情報（岐阜センター）\n\n番組へのメッセージはこちら\n\npuri@zf-web.com\nXハッシュタグは「#小沢典子」\nXアカウントは「@tappuriozawa」\"",
+      "start_time": "2026-06-16T08:00:00+09:00",
+      "end_time": "2026-06-16T08:25:00+09:00",
+      "duration_sec": 1500,
+      "series_id": "rdk_271bd094d784",
+      "series_name": "小沢典子のたっぷりモーニング",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
     },
     {
       "id": "RN1-13481433",
@@ -2391,22 +2511,22 @@
       "series_name": "日経電子版NEWS",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
-      "id": "HELLOFIVE-13466300",
-      "service": "radiko:HELLOFIVE",
-      "title": "[エフエム石川] イエローハット TODAY'S KEY NUMBER",
-      "subtitle": "",
-      "content": "この数字を知っておけば、会議や朝礼で話せる！\n今日のニュースを象徴するたった一つの数字を紹介します。",
+      "id": "FMAICHI-13467943",
+      "service": "radiko:FMAICHI",
+      "title": "[FM AICHI] イエローハット TODAY'S KEY NUMBER",
+      "subtitle": "ユージ / 吉田明世",
+      "content": "◆今日のニュースを象徴するたった一つの数字を毎朝紹介。この数字を知っておけば、会議や朝礼で話せる！その数字の背景にある社会情勢もコンパクトに解説します。◆\n\nXハッシュタグは「#エフエムアイチ」\nXアカウントは「@FMAICHI」",
       "start_time": "2026-06-16T08:00:00+09:00",
-      "end_time": "2026-06-16T08:09:00+09:00",
-      "duration_sec": 540,
-      "series_id": "rdk_c6495961f4e9",
+      "end_time": "2026-06-16T08:10:00+09:00",
+      "duration_sec": 600,
+      "series_id": "rdk_46afe4bdabd6",
       "series_name": "イエローハット TODAY'S KEY NUMBER",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
       "id": "JOCK-13495559",
@@ -2421,7 +2541,7 @@
       "series_name": "マイあさ！火曜８時台ニュース／ワールドアイ 世界熱帯雨林音楽祭２０２６／気象情報",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
       "id": "QRR-13473480",
@@ -2650,22 +2770,7 @@
       "series_name": "My Work Style",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
-    },
-    {
-      "id": "HELLOFIVE-13466301",
-      "service": "radiko:HELLOFIVE",
-      "title": "[エフエム石川] 今日のスポーツ",
-      "subtitle": "",
-      "content": "今日、注目のスポーツを60秒でまるっとチェックします。今朝チェックするのは…？",
-      "start_time": "2026-06-16T08:09:00+09:00",
-      "end_time": "2026-06-16T08:10:00+09:00",
-      "duration_sec": 60,
-      "series_id": "rdk_f878d93adeee",
-      "series_name": "今日のスポーツ",
-      "episode_name": "",
-      "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
       "id": "RN1-13481434",
@@ -2680,22 +2785,22 @@
       "series_name": "おはようマーケット",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
-      "id": "HELLOFIVE-13466302",
-      "service": "radiko:HELLOFIVE",
-      "title": "[エフエム石川] 菌活 TREND ONE",
-      "subtitle": "",
-      "content": "毎週火曜日は 『菌活 TREND ONE』。\n日々の健康にうれしい、さまざまな“〇（マル）活”を一挙に叶える、\n“きのこで菌活”に関する情報をお届けしています！\n毎日の健康のために、簡単に取り入れられる「きのこレシピ」も公開中！\n\n番組Webサイト：https://www.tfm.co.jp/one/kinkatsu/\nメッセージフォーム：https://www.tfm.co.jp/f/om/kinkatsu",
+      "id": "FMAICHI-13467944",
+      "service": "radiko:FMAICHI",
+      "title": "[FM AICHI] 菌活 TREND ONE",
+      "subtitle": "ユージ / 吉田明世",
+      "content": "◆この時間は「菌活」をテーマにお届け！◆\n\nXハッシュタグは「#エフエムアイチ」\nXアカウントは「@FMAICHI」",
       "start_time": "2026-06-16T08:10:00+09:00",
-      "end_time": "2026-06-16T08:19:00+09:00",
-      "duration_sec": 540,
-      "series_id": "rdk_860cfc6c78e1",
+      "end_time": "2026-06-16T08:20:00+09:00",
+      "duration_sec": 600,
+      "series_id": "rdk_7e511310aa02",
       "series_name": "菌活 TREND ONE",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
       "id": "r1-270-2026061667772",
@@ -2717,21 +2822,6 @@
       "area": "NHK"
     },
     {
-      "id": "MRO-13481218",
-      "service": "radiko:MRO",
-      "title": "[MROラジオ] まごころで健康を アルプモーニングスマイル",
-      "subtitle": "秋本和美",
-      "content": "",
-      "start_time": "2026-06-16T08:15:00+09:00",
-      "end_time": "2026-06-16T08:20:00+09:00",
-      "duration_sec": 300,
-      "series_id": "rdk_1d7a0feece0d",
-      "series_name": "まごころで健康を アルプモーニングスマイル",
-      "episode_name": "",
-      "genre": [],
-      "area": "JP17"
-    },
-    {
       "id": "JOCK-13495560",
       "service": "radiko:JOCK",
       "title": "[NHK AM（名古屋）] まいにち朗読「ラジオも秀吉！新書太閤記」 第５７回",
@@ -2744,37 +2834,22 @@
       "series_name": "まいにち朗読「ラジオも秀吉！新書太閤記」",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
-      "id": "HELLOFIVE-13466303",
-      "service": "radiko:HELLOFIVE",
-      "title": "[エフエム石川] 快適生活ラジオショッピング",
-      "subtitle": "",
-      "content": "快適生活ラジオショッピング\n\n電話：0120-40-1475",
-      "start_time": "2026-06-16T08:19:00+09:00",
-      "end_time": "2026-06-16T08:25:00+09:00",
-      "duration_sec": 360,
-      "series_id": "rdk_bd50c5837b29",
-      "series_name": "快適生活ラジオショッピング",
-      "episode_name": "",
-      "genre": [],
-      "area": "JP17"
-    },
-    {
-      "id": "MRO-13481219",
-      "service": "radiko:MRO",
-      "title": "[MROラジオ] あさ＊ダッシュ!",
-      "subtitle": "谷川恵一",
-      "content": "8:25頃 MRO Morning News\n8:30頃 天気予報\n8:35頃 交通情報\n8:40頃 北國新聞 きょうのイチ押し\n8:50 武田鉄矢 今朝の三枚おろし\n9:05頃 今日は何の日\n9:10頃 あんたさんどう思うけ～\n9:30頃 今夜の一品\n9:51 黒木瞳のあさナビ\n10:00頃 MRO News&Weather\n10:05頃 いしかわお天気ネット\n10:10頃 ねたのたね\n10:35頃 きょうの誕生日\n11:00頃 MRO News&Weather\n11:05頃 ランチリクエスト\n11:15頃 はぴねすくらぶラジオショッピング\n11:25頃 交通情報",
+      "id": "FMAICHI-13467945",
+      "service": "radiko:FMAICHI",
+      "title": "[FM AICHI] MORNING BREEZE",
+      "subtitle": "水城あやの",
+      "content": "◆心地よい音楽とその日、役立つエリア情報をお送りします。◆\n\nメッセージ・リクエストはこちら\n\nXハッシュタグは「#ブリーズ807」\nXアカウントは「@breeze807」",
       "start_time": "2026-06-16T08:20:00+09:00",
-      "end_time": "2026-06-16T08:50:00+09:00",
-      "duration_sec": 1800,
-      "series_id": "rdk_66d9c266e0dc",
-      "series_name": "あさ＊ダッシュ!",
+      "end_time": "2026-06-16T10:50:00+09:00",
+      "duration_sec": 9000,
+      "series_id": "rdk_d05908d44d3c",
+      "series_name": "MORNING BREEZE",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
       "id": "FMO-13465943",
@@ -2792,6 +2867,21 @@
       "area": "JP27"
     },
     {
+      "id": "GBS-13462983",
+      "service": "radiko:GBS",
+      "title": "[ぎふチャン] 羽田美智子のいってらっしゃい",
+      "subtitle": "羽田美智子",
+      "content": "番組へのメッセージはこちら\nhada@1242.com\"",
+      "start_time": "2026-06-16T08:25:00+09:00",
+      "end_time": "2026-06-16T08:30:00+09:00",
+      "duration_sec": 300,
+      "series_id": "rdk_4c535c6c6a63",
+      "series_name": "羽田美智子のいってらっしゃい",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
+    },
+    {
       "id": "RN1-13487924",
       "service": "radiko:RN1",
       "title": "[ラジオNIKKEI第1] 森永乳業ＩＲ特集",
@@ -2804,22 +2894,7 @@
       "series_name": "森永乳業ＩＲ特集",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
-    },
-    {
-      "id": "HELLOFIVE-13466304",
-      "service": "radiko:HELLOFIVE",
-      "title": "[エフエム石川] トラフィック・インフォメーション",
-      "subtitle": "",
-      "content": "交通情報をお届けします",
-      "start_time": "2026-06-16T08:25:00+09:00",
-      "end_time": "2026-06-16T08:30:00+09:00",
-      "duration_sec": 300,
-      "series_id": "rdk_cdf5ef66af7c",
-      "series_name": "トラフィック・インフォメーション",
-      "episode_name": "",
-      "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
       "id": "r1-270-2026061667773",
@@ -2839,6 +2914,21 @@
       "area": "NHK"
     },
     {
+      "id": "GBS-13462984",
+      "service": "radiko:GBS",
+      "title": "[ぎふチャン] 小沢典子のたっぷりモーニング",
+      "subtitle": "小沢典子",
+      "content": "【主なコーナー】\n▽道路交通情報（岐阜センター）\n▽こちら110番\n▽ハッピードライブ\n▽岐阜市！元気インフォメーション\n番組へのメッセージはこちら\n\npuri@zf-web.com\nXハッシュタグは「#小沢典子」\nXアカウントは「@tappuriozawa」",
+      "start_time": "2026-06-16T08:30:00+09:00",
+      "end_time": "2026-06-16T09:55:00+09:00",
+      "duration_sec": 5100,
+      "series_id": "rdk_271bd094d784",
+      "series_name": "小沢典子のたっぷりモーニング",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
+    },
+    {
       "id": "RN2-13506076",
       "service": "radiko:RN2",
       "title": "[ラジオNIKKEI第2] RaNi Music♪Start",
@@ -2851,22 +2941,7 @@
       "series_name": "RaNi Music♪Start",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
-    },
-    {
-      "id": "HELLOFIVE-13466305",
-      "service": "radiko:HELLOFIVE",
-      "title": "[エフエム石川] OH! HAPPY MORNING",
-      "subtitle": "井門宗之 / 森藤恵美",
-      "content": "あたり前の日常の中にこそ、ハッピーが詰まっている！\nハピモニでは、リスナーの方々と一緒に、幸せになるヒントを探していきます！\nどうか今日が、ハッピーな一日となりますように♪\n\n番組Webサイト：https://jfn-pods.com/program/27266\nメッセージフォーム：https://form.jfn.co.jp/happy/message\n\nXハッシュタグは「#ハピモニ」\nXアカウントは「@hapimoni」",
-      "start_time": "2026-06-16T08:30:00+09:00",
-      "end_time": "2026-06-16T08:55:00+09:00",
-      "duration_sec": 1500,
-      "series_id": "rdk_3fa2f2435cbe",
-      "series_name": "OH! HAPPY MORNING",
-      "episode_name": "",
-      "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
       "id": "JOCK-13495561",
@@ -2881,7 +2956,7 @@
       "series_name": "ふんわり 火曜ＭＣは木村祐一さん／ラジオ体操 ８時台（６／１６）",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
       "id": "TBS-13468237",
@@ -2911,22 +2986,7 @@
       "series_name": "おはようマーケット",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
-    },
-    {
-      "id": "MRO-13481220",
-      "service": "radiko:MRO",
-      "title": "[MROラジオ] 武田鉄矢 今朝の三枚おろし",
-      "subtitle": "武田鉄矢 水谷加奈",
-      "content": "",
-      "start_time": "2026-06-16T08:50:00+09:00",
-      "end_time": "2026-06-16T09:00:00+09:00",
-      "duration_sec": 600,
-      "series_id": "rdk_f411638ce244",
-      "series_name": "武田鉄矢 今朝の三枚おろし",
-      "episode_name": "",
-      "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
       "id": "INT-13465674",
@@ -2989,21 +3049,6 @@
       "area": "NHK"
     },
     {
-      "id": "HELLOFIVE-13466306",
-      "service": "radiko:HELLOFIVE",
-      "title": "[エフエム石川] 北國新聞ニュース",
-      "subtitle": "",
-      "content": "---",
-      "start_time": "2026-06-16T08:55:00+09:00",
-      "end_time": "2026-06-16T09:00:00+09:00",
-      "duration_sec": 300,
-      "series_id": "rdk_4be79b75c449",
-      "series_name": "北國新聞ニュース",
-      "episode_name": "",
-      "genre": [],
-      "area": "JP17"
-    },
-    {
       "id": "JOCK-13495562",
       "service": "radiko:JOCK",
       "title": "[NHK AM（名古屋）] 全国気象情報・全国交通情報",
@@ -3016,7 +3061,7 @@
       "series_name": "全国気象情報・全国交通情報",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
       "id": "JOAK-13495268",
@@ -3049,19 +3094,34 @@
       "area": "JP13"
     },
     {
-      "id": "MRO-13481221",
-      "service": "radiko:MRO",
-      "title": "[MROラジオ] あさ＊ダッシュ!",
-      "subtitle": "谷川恵一 冨優香子",
-      "content": "9:05頃 今日は何の日\n9:10頃 あんたさんどう思うけ～\n9:30頃 今夜の一品\n9:51 黒木瞳のあさナビ\n10:00頃 MRO News&Weather\n10:05頃 いしかわお天気ネット\n10:10頃 ねたのたね\n10:35頃 きょうの誕生日\n11:00頃 MRO News&Weather\n11:05頃 ランチリクエスト\n11:15頃 はぴねすくらぶラジオショッピング\n11:25頃 交通情報",
+      "id": "CBC-13481094",
+      "service": "radiko:CBC",
+      "title": "[CBCラジオ] つボイノリオの聞けば聞くほど",
+      "subtitle": "つボイノリオ 小高直子",
+      "content": "世間の出来事、つボイノリオ自身の体験や、個々人の身の回りの日常など番組で取り上げる話題はすべて、リスナーの生活と密着した「いま」そのもの。\n\n一緒に聞き、一緒に番組を創っていく。送られてくるおたよりは全国から毎日300通余り。\n\nコメントに関する即座のリアクションによって、番組はLIVE感あふれる究極の「井戸端会議」！\n\nパーソナリティは、名（迷）曲「金太の大冒険」で東海地区ではおなじみのつボイノリオと、小高直子CBCアナウンサーの名コンビ。\n\n番組記事を読む→こちら\n\n番組「X」アカウントはこちら\n\n番組へのおたよりは こちら\n\nFAXは 052-263-6800 まで",
       "start_time": "2026-06-16T09:00:00+09:00",
-      "end_time": "2026-06-16T09:51:00+09:00",
-      "duration_sec": 3060,
-      "series_id": "rdk_66d9c266e0dc",
-      "series_name": "あさ＊ダッシュ!",
+      "end_time": "2026-06-16T11:55:00+09:00",
+      "duration_sec": 10500,
+      "series_id": "rdk_f0b5da26e800",
+      "series_name": "つボイノリオの聞けば聞くほど",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
+    },
+    {
+      "id": "TOKAIRADIO-13468384",
+      "service": "radiko:TOKAIRADIO",
+      "title": "[TOKAI RADIO] Paradise (1)",
+      "subtitle": "神野三枝",
+      "content": "□9:00～\n◆TRAFFIC INFORMATION\n◆堀田商事INFORMATION\n◆暮らしの栞\n\n□10:00～\n◆NEWS\n◆WEATHER INFORMATION\n◆TRAFFIC INFORMATION\n◆ジャパネットたかたラジオショッピング\n\n番組へのメッセージは【コチラ】\n番組ハッシュタグは「#パラダイス929」\n番組公式X（旧twitter）アカウントは「paradise9291332」\nTOKAI RADIOのハッシュタグは「#TOKAIRADIO」\nTOKAI RADIO公式X（旧twitter）アカウントは「@tokairadio」",
+      "start_time": "2026-06-16T09:00:00+09:00",
+      "end_time": "2026-06-16T10:00:00+09:00",
+      "duration_sec": 3600,
+      "series_id": "rdk_1dbc87fe71a1",
+      "series_name": "Paradise",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
     },
     {
       "id": "RN1-13481435",
@@ -3076,7 +3136,7 @@
       "series_name": "マーケットプレス 前場",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
       "id": "RN2-13506077",
@@ -3091,22 +3151,22 @@
       "series_name": "RaNi Music♪Morning",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
-      "id": "HELLOFIVE-13466307",
-      "service": "radiko:HELLOFIVE",
-      "title": "[エフエム石川] OH! HAPPY MORNING",
-      "subtitle": "井門宗之 / 森藤恵美",
-      "content": "あたり前の日常の中にこそ、ハッピーが詰まっている！\nハピモニでは、リスナーの方々と一緒に、幸せになるヒントを探していきます！\nどうか今日が、ハッピーな一日となりますように♪\n\n▽09:08〜 【 TODAY'S FOCUS 】\n気になるニュースに焦点を当てて、様 々な専門家、コメンテイターの方に詳しくお話を伺うコーナー\n\n▽09:26〜 【 ウエザー＆インフォメーション 】\n---\n\n▽09:40〜 【 OH! HAPPY TALK 】\n皆さんからいただいたメッセージをご紹介します！\n\n▽09:49〜 【 快適生活ラジオショッピング 】\n快適生活ラジオショッピング\n\n番組Webサイト：https://jfn-pods.com/program/27266\nメッセージフォーム：https://form.jfn.co.jp/happy/message\n\nXハッシュタグは「#ハピモニ」\nXアカウントは「@hapimoni」",
+      "id": "ZIP-FM-13481155",
+      "service": "radiko:ZIP-FM",
+      "title": "[ZIP-FM] BRUNCH STYLE",
+      "subtitle": "永田レイナ",
+      "content": "9:21 RADIO SHOPPING (Mon-Thu:はぴねすくらぶ)\n\n9:40 GOOD HARVEST (Thu:セントライグループ)\n\n10:00 DRIVING A GO GO (Tue:渥美モータース)\n\n10:36 FAMILY TALKING (Mon-Thu:沢井製薬)",
       "start_time": "2026-06-16T09:00:00+09:00",
-      "end_time": "2026-06-16T09:55:00+09:00",
-      "duration_sec": 3300,
-      "series_id": "rdk_3fa2f2435cbe",
-      "series_name": "OH! HAPPY MORNING",
+      "end_time": "2026-06-16T12:00:00+09:00",
+      "duration_sec": 10800,
+      "series_id": "rdk_f2284ff4879d",
+      "series_name": "BRUNCH STYLE",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
       "id": "JOCK-13495563",
@@ -3121,7 +3181,7 @@
       "series_name": "ニュース",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
       "id": "QRR-13473481",
@@ -3440,7 +3500,7 @@
       "series_name": "ふんわり「木村家のリビング」俳優・川平慈英さん登場！ ９時台",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
       "id": "r3-270-2026061667872",
@@ -3459,21 +3519,6 @@
         "音楽"
       ],
       "area": "NHK"
-    },
-    {
-      "id": "MRO-13481222",
-      "service": "radiko:MRO",
-      "title": "[MROラジオ] 黒木瞳のあさナビ",
-      "subtitle": "黒木瞳 舘ひろし",
-      "content": "",
-      "start_time": "2026-06-16T09:51:00+09:00",
-      "end_time": "2026-06-16T10:00:00+09:00",
-      "duration_sec": 540,
-      "series_id": "rdk_e32c767d7898",
-      "series_name": "黒木瞳のあさナビ",
-      "episode_name": "",
-      "genre": [],
-      "area": "JP17"
     },
     {
       "id": "r1-270-2026061688911",
@@ -3508,19 +3553,19 @@
       "area": "NHK"
     },
     {
-      "id": "HELLOFIVE-13466308",
-      "service": "radiko:HELLOFIVE",
-      "title": "[エフエム石川] 北陸電力プレゼンツ CHIKOの“こたかな”（再放送）",
-      "subtitle": "CHIKO",
-      "content": "「こたえていく」「かなえていく」をテーマに、北陸３県の夢を実現した人【こたかなびと】を紹介していく番組です。",
+      "id": "GBS-13462985",
+      "service": "radiko:GBS",
+      "title": "[ぎふチャン] Ｐｉｃｋ ｕｐ！",
+      "subtitle": "",
+      "content": "",
       "start_time": "2026-06-16T09:55:00+09:00",
       "end_time": "2026-06-16T10:00:00+09:00",
       "duration_sec": 300,
-      "series_id": "rdk_b931594f6c96",
-      "series_name": "北陸電力プレゼンツ CHIKOの“こたかな”（再放送）",
+      "series_id": "rdk_f48ecd7f247d",
+      "series_name": "Ｐｉｃｋ ｕｐ！",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
       "id": "JOCK-13495565",
@@ -3535,7 +3580,7 @@
       "series_name": "気象情報・おしらせ・交通情報（東海３県）",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
       "id": "INT-13465676",
@@ -3568,34 +3613,34 @@
       "area": "JP13"
     },
     {
-      "id": "MRO-13481223",
-      "service": "radiko:MRO",
-      "title": "[MROラジオ] MRO News&Weather",
-      "subtitle": "",
-      "content": "",
+      "id": "TOKAIRADIO-13468384",
+      "service": "radiko:TOKAIRADIO",
+      "title": "[TOKAI RADIO] Paradise (2)",
+      "subtitle": "神野三枝",
+      "content": "□9:00～\n◆TRAFFIC INFORMATION\n◆堀田商事INFORMATION\n◆暮らしの栞\n\n□10:00～\n◆NEWS\n◆WEATHER INFORMATION\n◆TRAFFIC INFORMATION\n◆ジャパネットたかたラジオショッピング\n\n番組へのメッセージは【コチラ】\n番組ハッシュタグは「#パラダイス929」\n番組公式X（旧twitter）アカウントは「paradise9291332」\nTOKAI RADIOのハッシュタグは「#TOKAIRADIO」\nTOKAI RADIO公式X（旧twitter）アカウントは「@tokairadio」",
       "start_time": "2026-06-16T10:00:00+09:00",
-      "end_time": "2026-06-16T10:05:00+09:00",
-      "duration_sec": 300,
-      "series_id": "rdk_fb83b180c93a",
-      "series_name": "MRO News&Weather",
+      "end_time": "2026-06-16T11:00:00+09:00",
+      "duration_sec": 3600,
+      "series_id": "rdk_1dbc87fe71a1",
+      "series_name": "Paradise",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
-      "id": "HELLOFIVE-13466309",
-      "service": "radiko:HELLOFIVE",
-      "title": "[エフエム石川] OH! HAPPY MORNING",
-      "subtitle": "井門宗之 / 森藤恵美",
-      "content": "あたり前の日常の中にこそ、ハッピーが詰まっている！\nハピモニでは、リスナーの方々と一緒に、幸せになるヒントを探していきます！\nどうか今日が、ハッピーな一日となりますように♪\n\n▽10:20〜 【 ジャパネットたかたラジオショッピング 】\nラジオショッピング\n\n番組Webサイト：https://jfn-pods.com/program/27266\nメッセージフォーム：https://form.jfn.co.jp/happy/message\n\nXハッシュタグは「#ハピモニ」\nXアカウントは「@hapimoni」",
+      "id": "GBS-13462986",
+      "service": "radiko:GBS",
+      "title": "[ぎふチャン] Ｍｕｓｉｃ Ｔｕｎｅ",
+      "subtitle": "相川真一",
+      "content": "【主なコーナー】\n▽ぎふ発！ふるさとＴｕｎｅ\n▽岐阜バス歌のドライブ\n\n番組へのメッセージはこちら\n\ntune@zf-web.com\nXのアカウントは「@tune1431」、ハッシュタグは「#MusicTune」\"",
       "start_time": "2026-06-16T10:00:00+09:00",
-      "end_time": "2026-06-16T10:55:00+09:00",
-      "duration_sec": 3300,
-      "series_id": "rdk_3fa2f2435cbe",
-      "series_name": "OH! HAPPY MORNING",
+      "end_time": "2026-06-16T11:00:00+09:00",
+      "duration_sec": 3600,
+      "series_id": "rdk_63e9a8508044",
+      "series_name": "Ｍｕｓｉｃ Ｔｕｎｅ",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
       "id": "JOCK-13495566",
@@ -3610,7 +3655,7 @@
       "series_name": "ニュース",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
       "id": "TBS-13468237",
@@ -3857,21 +3902,6 @@
       "area": "NHK"
     },
     {
-      "id": "MRO-13481224",
-      "service": "radiko:MRO",
-      "title": "[MROラジオ] あさ＊ダッシュ!",
-      "subtitle": "谷川恵一 冨優香子",
-      "content": "10:05頃 いしかわお天気ネット\n10:10頃 ねたのたね\n10:35頃 きょうの誕生日\n11:00頃 MRO News&Weather\n11:05頃 ランチリクエスト\n11:15頃 はぴねすくらぶラジオショッピング\n11:25頃 交通情報",
-      "start_time": "2026-06-16T10:05:00+09:00",
-      "end_time": "2026-06-16T11:00:00+09:00",
-      "duration_sec": 3300,
-      "series_id": "rdk_66d9c266e0dc",
-      "series_name": "あさ＊ダッシュ!",
-      "episode_name": "",
-      "genre": [],
-      "area": "JP17"
-    },
-    {
       "id": "JOCK-13495567",
       "service": "radiko:JOCK",
       "title": "[NHK AM（名古屋）] ふんわり「ふるさとてんこ盛り！」「おひる、こんなんどう？」 １０時台",
@@ -3884,7 +3914,7 @@
       "series_name": "ふんわり「ふるさとてんこ盛り！」「おひる、こんなんどう？」 １０時台",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
       "id": "r3-270-2026061667874",
@@ -3980,6 +4010,21 @@
       "area": "JP13"
     },
     {
+      "id": "FMAICHI-13467946",
+      "service": "radiko:FMAICHI",
+      "title": "[FM AICHI] あぐりずむ",
+      "subtitle": "川瀬良子",
+      "content": "◆日本の未来を元気にする農業応援プログラム！全国の生産者と消費者をおいしいリズムでつなげます！◆\n\nXハッシュタグは「#エフエムアイチ」\nXアカウントは「@FMAICHI」",
+      "start_time": "2026-06-16T10:50:00+09:00",
+      "end_time": "2026-06-16T11:00:00+09:00",
+      "duration_sec": 600,
+      "series_id": "rdk_2fd6ff6656dc",
+      "series_name": "あぐりずむ",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
+    },
+    {
       "id": "FMO-13465944",
       "service": "radiko:FMO",
       "title": "[FM大阪] あぐりずむ",
@@ -4010,21 +4055,6 @@
       "area": "NHK"
     },
     {
-      "id": "HELLOFIVE-13466310",
-      "service": "radiko:HELLOFIVE",
-      "title": "[エフエム石川] コミュニティ・ガイド（能美市）",
-      "subtitle": "井上亜紀子",
-      "content": "能美市からのお知らせ",
-      "start_time": "2026-06-16T10:55:00+09:00",
-      "end_time": "2026-06-16T11:00:00+09:00",
-      "duration_sec": 300,
-      "series_id": "rdk_2758a26210cb",
-      "series_name": "コミュニティ・ガイド（能美市）",
-      "episode_name": "",
-      "genre": [],
-      "area": "JP17"
-    },
-    {
       "id": "JOCK-13495568",
       "service": "radiko:JOCK",
       "title": "[NHK AM（名古屋）] みんなのうた「愛されてパヤパヤ」／「ＴＨＥ ＲＩＶＥＲ」",
@@ -4037,7 +4067,7 @@
       "series_name": "みんなのうた「愛されてパヤパヤ」／「ＴＨＥ ＲＩＶＥＲ」",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
       "id": "JOAK-13495274",
@@ -4055,34 +4085,49 @@
       "area": "JP13"
     },
     {
-      "id": "MRO-13481225",
-      "service": "radiko:MRO",
-      "title": "[MROラジオ] MRO News&Weather",
-      "subtitle": "",
-      "content": "",
+      "id": "TOKAIRADIO-13468385",
+      "service": "radiko:TOKAIRADIO",
+      "title": "[TOKAI RADIO] LIFE HACKERS! (1)",
+      "subtitle": "南城大輔",
+      "content": "□11:00～\n◆TRAFFIC INFORMATION\n◆LUNCH REQUEST\n◆キング観光SOUNDS GOOD!\n\n□12:00～\n◆NEWS\n◆WEATHER INFORMATION\n◆TRAFFIC INFORMATION\n◆南海トラフ巨大地震どうなる？どうする！\n◆まいどあり～。\n\n番組へのメッセージは【コチラ】\n番組ハッシュタグは「#ハッカーズ」\n番組公式X（旧twitter）アカウントは「@LIFEHACKERS929」\nTOKAI RADIOのハッシュタグは「#TOKAIRADIO」\nTOKAI RADIO公式X（旧twitter）アカウントは「@tokairadio」",
       "start_time": "2026-06-16T11:00:00+09:00",
-      "end_time": "2026-06-16T11:05:00+09:00",
-      "duration_sec": 300,
-      "series_id": "rdk_fb83b180c93a",
-      "series_name": "MRO News&Weather",
+      "end_time": "2026-06-16T12:00:00+09:00",
+      "duration_sec": 3600,
+      "series_id": "rdk_b53074ab9256",
+      "series_name": "LIFE HACKERS!",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
-      "id": "HELLOFIVE-13466311",
-      "service": "radiko:HELLOFIVE",
-      "title": "[エフエム石川] ディア・フレンズ",
+      "id": "GBS-13462987",
+      "service": "radiko:GBS",
+      "title": "[ぎふチャン] Ｍｕｓｉｃ Ｔｕｎｅ",
+      "subtitle": "相川真一",
+      "content": "【主なコーナー】\n▽今週の歌\n\n番組へのメッセージはこちら\ntune@zf-web.com\nXのアカウントは「@tune1431」、ハッシュタグは「#MusicTune」\"",
+      "start_time": "2026-06-16T11:00:00+09:00",
+      "end_time": "2026-06-16T12:00:00+09:00",
+      "duration_sec": 3600,
+      "series_id": "rdk_63e9a8508044",
+      "series_name": "Ｍｕｓｉｃ Ｔｕｎｅ",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
+    },
+    {
+      "id": "FMAICHI-13467947",
+      "service": "radiko:FMAICHI",
+      "title": "[FM AICHI] ディア・フレンズ",
       "subtitle": "坂本美雨",
-      "content": "＜ゲスト：竹原ピストル＞\nディアフレンズ・ファミリーの竹原ピストルさんが登場！\n昨年9月12日、有楽町「I'M A SHOW」で開催された「ディアフレンズ 30th Anniversary LIVE」にもご出演いただいた竹原さん。\n音楽はもちろん、俳優としても映画「災 劇場版」「君が最後に遺した歌」、ドラマ「嘘が嘘で嘘は嘘だ」「夫婦別姓刑事」などでご活躍！\n\n5月27日には最新アルバム「FIRST CRY!!」がリリース♬\n50歳を目前にした「新たなスタート」。そして「産声」という意味を込めた作品は、バリエーション豊かな全13曲。\nまた、全国47都道府県をまわる全国ツアーも開催！\n\nニューアルバムへの思いや、全国ツアーについて、いろいろうかがいます♪\n\n番組Webサイト：https://www.tfm.co.jp/dear/\n\nXハッシュタグは「#ディアフレンズ」\nXアカウントは「@dearfriends80」",
+      "content": "◆様々なジャンルの旬な人物をゲストにお迎えしてお送りするトーク番組。◆\n\nXハッシュタグは「#エフエムアイチ」\nXアカウントは「@FMAICHI」",
       "start_time": "2026-06-16T11:00:00+09:00",
       "end_time": "2026-06-16T11:30:00+09:00",
       "duration_sec": 1800,
-      "series_id": "rdk_f97451d1ce70",
+      "series_id": "rdk_736e1dd5ab2e",
       "series_name": "ディア・フレンズ",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
       "id": "JOCK-13495569",
@@ -4097,7 +4142,7 @@
       "series_name": "ニュース",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
       "id": "JOAK-FM-13495210",
@@ -4112,7 +4157,7 @@
       "series_name": "浪曲十八番 京山幸枝若「慶安太平記 由井正雪東下り」（前編）",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
       "id": "TBS-13468238",
@@ -4437,21 +4482,6 @@
       "area": "NHK"
     },
     {
-      "id": "MRO-13481226",
-      "service": "radiko:MRO",
-      "title": "[MROラジオ] あさ＊ダッシュ!",
-      "subtitle": "谷川恵一 冨優香子",
-      "content": "11:05頃 ランチリクエスト\n11:15頃 はぴねすくらぶラジオショッピング\n11:25頃 交通情報",
-      "start_time": "2026-06-16T11:05:00+09:00",
-      "end_time": "2026-06-16T11:40:00+09:00",
-      "duration_sec": 2100,
-      "series_id": "rdk_66d9c266e0dc",
-      "series_name": "あさ＊ダッシュ!",
-      "episode_name": "",
-      "genre": [],
-      "area": "JP17"
-    },
-    {
       "id": "JOCK-13495570",
       "service": "radiko:JOCK",
       "title": "[NHK AM（名古屋）] ふんわり まいにちリクエスト♪ 火曜１１時台（６／１６）",
@@ -4464,7 +4494,7 @@
       "series_name": "ふんわり まいにちリクエスト♪ 火曜１１時台（６／１６）",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
       "id": "LFR-13473395",
@@ -4501,19 +4531,19 @@
       "area": "NHK"
     },
     {
-      "id": "HELLOFIVE-13466312",
-      "service": "radiko:HELLOFIVE",
-      "title": "[エフエム石川] Otona no Radio Alexandria",
-      "subtitle": "ロバート・ハリス",
-      "content": "ロバート・ハリスが送る文化情報発信番組。植物、動物、そして人間の生生流転の中でのストーリー【生き物の物語】、ロバート・ハリスのデイリーエッセイ【SELF PORTRAIT】、過去とイマを繋ぐ名曲たちをオンエアする【大人のサードプレイス】・・・好奇心をくすぐる雑談を添えながら、”様々な生き方”のヒントを共有していきます。\n\n▽11:55〜 【 FM石川ニュース（JFN） 】\n---\n\n番組Webサイト：https://jfn-pods.com/program/57661\nメッセージフォーム：https://form.jfn.co.jp/alexandria/message\n\nXアカウントは「@alexinterfm」",
+      "id": "FMAICHI-13467948",
+      "service": "radiko:FMAICHI",
+      "title": "[FM AICHI] DAYDREAM MAGIC",
+      "subtitle": "吉川朋江",
+      "content": "◆ランチタイムにシェアしたくなる話題をお届けします。◆\n\nメッセージ・リクエストはこちら\n\nXハッシュタグは「#デイドリ807」\nXアカウントは「@daydream807」",
       "start_time": "2026-06-16T11:30:00+09:00",
-      "end_time": "2026-06-16T12:55:00+09:00",
-      "duration_sec": 5100,
-      "series_id": "rdk_c23e94a1f57a",
-      "series_name": "Otona no Radio Alexandria",
+      "end_time": "2026-06-16T13:00:00+09:00",
+      "duration_sec": 5400,
+      "series_id": "rdk_894cc138b63a",
+      "series_name": "DAYDREAM MAGIC",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
       "id": "QRR-13473484",
@@ -4603,22 +4633,7 @@
       "series_name": "小塚アナの褒めタイム！",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
-    },
-    {
-      "id": "MRO-13481227",
-      "service": "radiko:MRO",
-      "title": "[MROラジオ] テレフォン人生相談",
-      "subtitle": "加藤諦三 今井通子 柴田理恵 玉置妙憂 田中ウルヴェ京",
-      "content": "",
-      "start_time": "2026-06-16T11:40:00+09:00",
-      "end_time": "2026-06-16T12:00:00+09:00",
-      "duration_sec": 1200,
-      "series_id": "rdk_2ae235e31724",
-      "series_name": "テレフォン人生相談",
-      "episode_name": "",
-      "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
       "id": "r1-270-2026061688927",
@@ -4648,7 +4663,7 @@
       "series_name": "気象情報・おしらせ（東海３県）",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
       "id": "JOAK-FM-13495212",
@@ -4663,7 +4678,22 @@
       "series_name": "気象情報・交通情報（関東）",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
+    },
+    {
+      "id": "CBC-13481095",
+      "service": "radiko:CBC",
+      "title": "[CBCラジオ] ニュース",
+      "subtitle": "",
+      "content": "この時間は、最新のニュースをお伝えします。",
+      "start_time": "2026-06-16T11:55:00+09:00",
+      "end_time": "2026-06-16T12:00:00+09:00",
+      "duration_sec": 300,
+      "series_id": "rdk_65810b7f33fd",
+      "series_name": "ニュース",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
     },
     {
       "id": "JORF-13421752",
@@ -4711,19 +4741,49 @@
       "area": "JP27"
     },
     {
-      "id": "MRO-13481228",
-      "service": "radiko:MRO",
-      "title": "[MROラジオ] 2st 1200",
+      "id": "CBC-13481096",
+      "service": "radiko:CBC",
+      "title": "[CBCラジオ] テレフォン人生相談",
       "subtitle": "",
-      "content": "12:01 全国ニュース\n12:07 MRO News&Weather\n12:13頃 証券情報",
+      "content": "誰にも相談できない「悩み」や「苦しみ」でお困りの方、専門家がお答えします。\n\nこの番組はタイムフリー非対応です。ご了承ください。",
       "start_time": "2026-06-16T12:00:00+09:00",
       "end_time": "2026-06-16T12:20:00+09:00",
       "duration_sec": 1200,
-      "series_id": "rdk_181ace10e0b5",
-      "series_name": "2st 1200",
+      "series_id": "rdk_8389c89f9e97",
+      "series_name": "テレフォン人生相談",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
+    },
+    {
+      "id": "TOKAIRADIO-13468385",
+      "service": "radiko:TOKAIRADIO",
+      "title": "[TOKAI RADIO] LIFE HACKERS! (2)",
+      "subtitle": "南城大輔",
+      "content": "□11:00～\n◆TRAFFIC INFORMATION\n◆LUNCH REQUEST\n◆キング観光SOUNDS GOOD!\n\n□12:00～\n◆NEWS\n◆WEATHER INFORMATION\n◆TRAFFIC INFORMATION\n◆南海トラフ巨大地震どうなる？どうする！\n◆まいどあり～。\n\n番組へのメッセージは【コチラ】\n番組ハッシュタグは「#ハッカーズ」\n番組公式X（旧twitter）アカウントは「@LIFEHACKERS929」\nTOKAI RADIOのハッシュタグは「#TOKAIRADIO」\nTOKAI RADIO公式X（旧twitter）アカウントは「@tokairadio」",
+      "start_time": "2026-06-16T12:00:00+09:00",
+      "end_time": "2026-06-16T13:00:00+09:00",
+      "duration_sec": 3600,
+      "series_id": "rdk_b53074ab9256",
+      "series_name": "LIFE HACKERS!",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
+    },
+    {
+      "id": "GBS-13462988",
+      "service": "radiko:GBS",
+      "title": "[ぎふチャン] Ｍｕｓｉｃ Ｔｕｎｅ",
+      "subtitle": "相川真一",
+      "content": "tune@zf-web.com\nXのアカウントは「@tune1431」、ハッシュタグは「#MusicTune」\"",
+      "start_time": "2026-06-16T12:00:00+09:00",
+      "end_time": "2026-06-16T13:00:00+09:00",
+      "duration_sec": 3600,
+      "series_id": "rdk_63e9a8508044",
+      "series_name": "Ｍｕｓｉｃ Ｔｕｎｅ",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
     },
     {
       "id": "RN1-13481437",
@@ -4738,7 +4798,7 @@
       "series_name": "農のミライ",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
       "id": "RN2-13506078",
@@ -4753,7 +4813,22 @@
       "series_name": "RaNi Music♪Day",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
+    },
+    {
+      "id": "ZIP-FM-13481156",
+      "service": "radiko:ZIP-FM",
+      "title": "[ZIP-FM] get ready",
+      "subtitle": "小林拓一郎",
+      "content": "12:20 MUSIC BOX《Mon-Thu:平成観光》\n\n12:40 DUNK THE SPORTS (Mon-Thu:アイシン)\n\n13:10 RADIO SHOPPING (Mon-Thu:はぴねすくらぶ)\n\n13:30 Dream Shift (Mon:一宮西病院）\n\n13:30 WATCH STYLE (Tue:ZETTON)\n\n14:45 SAKAE SP-RING 2026 (Mon-Thu:TIGET)〈～6/6〉",
+      "start_time": "2026-06-16T12:00:00+09:00",
+      "end_time": "2026-06-16T15:00:00+09:00",
+      "duration_sec": 10800,
+      "series_id": "rdk_8a210e7c24f6",
+      "series_name": "get ready",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
     },
     {
       "id": "JOCK-13495572",
@@ -4768,7 +4843,7 @@
       "series_name": "ニュース 正午のＮＨＫニュース",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
       "id": "JOAK-FM-13495213",
@@ -4783,7 +4858,7 @@
       "series_name": "ニュース 正午のＮＨＫニュース",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
       "id": "TBS-13468238",
@@ -5040,7 +5115,7 @@
       "series_name": "ニュース・気象情報（東海３県）",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
       "id": "JOAK-FM-13495214",
@@ -5055,7 +5130,7 @@
       "series_name": "ニュース（関東）",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
       "id": "r1-270-2026061667011",
@@ -5094,19 +5169,19 @@
       "area": "NHK"
     },
     {
-      "id": "MRO-13481229",
-      "service": "radiko:MRO",
-      "title": "[MROラジオ] 夏井いつきの一句一遊",
-      "subtitle": "夏井いつき",
-      "content": "",
+      "id": "CBC-13481097",
+      "service": "radiko:CBC",
+      "title": "[CBCラジオ] いっしょにSDGs",
+      "subtitle": "瀧川幸樹",
+      "content": "持続可能な開発目標「SDGs」は、2030年までに世界で達成させる17の目標です。\n\nどんな目標があるのか、日本に生きる私たちはどんなことをしたらよいのか。\n\nいっしょに考えていきましょう。\n\n番組へのおたよりは こちら\n\nFAXは 052-263-6800 まで",
       "start_time": "2026-06-16T12:20:00+09:00",
       "end_time": "2026-06-16T12:30:00+09:00",
       "duration_sec": 600,
-      "series_id": "rdk_e60448a146bf",
-      "series_name": "夏井いつきの一句一遊",
+      "series_id": "rdk_89c15f508a96",
+      "series_name": "いっしょにSDGs",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
       "id": "JOCK-13495574",
@@ -5121,7 +5196,7 @@
       "series_name": "ひるのいこい",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
       "id": "r1-270-2026061667791",
@@ -5161,19 +5236,19 @@
       "area": "NHK"
     },
     {
-      "id": "MRO-13481230",
-      "service": "radiko:MRO",
-      "title": "[MROラジオ] イトーとスドーのモノ申し隊!",
-      "subtitle": "",
-      "content": "",
+      "id": "CBC-13481098",
+      "service": "radiko:CBC",
+      "title": "[CBCラジオ] きく！ラジオ",
+      "subtitle": "渡辺美香",
+      "content": "あなたの健康な暮らしに役立つ情報いっぱいの健康ラジオ。\n\nこの番組は、より健やかに生きていくために必要な「健康」「医療」に関する正しい知識・情報を、専門の医師の話などを交えながらしっかりお届けします。\n\n「健やかメモ」では、食事、娯楽、運動、旅行、気になる用語解説など、健康にまつわるミニ情報をお伝えします。\n\n番組へのおたよりは こちら\n\nFAXは 052-263-6800 まで",
       "start_time": "2026-06-16T12:30:00+09:00",
-      "end_time": "2026-06-16T12:45:00+09:00",
-      "duration_sec": 900,
-      "series_id": "rdk_97eee7861b9d",
-      "series_name": "イトーとスドーのモノ申し隊!",
+      "end_time": "2026-06-16T13:00:00+09:00",
+      "duration_sec": 1800,
+      "series_id": "rdk_fa4287f5dde6",
+      "series_name": "きく！ラジオ",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
       "id": "RN1-13481438",
@@ -5188,7 +5263,7 @@
       "series_name": "マーケット・テラス（12:30～）",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
       "id": "JOCK-13495575",
@@ -5203,7 +5278,7 @@
       "series_name": "まんまる パートナーは小宮山雄飛／午後０時台 そのまちのお昼",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
       "id": "NACK5-13466383",
@@ -5234,21 +5309,6 @@
       "episode_name": "",
       "genre": [],
       "area": "JP27"
-    },
-    {
-      "id": "MRO-13481231",
-      "service": "radiko:MRO",
-      "title": "[MROラジオ] Energy Music",
-      "subtitle": "",
-      "content": "",
-      "start_time": "2026-06-16T12:45:00+09:00",
-      "end_time": "2026-06-16T13:00:00+09:00",
-      "duration_sec": 900,
-      "series_id": "rdk_98bc3d3a8941",
-      "series_name": "Energy Music",
-      "episode_name": "",
-      "genre": [],
-      "area": "JP17"
     },
     {
       "id": "NACK5-13466384",
@@ -5293,7 +5353,7 @@
       "series_name": "日経電子版NEWS",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
       "id": "CRK-13472773",
@@ -5328,21 +5388,6 @@
       "area": "NHK"
     },
     {
-      "id": "HELLOFIVE-13466313",
-      "service": "radiko:HELLOFIVE",
-      "title": "[エフエム石川] Words Of Wisdom－ときめく、言葉－",
-      "subtitle": "真飛聖",
-      "content": "古今東西の名言、季節の言葉、ニュースのキーワードを毎日ひとつご紹介♪\n今日は作曲家でジャズピアニスト、大野雄二さんの言葉です。\n\n番組Webサイト：http://www.jfn.jp/word\nメッセージフォーム：https://form.jfn.co.jp/wordsofwisdom/message",
-      "start_time": "2026-06-16T12:55:00+09:00",
-      "end_time": "2026-06-16T13:00:00+09:00",
-      "duration_sec": 300,
-      "series_id": "rdk_79befda85e39",
-      "series_name": "Words Of Wisdom－ときめく、言葉－",
-      "episode_name": "",
-      "genre": [],
-      "area": "JP17"
-    },
-    {
       "id": "JOCK-13495576",
       "service": "radiko:JOCK",
       "title": "[NHK AM（名古屋）] 全国気象情報・全国交通情報",
@@ -5355,7 +5400,7 @@
       "series_name": "全国気象情報・全国交通情報",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
       "id": "INT-13465682",
@@ -5373,19 +5418,49 @@
       "area": "JP13"
     },
     {
-      "id": "MRO-13481232",
-      "service": "radiko:MRO",
-      "title": "[MROラジオ] ノコトラジオ",
-      "subtitle": "越村えり 川瀬裕子",
-      "content": "13:00頃 オープニング\n13:15頃 スリーピー出演コーナー(1,3週)／食ノコト!グルメリ(2,4,5週)\n13:40頃 Carry Over The 運\n14:00頃 北國新聞ニュース･天気予報\n14:10頃 アノコトTeaTime\n14:25頃 ノトノコトノハ\n14:35頃 肴の匠 ホクチンおつまみ研究所(2週)\n14:45頃 終活と向き合う～人生の終わりにすべきこと(1,3週)／石川に泊まろう!宿泊施設ノコト(2,4,5週)\n15:00頃 MRO News&Weather\n15:10頃 曜日別コーナー\n15:50頃 エンディング",
+      "id": "CBC-13481099",
+      "service": "radiko:CBC",
+      "title": "[CBCラジオ] 北野誠のズバリ",
+      "subtitle": "北野誠 佐藤実絵子 松原タニシ",
+      "content": "本音トークでズバっとぶった斬り！一度聴いたらクセになる！\n\n北野誠が中高年リスナーとともにお送りする3時間の生放送！\n\n仕事・家庭・健康…いろいろトラブるお年頃。\n\nいいことばかりじゃないけれど、テキトーにやればきっと楽しい時もある？そんな人生バラエティワイド！\n\nまた月～水曜日 13:40からは「しろくじちゃんとアホロートルが昼下がりにほめるラジオ」も放送！\n\nズバリ公式LINE＠はここから\n\n番組へのおたよりはこちら\n\nFAXは 052-263-6800 まで\n\n北野誠とリスナーが自腹で飲み会をする「マコ酒RUN」では、北野誠に食べに来てほしいお店を募集中！\n\nご応募はこちら",
+      "start_time": "2026-06-16T13:00:00+09:00",
+      "end_time": "2026-06-16T16:00:00+09:00",
+      "duration_sec": 10800,
+      "series_id": "rdk_48250592e4f7",
+      "series_name": "北野誠のズバリ",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
+    },
+    {
+      "id": "TOKAIRADIO-13468386",
+      "service": "radiko:TOKAIRADIO",
+      "title": "[TOKAI RADIO] OH! MY CHANNEL! (1)",
+      "subtitle": "大前りょうすけ",
+      "content": "□13:00～\n◆OH!MY TOPICS!\n◆police journal\n◆NEWS\n◆WEATHER INFORMATION\n◆TRAFFIC INFORMATION\n\n□14:00～\n◆夕刊エクスプレス\n◆OH!MY SAX!（第1・3週）\n◆ピカピカハッピー!! OH! MY DENTAL（2・4週）\n\n□15:00～\n◆OH!MY BOX!\n◆NEWS\n◆TRAFFIC INFORMATION\n◆OH!MY HIGH SCHOOL!\n◆SAFETY SUPPORT\n◆OH!MY 危機一髪!\n\n番組へのメッセージは【コチラ】\n番組ハッシュタグは「#おおまえチャン」\n番組公式X（旧twitter）アカウントは「@ohmy1332」\n番組公式LINEアカウントは「@ohmy1332」\nTOKAI RADIOのハッシュタグは「#TOKAIRADIO」\nTOKAI RADIO公式X（旧twitter）アカウントは「@tokairadio」",
       "start_time": "2026-06-16T13:00:00+09:00",
       "end_time": "2026-06-16T14:00:00+09:00",
       "duration_sec": 3600,
-      "series_id": "rdk_5d7896770ae0",
-      "series_name": "ノコトラジオ",
+      "series_id": "rdk_9bd387395236",
+      "series_name": "OH! MY CHANNEL!",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
+    },
+    {
+      "id": "GBS-13462989",
+      "service": "radiko:GBS",
+      "title": "[ぎふチャン] Ｍｕｓｉｃ Ｔｕｎｅ",
+      "subtitle": "相川真一",
+      "content": "番組へのメッセージはこちら\ntune@zf-web.com\nXのアカウントは「@tune1431」、ハッシュタグは「#MusicTune」\"",
+      "start_time": "2026-06-16T13:00:00+09:00",
+      "end_time": "2026-06-16T13:55:00+09:00",
+      "duration_sec": 3300,
+      "series_id": "rdk_63e9a8508044",
+      "series_name": "Ｍｕｓｉｃ Ｔｕｎｅ",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
     },
     {
       "id": "RN1-13481440",
@@ -5400,22 +5475,22 @@
       "series_name": "マーケット・テラス（13:00～）",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
-      "id": "HELLOFIVE-13466314",
-      "service": "radiko:HELLOFIVE",
-      "title": "[エフエム石川] デイリーフライヤー",
+      "id": "FMAICHI-13467949",
+      "service": "radiko:FMAICHI",
+      "title": "[FM AICHI] デイリーフライヤー",
       "subtitle": "大橋俊夫",
-      "content": "～「見た? 聞いた? 知ってる? さわった? 行ってみた? 食べた?」\nをキーワードにあらゆる分野からピックアップしたコンパクト\nサイズの旬な情報満載！～\n◇特集：宇宙由来\n◇ジャパネットたかたラジオショッピング\n\n▽13:08〜 【 ジャパネットたかたラジオショッピング 】\nラジオショッピング\n\n番組Webサイト：https://jfn-pods.com/program/1875\nメッセージフォーム：https://form.jfn.co.jp/dailyflyer/message",
+      "content": "◆その日、その時の“気になる情報”をお届けする「デイリーフライヤー」略して「デリフラ」！あらゆるジャンルのリアルタイムなニュースをピックアップ！今すぐ使える、誰かに話したくなる情報を、30分にギュッと凝縮してお送りします。◆\n\nXハッシュタグは「#エフエムアイチ」\nXアカウントは「@FMAICHI」",
       "start_time": "2026-06-16T13:00:00+09:00",
       "end_time": "2026-06-16T13:30:00+09:00",
       "duration_sec": 1800,
-      "series_id": "rdk_b260783387c6",
+      "series_id": "rdk_6b96ba1bc8fc",
       "series_name": "デイリーフライヤー",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
       "id": "JOCK-13495577",
@@ -5430,7 +5505,7 @@
       "series_name": "ニュース",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
       "id": "TBS-13468238",
@@ -5542,7 +5617,7 @@
       "service": "radiko:NACK5",
       "title": "[NACK5] GOGOMONZ Part1",
       "subtitle": "アイドル鳥越,佐々木成三",
-      "content": "今週、三遊亭鬼丸は夏休み中！\n\nアイドル鳥越と元埼玉県警察本部 刑事部捜査第一課 警部補。\n犯罪コメンテーターの佐々木成三さんが午後を盛り上げます。\n\n午後者達の今日のお題！\n①「おろ？！『騒ぎ』or『いざこざ』or 『揉め事』の、記憶」\n\n②「元刑事さんにズバリ！これを聞いてみたい！」\n(佐々木成三さんへの質問大募集！)\n\n＜2時台＞\n【ティーチャー鳥越のお答えします。】\nわからないことがあったら鳥越先生に「なんなりと」聞いてください。\n先生は全科目に長けていますが、特に数字が絡む科目は得意です！\n\n＜3時台＞\n【事件はスマホで起きている！ストップ特殊詐欺GOGOMONZスペシャル】\nメッセージテーマは\n①「ああっ…『騙された』『利用された』『罠にかかった』の記憶」\n(※特殊詐欺や事件性の無いお話でお願いします)\n②「家族が。親戚が。友人・知人が…特殊詐欺にあいました報告会」\n(※特殊詐欺や事件性があるお話でお願いします)\n\n【DRIVE A GOGOMONZ 素敵なクルマライフ】\n火曜日のテーマ\n「おろ？！『地味～に傷つく』『じんわりと心に刺さる』の、記憶」\n\n【口にはしないけど、日本人の８割ぐらいが思っていること！発表会】\nそんなあなたの思い込みで作るコーナーです。\n合言葉は『なっときらんちょ☆』おそらく…多分…\n\n＜4時台＞\n【4時のGOGOMONZ】\n◆後半のメッセージテーマ\nその①\n「『ごもっとも』『おっしゃる通り』・・・なんですが！の、記憶」\nその②\n「私の中にある『あっち側・こっち側』報告会」\n\n◆「リクエストBOX」\nリクエスト曲を送ってもらうと、４時台に曲がかかるかも？！\n\n◆【4時のGOGOMONZ】前半の＜クイズ！ぴったんこピンピン＞はお休みです。\n\n【メッセージフォーム】\n\n「お買い物中に現れる『迷惑な人』or『不快な人』or『面倒な人』の記憶」\n\n「お宅寄席」\n\n「ASAHIBEER AFTER6 CRUISING」\n\nスタイルフリー\n\nリクエストBOX\n\n水曜日の午後者達の今日のお題1\n\n水曜日の午後者達の今日のお題2\n\n木曜日の午後者達の今日のお題\n\n「DRIVE A GOGOMONZ」\n\n4時のGOGOMONZ\n\n「平成エンタープライズグループ Farm & Travel」\n\nGOGOMONZ大喜利 season Ⅲ\n\nBRAINエクササイズ「逆さワードクイズ・シーズンⅡ」\n\n「?ティーチャー鳥越のお答えします。?」\n\n「ああっ…『騙された』『利用された』『罠にかかった』の記憶」\n\n「家族が。親戚が。友人・知人が…特殊詐欺にあいました報告会」\n\n「口にはしないけど、日本人の８割ぐらいが思っていること！発表会」\n\n「クイズ！ぴったんこピンピン」\n\n「クイズ！ぴったんこピンピン」出場希望者はこちら\n\n「小さくってゴメンね！これが私の人生・Second！」\n\n「お金を持っている人観察会」\n\n「はたらくを輝くに！自分笑顔に！GOGOMONZ仕事のおはなし」\n\n「義理と名の付く家族への手紙！」\n\n「若者が嫌いだ！」\n\n「アイダ設計presents 我が家の喜怒哀楽 都都逸」\n\n「お局様地獄・ボスママinferno」",
+      "content": "今週、三遊亭鬼丸は夏休み中！\n\nアイドル鳥越と元埼玉県警察本部 刑事部捜査第一課 警部補。\n犯罪コメンテーターの佐々木成三さんが午後を盛り上げます。\n\n午後者達の今日のお題！\n①「おろ？！『騒ぎ』or『いざこざ』or 『揉め事』の、記憶」\n\n②「元刑事さんにズバリ！これを聞いてみたい！」\n(佐々木成三さんへの質問大募集！)\n\n＜2時台＞\n【ティーチャー鳥越のお答えします。】\nわからないことがあったら鳥越先生に「なんなりと」聞いてください。\n先生は全科目に長けていますが、特に数字が絡む科目は得意です！\n\n＜3時台＞\n【事件はスマホで起きている！ストップ特殊詐欺GOGOMONZスペシャル】\nメッセージテーマは\n①「ああっ…『騙された』『利用された』『罠にかかった』の記憶」\n(※特殊詐欺や事件性の無いお話でお願いします)\n②「家族が。親戚が。友人・知人が…特殊詐欺にあいました報告会」\n(※特殊詐欺や事件性があるお話でお願いします)\n\n【DRIVE A GOGOMONZ 素敵なクルマライフ】\n火曜日のテーマ\n「おろ？！『地味～に傷つく』『じんわりと心に刺さる』の、記憶」\n\n【口にはしないけど、日本人の８割ぐらいが思っていること！発表会】\nそんなあなたの思い込みで作るコーナーです。\n合言葉は『なっときらんちょ☆』おそらく…多分…\n\n＜4時台＞\n【4時のGOGOMONZ】\n◆後半のメッセージテーマ\nその①\n「『ごもっとも』『おっしゃる通り』・・・なんですが！の、記憶」\nその②\n「私の中にある『あっち側・こっち側』報告会」\n\n◆「リクエストBOX」\nリクエスト曲を送ってもらうと、４時台に曲がかかるかも？！\n\n◆【4時のGOGOMONZ】前半の＜クイズ！ぴったんこピンピン＞はお休みです。\n\n【メッセージフォーム】\n\n「お買い物中に現れる『迷惑な人』or『不快な人』or『面倒な人』の記憶」\n\n「お宅寄席」\n\n「ASAHIBEER AFTER6 CRUISING」\n\nスタイルフリー\n\nリクエストBOX\n\n木曜日の午後者達の今日のお題\n\n「DRIVE A GOGOMONZ」\n\n4時のGOGOMONZ\n\n「平成エンタープライズグループ Farm & Travel」\n\nGOGOMONZ大喜利 season Ⅲ\n\nBRAINエクササイズ「逆さワードクイズ・シーズンⅡ」\n\n「?ティーチャー鳥越のお答えします。?」\n\n「ああっ…『騙された』『利用された』『罠にかかった』の記憶」\n\n「家族が。親戚が。友人・知人が…特殊詐欺にあいました報告会」\n\n「口にはしないけど、日本人の８割ぐらいが思っていること！発表会」\n\n「クイズ！ぴったんこピンピン」\n\n「クイズ！ぴったんこピンピン」出場希望者はこちら\n\n「小さくってゴメンね！これが私の人生・Second！」\n\n「お金を持っている人観察会」\n\n「はたらくを輝くに！自分笑顔に！GOGOMONZ仕事のおはなし」\n\n「義理と名の付く家族への手紙！」\n\n「若者が嫌いだ！」\n\n「アイダ設計presents 我が家の喜怒哀楽 都都逸」\n\n「お局様地獄・ボスママinferno」",
       "start_time": "2026-06-16T13:00:00+09:00",
       "end_time": "2026-06-16T14:00:00+09:00",
       "duration_sec": 3600,
@@ -5766,22 +5841,22 @@
       "series_name": "まんまる 午後１時台 ひとのわ 山里の暮らしを支えた石積みの話",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
-      "id": "HELLOFIVE-13466315",
-      "service": "radiko:HELLOFIVE",
-      "title": "[エフエム石川] レコレール",
-      "subtitle": "鬼頭由芽",
-      "content": "「レコレール」とは、スペイン語で、「寄り道をして歩く」「巡る」 「旅をする」という意味。\n巡った道の数だけ物語が生まれ、 廻った分だけ世界は少し深くなる。\n聴くほどに知り、知るほどに寄り道が楽しくなる、レコレール。\n毎日アップデートされる”世の中の今と小さな変化“を鬼頭由芽が、やさしく、 分かりやすく音楽にのせてお届けしていきます。\n\n6月16日（火）は近年、AI生成楽曲がアメリカのビルボードチャートで\nトップ10にチャートインしているということもあり音楽業界とAIにフォーカス！\n2時台はAI生成歌手の台頭について、フリーライターの武藤弘樹さんにお話しを伺います。\n3時台は新曲「blue hour」も話題のシンガーソングライターのHana Hopeが登場！\n新曲についてたっぷりお話しを伺います。\n\n▽13:55〜 【 矢沢永吉 Sweet Rock'n'Roll 】\n半世紀以上にわたって常に音楽シーンの第一線で活躍し、走り続ける矢沢永吉。\n今年のMUSIC AWARDS JAPANでも、圧巻のレジェンド・パフォーマンスを披露してくれました。\n1975年のソロ・デビューから50年となる節目の年に、時に甘く、時に大胆に、あなたを包んでくれる、彼の魅力あるサウンドに酔いしれてみませんか？\n\n▽14:55〜 【 IMP.のIMPickup 】\n平日の午後IMP.のメンバーが毎日登場！\n今夜、誰かに教えたくなる「今日はなんの日？」雑学をメンバーの感性のままにおしゃべり。\n誰もが押さえておくべきお役立ち情報から、今日が少しだけ楽しく思える細かなトリビアまでお届けします。\n毎週土曜日14:55～アフタートークを配信中！\n番組の感想や、メンバーへの質問・相談、アフタートークのトークテーマなどなど、\nメッセージフォームからぜひご参加ください！\n\n＝＝＝ 各局のオンエア時間（24年10月現在）＝＝＝\n★ラジオの聞き方 → https://www.tfm.co.jp/listen/\n・TOKYO FM＆JFN34局：月～金 14:55-15:00\n・FM大阪＆エフエム沖縄：月～金 23:55-24:00\n・FMぐんま＆エフエム秋田：月～金 13:55-14:00\n\n▽15:42〜 【 快適生活ラジオショッピング 】\n快適生活ラジオショッピング\n\n番組Webサイト：https://jfn-pods.com/program/300004982\nメッセージフォーム：https://form.jfn.co.jp/recorrer/message\n\nXアカウントは「@recorrer_jfn」",
+      "id": "FMAICHI-13467950",
+      "service": "radiko:FMAICHI",
+      "title": "[FM AICHI] DAYDREAM MAGIC",
+      "subtitle": "吉川朋江",
+      "content": "◆ランチタイムにシェアしたくなる話題をお届けします。◆\n\nメッセージ・リクエストはこちら\n\nXハッシュタグは「#デイドリ807」\nXアカウントは「@daydream807」",
       "start_time": "2026-06-16T13:30:00+09:00",
-      "end_time": "2026-06-16T15:55:00+09:00",
-      "duration_sec": 8700,
-      "series_id": "rdk_ce68fefaaa99",
-      "series_name": "レコレール",
+      "end_time": "2026-06-16T14:30:00+09:00",
+      "duration_sec": 3600,
+      "series_id": "rdk_894cc138b63a",
+      "series_name": "DAYDREAM MAGIC",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
       "id": "INT-13465684",
@@ -5844,6 +5919,21 @@
       "area": "NHK"
     },
     {
+      "id": "GBS-13462990",
+      "service": "radiko:GBS",
+      "title": "[ぎふチャン] 岐阜新聞ニュース",
+      "subtitle": "",
+      "content": "",
+      "start_time": "2026-06-16T13:55:00+09:00",
+      "end_time": "2026-06-16T14:00:00+09:00",
+      "duration_sec": 300,
+      "series_id": "rdk_91f75fb9db44",
+      "series_name": "岐阜新聞ニュース",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
+    },
+    {
       "id": "JOCK-13495579",
       "service": "radiko:JOCK",
       "title": "[NHK AM（名古屋）] ニュース・気象情報・交通情報（東海３県）",
@@ -5856,7 +5946,7 @@
       "series_name": "ニュース・気象情報・交通情報（東海３県）",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
       "id": "INT-13465685",
@@ -5889,19 +5979,34 @@
       "area": "JP13"
     },
     {
-      "id": "MRO-13481233",
-      "service": "radiko:MRO",
-      "title": "[MROラジオ] 北國新聞ニュース･天気予報",
-      "subtitle": "",
-      "content": "",
+      "id": "TOKAIRADIO-13468386",
+      "service": "radiko:TOKAIRADIO",
+      "title": "[TOKAI RADIO] OH! MY CHANNEL! (2)",
+      "subtitle": "大前りょうすけ",
+      "content": "□13:00～\n◆OH!MY TOPICS!\n◆police journal\n◆NEWS\n◆WEATHER INFORMATION\n◆TRAFFIC INFORMATION\n\n□14:00～\n◆夕刊エクスプレス\n◆OH!MY SAX!（第1・3週）\n◆ピカピカハッピー!! OH! MY DENTAL（2・4週）\n\n□15:00～\n◆OH!MY BOX!\n◆NEWS\n◆TRAFFIC INFORMATION\n◆OH!MY HIGH SCHOOL!\n◆SAFETY SUPPORT\n◆OH!MY 危機一髪!\n\n番組へのメッセージは【コチラ】\n番組ハッシュタグは「#おおまえチャン」\n番組公式X（旧twitter）アカウントは「@ohmy1332」\n番組公式LINEアカウントは「@ohmy1332」\nTOKAI RADIOのハッシュタグは「#TOKAIRADIO」\nTOKAI RADIO公式X（旧twitter）アカウントは「@tokairadio」",
       "start_time": "2026-06-16T14:00:00+09:00",
-      "end_time": "2026-06-16T14:06:00+09:00",
-      "duration_sec": 360,
-      "series_id": "rdk_f8ad53656af7",
-      "series_name": "北國新聞ニュース･天気予報",
+      "end_time": "2026-06-16T15:00:00+09:00",
+      "duration_sec": 3600,
+      "series_id": "rdk_9bd387395236",
+      "series_name": "OH! MY CHANNEL!",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
+    },
+    {
+      "id": "GBS-13462991",
+      "service": "radiko:GBS",
+      "title": "[ぎふチャン] きょうもラジオは！？２時６時",
+      "subtitle": "小松肇 / 吉田早苗",
+      "content": "【主なコーナー】\n▽ラジオぎふうた見聞録\n▽岐阜よろず 黒ちゃんの中小企業応援 ハッピーチャチャチャ！（第２火曜）\n\n番組へのメッセージはこちら\nメッセージフォーム\nradio26@zf-web.com\nXハッシュタグは「#２時６時」\nXアカウントは「@radio2ji6ji」\"",
+      "start_time": "2026-06-16T14:00:00+09:00",
+      "end_time": "2026-06-16T15:00:00+09:00",
+      "duration_sec": 3600,
+      "series_id": "rdk_87532a3ae99d",
+      "series_name": "きょうもラジオは！？２時６時",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
     },
     {
       "id": "JOCK-13495580",
@@ -5916,7 +6021,7 @@
       "series_name": "ニュース",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
       "id": "JOAK-FM-13495217",
@@ -5931,7 +6036,7 @@
       "series_name": "クラシックの庭 ヴィラ・ローボスのブラジル風バッハ第５番",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
       "id": "TBS-13468239",
@@ -6028,7 +6133,7 @@
       "service": "radiko:NACK5",
       "title": "[NACK5] GOGOMONZ Part2",
       "subtitle": "アイドル鳥越,佐々木成三",
-      "content": "今週、三遊亭鬼丸は夏休み中！\n\nアイドル鳥越と元埼玉県警察本部 刑事部捜査第一課 警部補。\n犯罪コメンテーターの佐々木成三さんが午後を盛り上げます。\n\n午後者達の今日のお題！\n①「おろ？！『騒ぎ』or『いざこざ』or 『揉め事』の、記憶」\n\n②「元刑事さんにズバリ！これを聞いてみたい！」\n(佐々木成三さんへの質問大募集！)\n\n＜2時台＞\n【ティーチャー鳥越のお答えします。】\nわからないことがあったら鳥越先生に「なんなりと」聞いてください。\n先生は全科目に長けていますが、特に数字が絡む科目は得意です！\n\n＜3時台＞\n【事件はスマホで起きている！ストップ特殊詐欺GOGOMONZスペシャル】\nメッセージテーマは\n①「ああっ…『騙された』『利用された』『罠にかかった』の記憶」\n(※特殊詐欺や事件性の無いお話でお願いします)\n②「家族が。親戚が。友人・知人が…特殊詐欺にあいました報告会」\n(※特殊詐欺や事件性があるお話でお願いします)\n\n【DRIVE A GOGOMONZ 素敵なクルマライフ】\n火曜日のテーマ\n「おろ？！『地味～に傷つく』『じんわりと心に刺さる』の、記憶」\n\n【口にはしないけど、日本人の８割ぐらいが思っていること！発表会】\nそんなあなたの思い込みで作るコーナーです。\n合言葉は『なっときらんちょ☆』おそらく…多分…\n\n＜4時台＞\n【4時のGOGOMONZ】\n◆後半のメッセージテーマ\nその①\n「『ごもっとも』『おっしゃる通り』・・・なんですが！の、記憶」\nその②\n「私の中にある『あっち側・こっち側』報告会」\n\n◆「リクエストBOX」\nリクエスト曲を送ってもらうと、４時台に曲がかかるかも？！\n\n◆【4時のGOGOMONZ】前半の＜クイズ！ぴったんこピンピン＞はお休みです。\n\n【メッセージフォーム】\n\n「お買い物中に現れる『迷惑な人』or『不快な人』or『面倒な人』の記憶」\n\n「お宅寄席」\n\n「ASAHIBEER AFTER6 CRUISING」\n\nスタイルフリー\n\nリクエストBOX\n\n水曜日の午後者達の今日のお題1\n\n水曜日の午後者達の今日のお題2\n\n木曜日の午後者達の今日のお題\n\n「DRIVE A GOGOMONZ」\n\n4時のGOGOMONZ\n\n「平成エンタープライズグループ Farm & Travel」\n\nGOGOMONZ大喜利 season Ⅲ\n\nBRAINエクササイズ「逆さワードクイズ・シーズンⅡ」\n\n「?ティーチャー鳥越のお答えします。?」\n\n「ああっ…『騙された』『利用された』『罠にかかった』の記憶」\n\n「家族が。親戚が。友人・知人が…特殊詐欺にあいました報告会」\n\n「口にはしないけど、日本人の８割ぐらいが思っていること！発表会」\n\n「クイズ！ぴったんこピンピン」\n\n「クイズ！ぴったんこピンピン」出場希望者はこちら\n\n「小さくってゴメンね！これが私の人生・Second！」\n\n「お金を持っている人観察会」\n\n「はたらくを輝くに！自分笑顔に！GOGOMONZ仕事のおはなし」\n\n「義理と名の付く家族への手紙！」\n\n「若者が嫌いだ！」\n\n「アイダ設計presents 我が家の喜怒哀楽 都都逸」\n\n「お局様地獄・ボスママinferno」",
+      "content": "今週、三遊亭鬼丸は夏休み中！\n\nアイドル鳥越と元埼玉県警察本部 刑事部捜査第一課 警部補。\n犯罪コメンテーターの佐々木成三さんが午後を盛り上げます。\n\n午後者達の今日のお題！\n①「おろ？！『騒ぎ』or『いざこざ』or 『揉め事』の、記憶」\n\n②「元刑事さんにズバリ！これを聞いてみたい！」\n(佐々木成三さんへの質問大募集！)\n\n＜2時台＞\n【ティーチャー鳥越のお答えします。】\nわからないことがあったら鳥越先生に「なんなりと」聞いてください。\n先生は全科目に長けていますが、特に数字が絡む科目は得意です！\n\n＜3時台＞\n【事件はスマホで起きている！ストップ特殊詐欺GOGOMONZスペシャル】\nメッセージテーマは\n①「ああっ…『騙された』『利用された』『罠にかかった』の記憶」\n(※特殊詐欺や事件性の無いお話でお願いします)\n②「家族が。親戚が。友人・知人が…特殊詐欺にあいました報告会」\n(※特殊詐欺や事件性があるお話でお願いします)\n\n【DRIVE A GOGOMONZ 素敵なクルマライフ】\n火曜日のテーマ\n「おろ？！『地味～に傷つく』『じんわりと心に刺さる』の、記憶」\n\n【口にはしないけど、日本人の８割ぐらいが思っていること！発表会】\nそんなあなたの思い込みで作るコーナーです。\n合言葉は『なっときらんちょ☆』おそらく…多分…\n\n＜4時台＞\n【4時のGOGOMONZ】\n◆後半のメッセージテーマ\nその①\n「『ごもっとも』『おっしゃる通り』・・・なんですが！の、記憶」\nその②\n「私の中にある『あっち側・こっち側』報告会」\n\n◆「リクエストBOX」\nリクエスト曲を送ってもらうと、４時台に曲がかかるかも？！\n\n◆【4時のGOGOMONZ】前半の＜クイズ！ぴったんこピンピン＞はお休みです。\n\n【メッセージフォーム】\n\n「お買い物中に現れる『迷惑な人』or『不快な人』or『面倒な人』の記憶」\n\n「お宅寄席」\n\n「ASAHIBEER AFTER6 CRUISING」\n\nスタイルフリー\n\nリクエストBOX\n\n木曜日の午後者達の今日のお題\n\n「DRIVE A GOGOMONZ」\n\n4時のGOGOMONZ\n\n「平成エンタープライズグループ Farm & Travel」\n\nGOGOMONZ大喜利 season Ⅲ\n\nBRAINエクササイズ「逆さワードクイズ・シーズンⅡ」\n\n「?ティーチャー鳥越のお答えします。?」\n\n「ああっ…『騙された』『利用された』『罠にかかった』の記憶」\n\n「家族が。親戚が。友人・知人が…特殊詐欺にあいました報告会」\n\n「口にはしないけど、日本人の８割ぐらいが思っていること！発表会」\n\n「クイズ！ぴったんこピンピン」\n\n「クイズ！ぴったんこピンピン」出場希望者はこちら\n\n「小さくってゴメンね！これが私の人生・Second！」\n\n「お金を持っている人観察会」\n\n「はたらくを輝くに！自分笑顔に！GOGOMONZ仕事のおはなし」\n\n「義理と名の付く家族への手紙！」\n\n「若者が嫌いだ！」\n\n「アイダ設計presents 我が家の喜怒哀楽 都都逸」\n\n「お局様地獄・ボスママinferno」",
       "start_time": "2026-06-16T14:00:00+09:00",
       "end_time": "2026-06-16T15:00:00+09:00",
       "duration_sec": 3600,
@@ -6224,22 +6329,7 @@
       "series_name": "まんまる 午後２時台 ２時またぎアウトロクイズ／列島リレーニュース",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
-    },
-    {
-      "id": "MRO-13481234",
-      "service": "radiko:MRO",
-      "title": "[MROラジオ] ノコトラジオ",
-      "subtitle": "越村えり 川瀬裕子",
-      "content": "14:10頃 アノコトTeaTime\n14:25頃 ノトノコトノハ\n14:35頃 肴の匠 ホクチンおつまみ研究所(2週)\n14:45頃 終活と向き合う～人生の終わりにすべきこと(1,3週)／石川に泊まろう!宿泊施設ノコト(2,4,5週)\n15:00頃 MRO News&Weather\n15:10頃 曜日別コーナー\n15:50頃 エンディング",
-      "start_time": "2026-06-16T14:06:00+09:00",
-      "end_time": "2026-06-16T15:00:00+09:00",
-      "duration_sec": 3240,
-      "series_id": "rdk_5d7896770ae0",
-      "series_name": "ノコトラジオ",
-      "episode_name": "",
-      "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
       "id": "RN1-13481441",
@@ -6254,7 +6344,22 @@
       "series_name": "マーケット・テラス（14:30～）",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
+    },
+    {
+      "id": "FMAICHI-13467951",
+      "service": "radiko:FMAICHI",
+      "title": "[FM AICHI] AFTERNOON COLORS",
+      "subtitle": "SHOKO",
+      "content": "◆“今”と“これから”にフォーカスして午後をカラフルに！◆\n\nメッセージ・リクエストはこちら\n\nXハッシュタグは「#アフカラ807」\nXアカウントは「@afternoon807」",
+      "start_time": "2026-06-16T14:30:00+09:00",
+      "end_time": "2026-06-16T17:00:00+09:00",
+      "duration_sec": 9000,
+      "series_id": "rdk_336cda43ecf2",
+      "series_name": "AFTERNOON COLORS",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
     },
     {
       "id": "INT-13465687",
@@ -6314,7 +6419,7 @@
       "series_name": "ニュース・気象情報（東海４県）",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
       "id": "FMT-13467027",
@@ -6362,19 +6467,34 @@
       "area": "JP27"
     },
     {
-      "id": "MRO-13481235",
-      "service": "radiko:MRO",
-      "title": "[MROラジオ] MRO News&Weather",
-      "subtitle": "",
-      "content": "",
+      "id": "TOKAIRADIO-13468386",
+      "service": "radiko:TOKAIRADIO",
+      "title": "[TOKAI RADIO] OH! MY CHANNEL! (3)",
+      "subtitle": "大前りょうすけ",
+      "content": "□13:00～\n◆OH!MY TOPICS!\n◆police journal\n◆NEWS\n◆WEATHER INFORMATION\n◆TRAFFIC INFORMATION\n\n□14:00～\n◆夕刊エクスプレス\n◆OH!MY SAX!（第1・3週）\n◆ピカピカハッピー!! OH! MY DENTAL（2・4週）\n\n□15:00～\n◆OH!MY BOX!\n◆NEWS\n◆TRAFFIC INFORMATION\n◆OH!MY HIGH SCHOOL!\n◆SAFETY SUPPORT\n◆OH!MY 危機一髪!\n\n番組へのメッセージは【コチラ】\n番組ハッシュタグは「#おおまえチャン」\n番組公式X（旧twitter）アカウントは「@ohmy1332」\n番組公式LINEアカウントは「@ohmy1332」\nTOKAI RADIOのハッシュタグは「#TOKAIRADIO」\nTOKAI RADIO公式X（旧twitter）アカウントは「@tokairadio」",
       "start_time": "2026-06-16T15:00:00+09:00",
-      "end_time": "2026-06-16T15:05:00+09:00",
-      "duration_sec": 300,
-      "series_id": "rdk_fb83b180c93a",
-      "series_name": "MRO News&Weather",
+      "end_time": "2026-06-16T16:00:00+09:00",
+      "duration_sec": 3600,
+      "series_id": "rdk_9bd387395236",
+      "series_name": "OH! MY CHANNEL!",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
+    },
+    {
+      "id": "GBS-13462992",
+      "service": "radiko:GBS",
+      "title": "[ぎふチャン] きょうもラジオは！？２時６時",
+      "subtitle": "小松肇 / 吉田早苗",
+      "content": "【主なコーナー】\n番組へのメッセージはこちら\nメッセージフォーム\nradio26@zf-web.com\nXハッシュタグは「#２時６時」\nXアカウントは「@radio2ji6ji」\"",
+      "start_time": "2026-06-16T15:00:00+09:00",
+      "end_time": "2026-06-16T16:00:00+09:00",
+      "duration_sec": 3600,
+      "series_id": "rdk_87532a3ae99d",
+      "series_name": "きょうもラジオは！？２時６時",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
     },
     {
       "id": "RN2-13487920",
@@ -6389,7 +6509,22 @@
       "series_name": "判断力の源～一流になるための脳ケア～",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
+    },
+    {
+      "id": "ZIP-FM-13481157",
+      "service": "radiko:ZIP-FM",
+      "title": "[ZIP-FM] palette",
+      "subtitle": "高木マーガレット",
+      "content": "16:45 MONEY NAVI (Tue:フィナンシャルクリエイト）\n\n17:44 NEW COLOR (Tue:ファミリーマート）",
+      "start_time": "2026-06-16T15:00:00+09:00",
+      "end_time": "2026-06-16T18:00:00+09:00",
+      "duration_sec": 10800,
+      "series_id": "rdk_395014456682",
+      "series_name": "palette",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
     },
     {
       "id": "JOCK-13495583",
@@ -6404,7 +6539,7 @@
       "series_name": "ニュース",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
       "id": "TBS-13468239",
@@ -6516,7 +6651,7 @@
       "service": "radiko:NACK5",
       "title": "[NACK5] GOGOMONZ Part3",
       "subtitle": "アイドル鳥越,佐々木成三",
-      "content": "今週、三遊亭鬼丸は夏休み中！\n\nアイドル鳥越と元埼玉県警察本部 刑事部捜査第一課 警部補。\n犯罪コメンテーターの佐々木成三さんが午後を盛り上げます。\n\n午後者達の今日のお題！\n①「おろ？！『騒ぎ』or『いざこざ』or 『揉め事』の、記憶」\n\n②「元刑事さんにズバリ！これを聞いてみたい！」\n(佐々木成三さんへの質問大募集！)\n\n＜2時台＞\n【ティーチャー鳥越のお答えします。】\nわからないことがあったら鳥越先生に「なんなりと」聞いてください。\n先生は全科目に長けていますが、特に数字が絡む科目は得意です！\n\n＜3時台＞\n【事件はスマホで起きている！ストップ特殊詐欺GOGOMONZスペシャル】\nメッセージテーマは\n①「ああっ…『騙された』『利用された』『罠にかかった』の記憶」\n(※特殊詐欺や事件性の無いお話でお願いします)\n②「家族が。親戚が。友人・知人が…特殊詐欺にあいました報告会」\n(※特殊詐欺や事件性があるお話でお願いします)\n\n【DRIVE A GOGOMONZ 素敵なクルマライフ】\n火曜日のテーマ\n「おろ？！『地味～に傷つく』『じんわりと心に刺さる』の、記憶」\n\n【口にはしないけど、日本人の８割ぐらいが思っていること！発表会】\nそんなあなたの思い込みで作るコーナーです。\n合言葉は『なっときらんちょ☆』おそらく…多分…\n\n＜4時台＞\n【4時のGOGOMONZ】\n◆後半のメッセージテーマ\nその①\n「『ごもっとも』『おっしゃる通り』・・・なんですが！の、記憶」\nその②\n「私の中にある『あっち側・こっち側』報告会」\n\n◆「リクエストBOX」\nリクエスト曲を送ってもらうと、４時台に曲がかかるかも？！\n\n◆【4時のGOGOMONZ】前半の＜クイズ！ぴったんこピンピン＞はお休みです。\n\n【メッセージフォーム】\n\n「お買い物中に現れる『迷惑な人』or『不快な人』or『面倒な人』の記憶」\n\n「お宅寄席」\n\n「ASAHIBEER AFTER6 CRUISING」\n\nスタイルフリー\n\nリクエストBOX\n\n水曜日の午後者達の今日のお題1\n\n水曜日の午後者達の今日のお題2\n\n木曜日の午後者達の今日のお題\n\n「DRIVE A GOGOMONZ」\n\n4時のGOGOMONZ\n\n「平成エンタープライズグループ Farm & Travel」\n\nGOGOMONZ大喜利 season Ⅲ\n\nBRAINエクササイズ「逆さワードクイズ・シーズンⅡ」\n\n「?ティーチャー鳥越のお答えします。?」\n\n「ああっ…『騙された』『利用された』『罠にかかった』の記憶」\n\n「家族が。親戚が。友人・知人が…特殊詐欺にあいました報告会」\n\n「口にはしないけど、日本人の８割ぐらいが思っていること！発表会」\n\n「クイズ！ぴったんこピンピン」\n\n「クイズ！ぴったんこピンピン」出場希望者はこちら\n\n「小さくってゴメンね！これが私の人生・Second！」\n\n「お金を持っている人観察会」\n\n「はたらくを輝くに！自分笑顔に！GOGOMONZ仕事のおはなし」\n\n「義理と名の付く家族への手紙！」\n\n「若者が嫌いだ！」\n\n「アイダ設計presents 我が家の喜怒哀楽 都都逸」\n\n「お局様地獄・ボスママinferno」",
+      "content": "今週、三遊亭鬼丸は夏休み中！\n\nアイドル鳥越と元埼玉県警察本部 刑事部捜査第一課 警部補。\n犯罪コメンテーターの佐々木成三さんが午後を盛り上げます。\n\n午後者達の今日のお題！\n①「おろ？！『騒ぎ』or『いざこざ』or 『揉め事』の、記憶」\n\n②「元刑事さんにズバリ！これを聞いてみたい！」\n(佐々木成三さんへの質問大募集！)\n\n＜2時台＞\n【ティーチャー鳥越のお答えします。】\nわからないことがあったら鳥越先生に「なんなりと」聞いてください。\n先生は全科目に長けていますが、特に数字が絡む科目は得意です！\n\n＜3時台＞\n【事件はスマホで起きている！ストップ特殊詐欺GOGOMONZスペシャル】\nメッセージテーマは\n①「ああっ…『騙された』『利用された』『罠にかかった』の記憶」\n(※特殊詐欺や事件性の無いお話でお願いします)\n②「家族が。親戚が。友人・知人が…特殊詐欺にあいました報告会」\n(※特殊詐欺や事件性があるお話でお願いします)\n\n【DRIVE A GOGOMONZ 素敵なクルマライフ】\n火曜日のテーマ\n「おろ？！『地味～に傷つく』『じんわりと心に刺さる』の、記憶」\n\n【口にはしないけど、日本人の８割ぐらいが思っていること！発表会】\nそんなあなたの思い込みで作るコーナーです。\n合言葉は『なっときらんちょ☆』おそらく…多分…\n\n＜4時台＞\n【4時のGOGOMONZ】\n◆後半のメッセージテーマ\nその①\n「『ごもっとも』『おっしゃる通り』・・・なんですが！の、記憶」\nその②\n「私の中にある『あっち側・こっち側』報告会」\n\n◆「リクエストBOX」\nリクエスト曲を送ってもらうと、４時台に曲がかかるかも？！\n\n◆【4時のGOGOMONZ】前半の＜クイズ！ぴったんこピンピン＞はお休みです。\n\n【メッセージフォーム】\n\n「お買い物中に現れる『迷惑な人』or『不快な人』or『面倒な人』の記憶」\n\n「お宅寄席」\n\n「ASAHIBEER AFTER6 CRUISING」\n\nスタイルフリー\n\nリクエストBOX\n\n木曜日の午後者達の今日のお題\n\n「DRIVE A GOGOMONZ」\n\n4時のGOGOMONZ\n\n「平成エンタープライズグループ Farm & Travel」\n\nGOGOMONZ大喜利 season Ⅲ\n\nBRAINエクササイズ「逆さワードクイズ・シーズンⅡ」\n\n「?ティーチャー鳥越のお答えします。?」\n\n「ああっ…『騙された』『利用された』『罠にかかった』の記憶」\n\n「家族が。親戚が。友人・知人が…特殊詐欺にあいました報告会」\n\n「口にはしないけど、日本人の８割ぐらいが思っていること！発表会」\n\n「クイズ！ぴったんこピンピン」\n\n「クイズ！ぴったんこピンピン」出場希望者はこちら\n\n「小さくってゴメンね！これが私の人生・Second！」\n\n「お金を持っている人観察会」\n\n「はたらくを輝くに！自分笑顔に！GOGOMONZ仕事のおはなし」\n\n「義理と名の付く家族への手紙！」\n\n「若者が嫌いだ！」\n\n「アイダ設計presents 我が家の喜怒哀楽 都都逸」\n\n「お局様地獄・ボスママinferno」",
       "start_time": "2026-06-16T15:00:00+09:00",
       "end_time": "2026-06-16T16:00:00+09:00",
       "duration_sec": 3600,
@@ -6721,7 +6856,7 @@
       "series_name": "RaNi Music♪Afternoon",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
       "id": "r1-270-2026061667803",
@@ -6743,21 +6878,6 @@
       "area": "NHK"
     },
     {
-      "id": "MRO-13481236",
-      "service": "radiko:MRO",
-      "title": "[MROラジオ] ノコトラジオ",
-      "subtitle": "越村えり 川瀬裕子",
-      "content": "15:10頃 曜日別コーナー\n15:50頃 エンディング",
-      "start_time": "2026-06-16T15:05:00+09:00",
-      "end_time": "2026-06-16T16:00:00+09:00",
-      "duration_sec": 3300,
-      "series_id": "rdk_5d7896770ae0",
-      "series_name": "ノコトラジオ",
-      "episode_name": "",
-      "genre": [],
-      "area": "JP17"
-    },
-    {
       "id": "JOCK-13495584",
       "service": "radiko:JOCK",
       "title": "[NHK AM（名古屋）] まんまる 午後３時台",
@@ -6770,7 +6890,7 @@
       "series_name": "まんまる 午後３時台",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
       "id": "LFR-13473400",
@@ -6817,7 +6937,7 @@
       "series_name": "気象通報",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
       "id": "r3-270-2026061667883",
@@ -6871,21 +6991,6 @@
       "area": "NHK"
     },
     {
-      "id": "HELLOFIVE-13466316",
-      "service": "radiko:HELLOFIVE",
-      "title": "[エフエム石川] FM石川ニュース（JFN）",
-      "subtitle": "",
-      "content": "---",
-      "start_time": "2026-06-16T15:55:00+09:00",
-      "end_time": "2026-06-16T16:00:00+09:00",
-      "duration_sec": 300,
-      "series_id": "rdk_5ed331f4d232",
-      "series_name": "FM石川ニュース（JFN）",
-      "episode_name": "",
-      "genre": [],
-      "area": "JP17"
-    },
-    {
       "id": "INT-13465690",
       "service": "radiko:INT",
       "title": "[interfm] interfm Headline News",
@@ -6901,19 +7006,49 @@
       "area": "JP13"
     },
     {
-      "id": "MRO-13481237",
-      "service": "radiko:MRO",
-      "title": "[MROラジオ] MRO News&Weather",
-      "subtitle": "",
-      "content": "",
+      "id": "CBC-13481100",
+      "service": "radiko:CBC",
+      "title": "[CBCラジオ] ドラ魂キング",
+      "subtitle": "加藤里奈 三浦優奈",
+      "content": "「超ド級、スポーツエンタ」がコンセプト！\n\nとれたて最新のドラゴンズ情報を中心としたスポーツ情報番組。\n\nCBCのスポーツアナウンサーの面々と加藤里奈、三浦優奈、安藤渚七のドラ魂3人娘が織りなす丁々発止のスタジオトークをお楽しみ下さい。\n\n番組「X」アカウントはこちら\n\n番組記事を読む→こちら\n\n番組へのおたよりはこちら\n\nFAXは 052-263-6800 まで",
       "start_time": "2026-06-16T16:00:00+09:00",
-      "end_time": "2026-06-16T16:05:00+09:00",
-      "duration_sec": 300,
-      "series_id": "rdk_fb83b180c93a",
-      "series_name": "MRO News&Weather",
+      "end_time": "2026-06-16T17:57:00+09:00",
+      "duration_sec": 7020,
+      "series_id": "rdk_ddff65bcafea",
+      "series_name": "ドラ魂キング",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
+    },
+    {
+      "id": "TOKAIRADIO-13468387",
+      "service": "radiko:TOKAIRADIO",
+      "title": "[TOKAI RADIO] bre:eze (1)",
+      "subtitle": "イレーネ / ゲスト：katawara",
+      "content": "□16:00～\n◆NEWS\n◆TRAFFIC INFORMATION\n◆HOT DISK selected by diskunion\n◆セーフティメッセージ\n□17:00～\n◆ニュースパレード\n◆ジャパネットたかたラジオショッピング\n◆HIGHWAY INFORMATION\n◆セーフティメッセージ\n\n番組へのメッセージは【コチラ】\n番組公式X（旧twitter）アカウントは「@breeze_929」\nTOKAI RADIOのハッシュタグは「#TOKAIRADIO」\nTOKAI RADIO公式X（旧twitter）アカウントは「@tokairadio」",
+      "start_time": "2026-06-16T16:00:00+09:00",
+      "end_time": "2026-06-16T17:00:00+09:00",
+      "duration_sec": 3600,
+      "series_id": "rdk_3321190b8823",
+      "series_name": "bre:eze",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
+    },
+    {
+      "id": "GBS-13462993",
+      "service": "radiko:GBS",
+      "title": "[ぎふチャン] きょうもラジオは！？２時６時",
+      "subtitle": "小松肇 / 吉田早苗",
+      "content": "【主なコーナー】\n▽みんなのメモリアルデー\n▽川柳だよ２時６時 お題は「お菓子」\n▽スポーツストレートＮＯＷ！\n▽マイベストプロ岐阜インフォメーション（第４火曜）\n▽道路交通情報（岐阜センター）\n\n番組へのメッセージはこちら\nメッセージフォーム\nradio26@zf-web.com\nXハッシュタグは「#２時６時」\nXアカウントは「@radio2ji6ji」\"",
+      "start_time": "2026-06-16T16:00:00+09:00",
+      "end_time": "2026-06-16T17:00:00+09:00",
+      "duration_sec": 3600,
+      "series_id": "rdk_87532a3ae99d",
+      "series_name": "きょうもラジオは！？２時６時",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
     },
     {
       "id": "RN1-13481442",
@@ -6928,22 +7063,7 @@
       "series_name": "マーケット・トレンドDX",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
-    },
-    {
-      "id": "HELLOFIVE-13466317",
-      "service": "radiko:HELLOFIVE",
-      "title": "[エフエム石川] Happy Our Party!",
-      "subtitle": "杉崎真宏",
-      "content": "あなたのご褒美Radio\n「Happy Our Party!」\nパーソナリティはラジオをレディオと呼ぶ男 杉崎真宏。\nそして、火曜バイトリーダーのものまね芸人のきのこちゃん。\n\n「バイクエクササイズの日」ということで・・・\n【HOPエクササイズ】\n今日は番組プロデューサーが大ハマり中というバイクエクササイズの日。\n暗闇の中で音楽に合わせてひたすらペダルを漕ぎ、大量の汗をかく…\nということでテーマは【HOPエクササイズ】\nスギシャマときのこちゃんにバイクエクササイズをしたかのような\n大量の汗をかかせるようなメッセージ\n例えば・・・ その場でスクワットして！とか、大爆笑をとれるギャグ言ってとか\n恥ずかしい思い出披露してとか、冷や汗かくようなエピソードとか・・\nとにかく、2人に汗をかかせるようなメッセージお待ちしています！\n\n後半コーナーは【勝手にキャッチフレーズ】\n世の中のあらゆるものに勝手にキャッチフレーズを付けていくコーナー！\n今回は「切り干し大根」のキャッチフレーズを勝手に考えちゃいましょう！！\n\n『はぴねすくらぶラジオショッピング』では、お買い得な商品をわかりやすくご紹介します！\n\n▽16:10〜 【 はぴねすくらぶラジオショッピング 】\nはぴねすくらぶラジオショッピング\n\n番組Webサイト：https://jfn-pods.com/program/22200\nメッセージフォーム：https://form.jfn.co.jp/party/message\n\nXハッシュタグは「#jfn_hop」\nXアカウントは「@jfn_hhp」",
-      "start_time": "2026-06-16T16:00:00+09:00",
-      "end_time": "2026-06-16T16:30:00+09:00",
-      "duration_sec": 1800,
-      "series_id": "rdk_361275adc70a",
-      "series_name": "Happy Our Party!",
-      "episode_name": "",
-      "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
       "id": "JOAK-FM-13495220",
@@ -6958,7 +7078,7 @@
       "series_name": "名演奏ライブラリー Ｎ響と名指揮者 フェルディナント・ライトナー",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
       "id": "TBS-13468239",
@@ -7055,7 +7175,7 @@
       "service": "radiko:NACK5",
       "title": "[NACK5] GOGOMONZ Part4",
       "subtitle": "アイドル鳥越,佐々木成三",
-      "content": "今週、三遊亭鬼丸は夏休み中！\n\nアイドル鳥越と元埼玉県警察本部 刑事部捜査第一課 警部補。\n犯罪コメンテーターの佐々木成三さんが午後を盛り上げます。\n\n午後者達の今日のお題！\n①「おろ？！『騒ぎ』or『いざこざ』or 『揉め事』の、記憶」\n\n②「元刑事さんにズバリ！これを聞いてみたい！」\n(佐々木成三さんへの質問大募集！)\n\n＜2時台＞\n【ティーチャー鳥越のお答えします。】\nわからないことがあったら鳥越先生に「なんなりと」聞いてください。\n先生は全科目に長けていますが、特に数字が絡む科目は得意です！\n\n＜3時台＞\n【事件はスマホで起きている！ストップ特殊詐欺GOGOMONZスペシャル】\nメッセージテーマは\n①「ああっ…『騙された』『利用された』『罠にかかった』の記憶」\n(※特殊詐欺や事件性の無いお話でお願いします)\n②「家族が。親戚が。友人・知人が…特殊詐欺にあいました報告会」\n(※特殊詐欺や事件性があるお話でお願いします)\n\n【DRIVE A GOGOMONZ 素敵なクルマライフ】\n火曜日のテーマ\n「おろ？！『地味～に傷つく』『じんわりと心に刺さる』の、記憶」\n\n【口にはしないけど、日本人の８割ぐらいが思っていること！発表会】\nそんなあなたの思い込みで作るコーナーです。\n合言葉は『なっときらんちょ☆』おそらく…多分…\n\n＜4時台＞\n【4時のGOGOMONZ】\n◆後半のメッセージテーマ\nその①\n「『ごもっとも』『おっしゃる通り』・・・なんですが！の、記憶」\nその②\n「私の中にある『あっち側・こっち側』報告会」\n\n◆「リクエストBOX」\nリクエスト曲を送ってもらうと、４時台に曲がかかるかも？！\n\n◆【4時のGOGOMONZ】前半の＜クイズ！ぴったんこピンピン＞はお休みです。\n\n【メッセージフォーム】\n\n「お買い物中に現れる『迷惑な人』or『不快な人』or『面倒な人』の記憶」\n\n「お宅寄席」\n\n「ASAHIBEER AFTER6 CRUISING」\n\nスタイルフリー\n\nリクエストBOX\n\n水曜日の午後者達の今日のお題1\n\n水曜日の午後者達の今日のお題2\n\n木曜日の午後者達の今日のお題\n\n「DRIVE A GOGOMONZ」\n\n4時のGOGOMONZ\n\n「平成エンタープライズグループ Farm & Travel」\n\nGOGOMONZ大喜利 season Ⅲ\n\nBRAINエクササイズ「逆さワードクイズ・シーズンⅡ」\n\n「?ティーチャー鳥越のお答えします。?」\n\n「ああっ…『騙された』『利用された』『罠にかかった』の記憶」\n\n「家族が。親戚が。友人・知人が…特殊詐欺にあいました報告会」\n\n「口にはしないけど、日本人の８割ぐらいが思っていること！発表会」\n\n「クイズ！ぴったんこピンピン」\n\n「クイズ！ぴったんこピンピン」出場希望者はこちら\n\n「小さくってゴメンね！これが私の人生・Second！」\n\n「お金を持っている人観察会」\n\n「はたらくを輝くに！自分笑顔に！GOGOMONZ仕事のおはなし」\n\n「義理と名の付く家族への手紙！」\n\n「若者が嫌いだ！」\n\n「アイダ設計presents 我が家の喜怒哀楽 都都逸」\n\n「お局様地獄・ボスママinferno」",
+      "content": "今週、三遊亭鬼丸は夏休み中！\n\nアイドル鳥越と元埼玉県警察本部 刑事部捜査第一課 警部補。\n犯罪コメンテーターの佐々木成三さんが午後を盛り上げます。\n\n午後者達の今日のお題！\n①「おろ？！『騒ぎ』or『いざこざ』or 『揉め事』の、記憶」\n\n②「元刑事さんにズバリ！これを聞いてみたい！」\n(佐々木成三さんへの質問大募集！)\n\n＜2時台＞\n【ティーチャー鳥越のお答えします。】\nわからないことがあったら鳥越先生に「なんなりと」聞いてください。\n先生は全科目に長けていますが、特に数字が絡む科目は得意です！\n\n＜3時台＞\n【事件はスマホで起きている！ストップ特殊詐欺GOGOMONZスペシャル】\nメッセージテーマは\n①「ああっ…『騙された』『利用された』『罠にかかった』の記憶」\n(※特殊詐欺や事件性の無いお話でお願いします)\n②「家族が。親戚が。友人・知人が…特殊詐欺にあいました報告会」\n(※特殊詐欺や事件性があるお話でお願いします)\n\n【DRIVE A GOGOMONZ 素敵なクルマライフ】\n火曜日のテーマ\n「おろ？！『地味～に傷つく』『じんわりと心に刺さる』の、記憶」\n\n【口にはしないけど、日本人の８割ぐらいが思っていること！発表会】\nそんなあなたの思い込みで作るコーナーです。\n合言葉は『なっときらんちょ☆』おそらく…多分…\n\n＜4時台＞\n【4時のGOGOMONZ】\n◆後半のメッセージテーマ\nその①\n「『ごもっとも』『おっしゃる通り』・・・なんですが！の、記憶」\nその②\n「私の中にある『あっち側・こっち側』報告会」\n\n◆「リクエストBOX」\nリクエスト曲を送ってもらうと、４時台に曲がかかるかも？！\n\n◆【4時のGOGOMONZ】前半の＜クイズ！ぴったんこピンピン＞はお休みです。\n\n【メッセージフォーム】\n\n「お買い物中に現れる『迷惑な人』or『不快な人』or『面倒な人』の記憶」\n\n「お宅寄席」\n\n「ASAHIBEER AFTER6 CRUISING」\n\nスタイルフリー\n\nリクエストBOX\n\n木曜日の午後者達の今日のお題\n\n「DRIVE A GOGOMONZ」\n\n4時のGOGOMONZ\n\n「平成エンタープライズグループ Farm & Travel」\n\nGOGOMONZ大喜利 season Ⅲ\n\nBRAINエクササイズ「逆さワードクイズ・シーズンⅡ」\n\n「?ティーチャー鳥越のお答えします。?」\n\n「ああっ…『騙された』『利用された』『罠にかかった』の記憶」\n\n「家族が。親戚が。友人・知人が…特殊詐欺にあいました報告会」\n\n「口にはしないけど、日本人の８割ぐらいが思っていること！発表会」\n\n「クイズ！ぴったんこピンピン」\n\n「クイズ！ぴったんこピンピン」出場希望者はこちら\n\n「小さくってゴメンね！これが私の人生・Second！」\n\n「お金を持っている人観察会」\n\n「はたらくを輝くに！自分笑顔に！GOGOMONZ仕事のおはなし」\n\n「義理と名の付く家族への手紙！」\n\n「若者が嫌いだ！」\n\n「アイダ設計presents 我が家の喜怒哀楽 都都逸」\n\n「お局様地獄・ボスママinferno」",
       "start_time": "2026-06-16T16:00:00+09:00",
       "end_time": "2026-06-16T17:00:00+09:00",
       "duration_sec": 3600,
@@ -7221,21 +7341,6 @@
       "area": "NHK"
     },
     {
-      "id": "MRO-13481238",
-      "service": "radiko:MRO",
-      "title": "[MROラジオ] 凜杏りんのスター図鑑",
-      "subtitle": "凜杏りん",
-      "content": "",
-      "start_time": "2026-06-16T16:05:00+09:00",
-      "end_time": "2026-06-16T16:20:00+09:00",
-      "duration_sec": 900,
-      "series_id": "rdk_ab5b8f80f0a3",
-      "series_name": "凜杏りんのスター図鑑",
-      "episode_name": "",
-      "genre": [],
-      "area": "JP17"
-    },
-    {
       "id": "JOCK-13495586",
       "service": "radiko:JOCK",
       "title": "[NHK AM（名古屋）] ニュース",
@@ -7248,7 +7353,7 @@
       "series_name": "ニュース",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
       "id": "r1-270-2026061667806",
@@ -7282,7 +7387,7 @@
       "series_name": "【にっぽん列島夕方ラジオ】関西ラジオワイド",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
       "id": "INT-13465692",
@@ -7312,7 +7417,7 @@
       "series_name": "みんなのFXラジオ",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
       "id": "INT-13465693",
@@ -7328,36 +7433,6 @@
       "episode_name": "",
       "genre": [],
       "area": "JP13"
-    },
-    {
-      "id": "MRO-13481239",
-      "service": "radiko:MRO",
-      "title": "[MROラジオ] 久々江龍飛のハイスクールNow!!(再)",
-      "subtitle": "久々江龍飛",
-      "content": "",
-      "start_time": "2026-06-16T16:20:00+09:00",
-      "end_time": "2026-06-16T16:35:00+09:00",
-      "duration_sec": 900,
-      "series_id": "rdk_3ca1acb4cd0e",
-      "series_name": "久々江龍飛のハイスクールNow!!(再)",
-      "episode_name": "",
-      "genre": [],
-      "area": "JP17"
-    },
-    {
-      "id": "HELLOFIVE-13466318",
-      "service": "radiko:HELLOFIVE",
-      "title": "[エフエム石川] Sunset Express MOVE",
-      "subtitle": "木村 雅幸",
-      "content": "木村雅幸が構成、選曲、出演までこなす平日の生ワイド。ニュースからスポーツの結果、新商品の話題に至るまで独自の視点ですくいあげ、落ち着いたトーンで熱く語ります。\n\n▽16:50〜 【 あぐりずむ 】\n日本の未来を元気にする農業応援プログラム！全国の生産者と消費者をおいしいリズムでつなげます\n\n▽17:05〜 【 石川ミリオンスターズ きらっと通信 】\nプロ野球独立リーグ・ルートインBCリーグで戦う石川ミリオンスターズに密着！\n監督、選手のインタビューをたっぷりと盛り込んでチームの快進撃を伝えます。\n\n▽17:20〜 【 ウェザー・インフォメーション 】\n---\n\n▽17:25〜 【 トラフィック・インフォメーション 】\n交通情報をお届けします\n\n▽17:30〜 【 Volkswagen TREASURES 】\n人生の中で誰もが持っている「心の宝物（TREASURES）」に耳を傾ける番組。\n音楽、風景、言葉、モノ ―\n形あるものもないものも含めて、リスナーの心を支え、\n人生を豊かにしてきた「大切なもの」たちをエピソードとともに紹介します。\n\n▽17:40〜 【 北國新聞ニュース 】\n---\n\n▽17:55〜 【 First Chord 】\n“新たな音楽との出会い”を日常に届ける、ショートフォーマットの新曲紹介番組。\nリスナーにとっての“はじめての出会い”となるような、国内外のフレッシュな楽曲を丁寧に届けます。\n\nサブスクでのプレイリスト文化が浸透した今だからこそ、“誰かの手で選ばれた音”との偶発的な出会いを作る15分間。\n\n聴いている誰かの感情と調和する瞬間を大切にした、ラジオの原点的な番組です。\n\n▽18:00〜 【 (第2週)玉田社長の福耳ラジオ、(第4週)けんせつ一番星☆ 】\n「玉田社長の福耳ラジオ」\n若き日には海外経験も積んだタンク作りでは国内トップメーカーのタマダ株式会社玉田社長の耳は見るからに福耳。この福耳が聞いてきた事柄は物作りメーカの３代目社長の見識を高めてきたに違いありません。そんな福耳を持つ玉田社長の物作りへのこだわりや企業理念、商売のモットーなどに鋭くパーソナリティー木村雅幸が切り込むインタビュー番組です。この番組を通して、タマダの認知度をＵＰし、イメージを上げリクルーティングにも繋げます。\n<提供：タマダ>\n\n「けんせつ一番星☆」\n毎回建設業界の期待の星にスタジオインタビューし建設業界の魅力についてお伝えします。\n＜提供：一般社団法人石川県建設業協会＞\n\n番組Webサイト：https://hellofive.jp/program/move/\n\nXハッシュタグは「#move805fm」\nXアカウントは「@MOVE805」",
-      "start_time": "2026-06-16T16:30:00+09:00",
-      "end_time": "2026-06-16T18:55:00+09:00",
-      "duration_sec": 8700,
-      "series_id": "rdk_2a0ffc9042df",
-      "series_name": "Sunset Express MOVE",
-      "episode_name": "",
-      "genre": [],
-      "area": "JP17"
     },
     {
       "id": "INT-13465694",
@@ -7388,36 +7463,6 @@
       "episode_name": "",
       "genre": [],
       "area": "JP13"
-    },
-    {
-      "id": "MRO-13481240",
-      "service": "radiko:MRO",
-      "title": "[MROラジオ] あなたにハッピー･メロディ",
-      "subtitle": "だいすけ",
-      "content": "",
-      "start_time": "2026-06-16T16:35:00+09:00",
-      "end_time": "2026-06-16T16:45:00+09:00",
-      "duration_sec": 600,
-      "series_id": "rdk_37dd4293ea48",
-      "series_name": "あなたにハッピー･メロディ",
-      "episode_name": "",
-      "genre": [],
-      "area": "JP17"
-    },
-    {
-      "id": "MRO-13481241",
-      "service": "radiko:MRO",
-      "title": "[MROラジオ] あなたの時間 ～イブニング･レディオ～",
-      "subtitle": "上坂典子",
-      "content": "16:55頃 身近にできる、みんなのSDGs\n17:00頃 ニュースパレード\n17:14頃 あなたの×3リクエスト\n17:30頃 ネットワークトゥデイ\n17:45頃 MROイブニングニュース\n17:55頃 ぼくの夢 わたしの未来\n18:00頃 大山商店 イブニングソニック\n18:10頃 石川県勤労者互助会presents おかえり交通情報",
-      "start_time": "2026-06-16T16:45:00+09:00",
-      "end_time": "2026-06-16T17:00:00+09:00",
-      "duration_sec": 900,
-      "series_id": "rdk_7687707cfe32",
-      "series_name": "あなたの時間 ～イブニング･レディオ～",
-      "episode_name": "",
-      "genre": [],
-      "area": "JP17"
     },
     {
       "id": "TBS-13468240",
@@ -7477,7 +7522,7 @@
       "series_name": "ニュース・気象情報・交通情報（東海・北陸）",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
       "id": "JOAK-13495294",
@@ -7510,19 +7555,34 @@
       "area": "JP27"
     },
     {
-      "id": "MRO-13481242",
-      "service": "radiko:MRO",
-      "title": "[MROラジオ] ニュースパレード",
-      "subtitle": "永野景子",
-      "content": "",
+      "id": "TOKAIRADIO-13468387",
+      "service": "radiko:TOKAIRADIO",
+      "title": "[TOKAI RADIO] bre:eze (2)",
+      "subtitle": "イレーネ / ゲスト：katawara",
+      "content": "□16:00～\n◆NEWS\n◆TRAFFIC INFORMATION\n◆HOT DISK selected by diskunion\n◆セーフティメッセージ\n□17:00～\n◆ニュースパレード\n◆ジャパネットたかたラジオショッピング\n◆HIGHWAY INFORMATION\n◆セーフティメッセージ\n\n番組へのメッセージは【コチラ】\n番組公式X（旧twitter）アカウントは「@breeze_929」\nTOKAI RADIOのハッシュタグは「#TOKAIRADIO」\nTOKAI RADIO公式X（旧twitter）アカウントは「@tokairadio」",
       "start_time": "2026-06-16T17:00:00+09:00",
-      "end_time": "2026-06-16T17:14:00+09:00",
-      "duration_sec": 840,
-      "series_id": "rdk_d841e907106c",
-      "series_name": "ニュースパレード",
+      "end_time": "2026-06-16T17:45:00+09:00",
+      "duration_sec": 2700,
+      "series_id": "rdk_3321190b8823",
+      "series_name": "bre:eze",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
+    },
+    {
+      "id": "GBS-13462994",
+      "service": "radiko:GBS",
+      "title": "[ぎふチャン] きょうもラジオは！？２時６時",
+      "subtitle": "小松肇 / 吉田早苗",
+      "content": "【主なコーナー】\n▽明日の天気\n▽道路交通情報（岐阜センター）\n\n番組へのメッセージはこちら\nメッセージフォーム\nradio26@zf-web.com\nXハッシュタグは「#２時６時」\nXアカウントは「@radio2ji6ji」\"",
+      "start_time": "2026-06-16T17:00:00+09:00",
+      "end_time": "2026-06-16T17:57:00+09:00",
+      "duration_sec": 3420,
+      "series_id": "rdk_87532a3ae99d",
+      "series_name": "きょうもラジオは！？２時６時",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
     },
     {
       "id": "RN1-13481444",
@@ -7537,7 +7597,7 @@
       "series_name": "日経電子版NEWS",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
       "id": "RN2-13506080",
@@ -7552,7 +7612,22 @@
       "series_name": "ルミナス tomorrow",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
+    },
+    {
+      "id": "FMAICHI-13467952",
+      "service": "radiko:FMAICHI",
+      "title": "[FM AICHI] EVENING STREET",
+      "subtitle": "黒岩唯一",
+      "content": "◆大人のリスナーに良質な音楽と情報をお届けするプログラム。 ◆\n\nメッセージ・リクエストはこちら\n\nXハッシュタグは「#イブスト807」\nXアカウントは「@evening807」",
+      "start_time": "2026-06-16T17:00:00+09:00",
+      "end_time": "2026-06-16T17:50:00+09:00",
+      "duration_sec": 3000,
+      "series_id": "rdk_716dfbd7787a",
+      "series_name": "EVENING STREET",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
     },
     {
       "id": "JOCK-13495589",
@@ -7567,7 +7642,7 @@
       "series_name": "夕刊 ゴジらじ▽「忍たま乱太郎」のミュージカル出演俳優が登場",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
       "id": "TBS-13468241",
@@ -7649,7 +7724,7 @@
       "service": "radiko:NACK5",
       "title": "[NACK5] THE SEITARO★RADIO SHOW「1700」",
       "subtitle": "大野勢太郎",
-      "content": "夕方5時15分頃からは日替わりコーナー！\n\n火曜日は『 テレフォン☆1700 』\n映画監督の福島拓哉さんに電話をつなぎます。\n\n#nack5 #17ラジアン\n\n【メッセージフォーム】\n\nメッセージはこちら\n\n誕生日・記念日のメッセージ\n\n17RADIO LETTER ～拝啓 ◯◯様へ～\n\n17川柳\n\n今日気になったニュースはこれだ！\n\n17ラジアンの知恵袋 ラジペディア\n\nあなたが選ぶ！17リクエスト",
+      "content": "夕方5時15分頃からは日替わりコーナー！\n\n火曜日は『 テレフォン☆1700 』\n映画監督の福島拓哉さんに電話をつなぎます。\n\n#nack5 #17ラジアン\n\n【メッセージフォーム】\n\n木曜メッセージテーマはこちら！\n\nメッセージはこちら\n\n誕生日・記念日のメッセージ\n\n17RADIO LETTER ～拝啓 ◯◯様へ～\n\n17川柳\n\n今日気になったニュースはこれだ！\n\n17ラジアンの知恵袋 ラジペディア\n\nあなたが選ぶ！17リクエスト",
       "start_time": "2026-06-16T17:00:00+09:00",
       "end_time": "2026-06-16T17:50:00+09:00",
       "duration_sec": 3000,
@@ -7887,7 +7962,7 @@
       "series_name": "大江麻理子が聞く 次代を拓くリーダーたち",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
       "id": "RN2-13506081",
@@ -7902,7 +7977,7 @@
       "series_name": "RaNi Music♪Evening",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
       "id": "QRR-13473490",
@@ -7918,21 +7993,6 @@
       "episode_name": "",
       "genre": [],
       "area": "JP13"
-    },
-    {
-      "id": "MRO-13481243",
-      "service": "radiko:MRO",
-      "title": "[MROラジオ] あなたの時間 ～イブニング･レディオ～",
-      "subtitle": "上坂典子",
-      "content": "17:14頃 あなたの×3リクエスト\n17:30頃 ネットワークトゥデイ\n17:45頃 MROイブニングニュース\n17:55頃 ぼくの夢 わたしの未来\n18:00頃 大山商店 イブニングソニック\n18:10頃 石川県勤労者互助会presents おかえり交通情報",
-      "start_time": "2026-06-16T17:14:00+09:00",
-      "end_time": "2026-06-16T17:30:00+09:00",
-      "duration_sec": 960,
-      "series_id": "rdk_7687707cfe32",
-      "series_name": "あなたの時間 ～イブニング･レディオ～",
-      "episode_name": "",
-      "genre": [],
-      "area": "JP17"
     },
     {
       "id": "OBC-13463985",
@@ -7977,7 +8037,7 @@
       "series_name": "ミュージックアプリ",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
       "id": "INT-13465695",
@@ -7993,21 +8053,6 @@
       "episode_name": "",
       "genre": [],
       "area": "JP13"
-    },
-    {
-      "id": "MRO-13481244",
-      "service": "radiko:MRO",
-      "title": "[MROラジオ] ネットワークトゥデイ",
-      "subtitle": "",
-      "content": "",
-      "start_time": "2026-06-16T17:30:00+09:00",
-      "end_time": "2026-06-16T17:45:00+09:00",
-      "duration_sec": 900,
-      "series_id": "rdk_2d999b255826",
-      "series_name": "ネットワークトゥデイ",
-      "episode_name": "",
-      "genre": [],
-      "area": "JP17"
     },
     {
       "id": "LFR-13473401",
@@ -8100,19 +8145,19 @@
       "area": "JP27"
     },
     {
-      "id": "MRO-13481245",
-      "service": "radiko:MRO",
-      "title": "[MROラジオ] あなたの時間 ～イブニング･レディオ～",
-      "subtitle": "上坂典子",
-      "content": "17:45頃 MROイブニングニュース\n17:55頃 ぼくの夢 わたしの未来\n18:00頃 大山商店 イブニングソニック\n18:10頃 石川県勤労者互助会presents おかえり交通情報",
+      "id": "TOKAIRADIO-13468388",
+      "service": "radiko:TOKAIRADIO",
+      "title": "[TOKAI RADIO] ガッツナイターカウントダウン",
+      "subtitle": "平松伴康",
+      "content": "◆Today's Starting Lineup!!\n\n応援メッセージは コチラ\n\nXアカウントは「@guts1332」\nTOKAI RADIOのハッシュタグは「#TOKAIRADIO」\nTOKAI RADIO公式Xアカウントは「@tokairadio」",
       "start_time": "2026-06-16T17:45:00+09:00",
-      "end_time": "2026-06-16T18:30:00+09:00",
-      "duration_sec": 2700,
-      "series_id": "rdk_7687707cfe32",
-      "series_name": "あなたの時間 ～イブニング･レディオ～",
+      "end_time": "2026-06-16T17:56:00+09:00",
+      "duration_sec": 660,
+      "series_id": "rdk_c48b3b0add3a",
+      "series_name": "ガッツナイターカウントダウン",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
       "id": "OBC-13463986",
@@ -8128,6 +8173,21 @@
       "episode_name": "",
       "genre": [],
       "area": "JP27"
+    },
+    {
+      "id": "FMAICHI-13467953",
+      "service": "radiko:FMAICHI",
+      "title": "[FM AICHI] Volkswagen TREASURES",
+      "subtitle": "加藤ローサ",
+      "content": "◆人生の中で誰もが持っている「心の宝物（TREASURES）」に耳を傾ける番組。音楽、風景、言葉、モノ ―形あるものもないものも含めて、リスナーの心を支え、人生を豊かにしてきた「大切なもの」たちをエピソードとともに紹介します。◆\n\nXハッシュタグは「#エフエムアイチ」\nXアカウントは「@FMAICHI」",
+      "start_time": "2026-06-16T17:50:00+09:00",
+      "end_time": "2026-06-16T18:00:00+09:00",
+      "duration_sec": 600,
+      "series_id": "rdk_6a3c216f8efc",
+      "series_name": "Volkswagen TREASURES",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
     },
     {
       "id": "QRR-13473492",
@@ -8249,7 +8309,7 @@
       "series_name": "おすすめラニィちゃん",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
       "id": "JOCK-13495590",
@@ -8264,7 +8324,7 @@
       "series_name": "気象情報（東海・北陸）",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
       "id": "JOAK-13495297",
@@ -8312,6 +8372,51 @@
       "area": "JP27"
     },
     {
+      "id": "TOKAIRADIO-13468389",
+      "service": "radiko:TOKAIRADIO",
+      "title": "[TOKAI RADIO] ガッツナイター (1)",
+      "subtitle": "【解説】八木裕 / 【実況】三ツ廣政輝（MBS）",
+      "content": "応援メッセージは コチラ\n\nXアカウントは「@guts1332」\nTOKAI RADIOのハッシュタグは「#TOKAIRADIO」\nTOKAI RADIO公式Xアカウントは「@tokairadio」",
+      "start_time": "2026-06-16T17:56:00+09:00",
+      "end_time": "2026-06-16T20:00:00+09:00",
+      "duration_sec": 7440,
+      "series_id": "rdk_4e2400c437f5",
+      "series_name": "ガッツナイター",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
+    },
+    {
+      "id": "CBC-13496596",
+      "service": "radiko:CBC",
+      "title": "[CBCラジオ] ドラ魂ワイド",
+      "subtitle": "加藤里奈 三浦優奈",
+      "content": "",
+      "start_time": "2026-06-16T17:57:00+09:00",
+      "end_time": "2026-06-16T19:00:00+09:00",
+      "duration_sec": 3780,
+      "series_id": "rdk_f9b9e1acc8f0",
+      "series_name": "ドラ魂ワイド",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
+    },
+    {
+      "id": "GBS-13462995",
+      "service": "radiko:GBS",
+      "title": "[ぎふチャン] インフォメーション",
+      "subtitle": "",
+      "content": "",
+      "start_time": "2026-06-16T17:57:00+09:00",
+      "end_time": "2026-06-16T18:00:00+09:00",
+      "duration_sec": 180,
+      "series_id": "rdk_8dbb3079cbc7",
+      "series_name": "インフォメーション",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
+    },
+    {
       "id": "JOCK-13495591",
       "service": "radiko:JOCK",
       "title": "[NHK AM（名古屋）] 交通情報（東海４県）",
@@ -8324,7 +8429,22 @@
       "series_name": "交通情報（東海４県）",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
+    },
+    {
+      "id": "GBS-13462996",
+      "service": "radiko:GBS",
+      "title": "[ぎふチャン] イトーとスドーのモノ申し隊！",
+      "subtitle": "",
+      "content": "",
+      "start_time": "2026-06-16T18:00:00+09:00",
+      "end_time": "2026-06-16T18:15:00+09:00",
+      "duration_sec": 900,
+      "series_id": "rdk_4005463cdc5d",
+      "series_name": "イトーとスドーのモノ申し隊！",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
     },
     {
       "id": "RN1-13481446",
@@ -8339,7 +8459,37 @@
       "series_name": "ミュージックアプリ",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
+    },
+    {
+      "id": "ZIP-FM-13481158",
+      "service": "radiko:ZIP-FM",
+      "title": "[ZIP-FM] THUMBS UP",
+      "subtitle": "上野正明",
+      "content": "18:20 SAKAE SP-RING 2026 (Mon-Thu:TIGET)〈～6/6〉\n\n19:35 MONEY STUDY (Wed:東海ろうきん）\n\nGUEST：katawara",
+      "start_time": "2026-06-16T18:00:00+09:00",
+      "end_time": "2026-06-16T20:00:00+09:00",
+      "duration_sec": 7200,
+      "series_id": "rdk_290a566a3d20",
+      "series_name": "THUMBS UP",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
+    },
+    {
+      "id": "FMAICHI-13467954",
+      "service": "radiko:FMAICHI",
+      "title": "[FM AICHI] EVENING STREET",
+      "subtitle": "黒岩唯一",
+      "content": "◆大人のリスナーに良質な音楽と情報をお届けするプログラム。 ◆\n\nメッセージ・リクエストはこちら\n\nXハッシュタグは「#イブスト807」\nXアカウントは「@evening807」",
+      "start_time": "2026-06-16T18:00:00+09:00",
+      "end_time": "2026-06-16T19:30:00+09:00",
+      "duration_sec": 5400,
+      "series_id": "rdk_716dfbd7787a",
+      "series_name": "EVENING STREET",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
     },
     {
       "id": "JOCK-13495592",
@@ -8354,7 +8504,7 @@
       "series_name": "ニュース",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
       "id": "JOAK-FM-13495222",
@@ -8369,7 +8519,7 @@
       "series_name": "マイ・フェイバリット・アルバム「ザ・ルースターズ」ザ・ルースターズ",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
       "id": "TBS-13468241",
@@ -8604,7 +8754,22 @@
       "series_name": "Ｎらじ",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
+    },
+    {
+      "id": "GBS-13462997",
+      "service": "radiko:GBS",
+      "title": "[ぎふチャン] せきぐちあいみのVirtual Radio",
+      "subtitle": "せきぐちあいみ",
+      "content": "",
+      "start_time": "2026-06-16T18:15:00+09:00",
+      "end_time": "2026-06-16T18:30:00+09:00",
+      "duration_sec": 900,
+      "series_id": "rdk_f0d6f2991db6",
+      "series_name": "せきぐちあいみのVirtual Radio",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
     },
     {
       "id": "FMO-13465950",
@@ -8637,19 +8802,19 @@
       "area": "JP13"
     },
     {
-      "id": "MRO-13481246",
-      "service": "radiko:MRO",
-      "title": "[MROラジオ] nano.RIPE 石川移住計画!",
-      "subtitle": "きみコ 西尾知亜紀",
-      "content": "",
+      "id": "GBS-13462998",
+      "service": "radiko:GBS",
+      "title": "[ぎふチャン] １スタは!? 夜もZawaZawa (1)",
+      "subtitle": "ジャーマネ",
+      "content": "▽ＵＦＯごとく、ぴゅぴゅ～と簡単！手抜きレシピ\n▽みんなでワッショイ！ 夜ザワかるた\n▽わたしのプレゼン！ジャーマネット・トゥトゥトゥ\n▽笑うジャーマネマン・懺悔コーナー\n番組へのメッセージはこちら\nメッセージフォーム\nzawa-thu@zf-web.com\nXハッシュタグは「#夜ザワ火曜日」\nXアカウントは「@jya__mane」\"",
       "start_time": "2026-06-16T18:30:00+09:00",
-      "end_time": "2026-06-16T18:45:00+09:00",
-      "duration_sec": 900,
-      "series_id": "rdk_650a8c77f9eb",
-      "series_name": "nano.RIPE 石川移住計画!",
+      "end_time": "2026-06-16T19:30:00+09:00",
+      "duration_sec": 3600,
+      "series_id": "rdk_65fe45fe92bf",
+      "series_name": "１スタは!? 夜もZawaZawa",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
       "id": "RN1-13487929",
@@ -8664,7 +8829,7 @@
       "series_name": "耳でわかる ビジネステック＆サイエンス",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
       "id": "FMO-13465951",
@@ -8712,21 +8877,6 @@
       "area": "JP13"
     },
     {
-      "id": "MRO-13481247",
-      "service": "radiko:MRO",
-      "title": "[MROラジオ] Energy Music",
-      "subtitle": "",
-      "content": "",
-      "start_time": "2026-06-16T18:45:00+09:00",
-      "end_time": "2026-06-16T19:00:00+09:00",
-      "duration_sec": 900,
-      "series_id": "rdk_98bc3d3a8941",
-      "series_name": "Energy Music",
-      "episode_name": "",
-      "genre": [],
-      "area": "JP17"
-    },
-    {
       "id": "r1-270-2026061689114",
       "service": "r1",
       "title": "海上予報・おしらせ・交通情報（関西）",
@@ -8754,7 +8904,7 @@
       "series_name": "交通情報・ニュース・気象情報（東海３県）",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
       "id": "JOAK-FM-13495223",
@@ -8769,7 +8919,7 @@
       "series_name": "ニュース・気象情報・交通情報（関東）",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
       "id": "FMJ-13487982",
@@ -8817,21 +8967,6 @@
       "area": "NHK"
     },
     {
-      "id": "HELLOFIVE-13466319",
-      "service": "radiko:HELLOFIVE",
-      "title": "[エフエム石川] FM石川ニュース（JFN）",
-      "subtitle": "",
-      "content": "---",
-      "start_time": "2026-06-16T18:55:00+09:00",
-      "end_time": "2026-06-16T19:00:00+09:00",
-      "duration_sec": 300,
-      "series_id": "rdk_5ed331f4d232",
-      "series_name": "FM石川ニュース（JFN）",
-      "episode_name": "",
-      "genre": [],
-      "area": "JP17"
-    },
-    {
       "id": "INT-13465700",
       "service": "radiko:INT",
       "title": "[interfm] interfm Headline News",
@@ -8862,19 +8997,19 @@
       "area": "JP13"
     },
     {
-      "id": "MRO-13481248",
-      "service": "radiko:MRO",
-      "title": "[MROラジオ] 荻上チキ Session",
-      "subtitle": "塚越健司 山本恵里伽",
-      "content": "",
+      "id": "CBC-13496597",
+      "service": "radiko:CBC",
+      "title": "[CBCラジオ] ドラ魂ワイド「戸井康成のドラ魂スクラッパー」",
+      "subtitle": "戸井康成 加藤愛",
+      "content": "内容：不定期放送増刊スクラッパーのドラ魂バージョン！\n\nここまでのシーズンを振り返り「嬉しい」「悔しい」「うらやましい」ニュースを大募集！\n\nネタコーナーも満載！\n\n①「リプレイ検証ショー」世の中の紛らわしい物やモヤっとする事を検証！\n\n②「細かすぎるウグイス嬢選手権」有名人の細かすぎる情報をウグイス嬢風に読み上げます！\n\n番組へのおたよりはこちら\n\nFAXは 052-263-6800 まで",
       "start_time": "2026-06-16T19:00:00+09:00",
-      "end_time": "2026-06-16T20:00:00+09:00",
-      "duration_sec": 3600,
-      "series_id": "rdk_c4c59e1f9011",
-      "series_name": "荻上チキ Session",
+      "end_time": "2026-06-16T21:00:00+09:00",
+      "duration_sec": 7200,
+      "series_id": "rdk_c4bf1ca906d4",
+      "series_name": "ドラ魂ワイド「戸井康成のドラ魂スクラッパー」",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
       "id": "RN1-13481447",
@@ -8889,7 +9024,7 @@
       "series_name": "前田公輝のヒラケテヒラク",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
       "id": "RN2-13481426",
@@ -8904,22 +9039,7 @@
       "series_name": "放送休止中",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
-    },
-    {
-      "id": "HELLOFIVE-13466320",
-      "service": "radiko:HELLOFIVE",
-      "title": "[エフエム石川] A・O・R",
-      "subtitle": "ユキ・ラインハート",
-      "content": "“お気に入りのコンピレーションＣＤ”を楽しむ感覚で一日の疲れをクールダウン。\n上質な音楽をお届けする。\n２０時台は音楽を圧倒的な熱量でレコメンド！ジャンル別に音楽を掘り下げていく。\n\n19時台：「アイ・ジャスト・ワナ・ストップ」ジノ・ヴァネリ\n\n20時台：～オール・ディス・ジャズ～\n音楽評論家、プロデューサーの牛窪成弘が出演、ソニー・ロリンズ追悼特集の１回目。\n\n▽19:55〜 【 FM石川ニュース（JFN） 】\n---\n\n番組Webサイト：http://www.jfn.jp/aor/\nメッセージフォーム：https://form.jfn.co.jp/aor/message",
-      "start_time": "2026-06-16T19:00:00+09:00",
-      "end_time": "2026-06-16T20:55:00+09:00",
-      "duration_sec": 6900,
-      "series_id": "rdk_023fc0901424",
-      "series_name": "A・O・R",
-      "episode_name": "",
-      "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
       "id": "JOCK-13495595",
@@ -8934,7 +9054,7 @@
       "series_name": "ニュース ＮＨＫきょうのニュース",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
       "id": "JOAK-FM-13495224",
@@ -8949,7 +9069,7 @@
       "series_name": "ニュース ＮＨＫきょうのニュース",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
       "id": "TBS-13468241",
@@ -9211,6 +9331,21 @@
       "area": "NHK"
     },
     {
+      "id": "GBS-13462998",
+      "service": "radiko:GBS",
+      "title": "[ぎふチャン] １スタは!? 夜もZawaZawa (2)",
+      "subtitle": "ジャーマネ",
+      "content": "▽ＵＦＯごとく、ぴゅぴゅ～と簡単！手抜きレシピ\n▽みんなでワッショイ！ 夜ザワかるた\n▽わたしのプレゼン！ジャーマネット・トゥトゥトゥ\n▽笑うジャーマネマン・懺悔コーナー\n番組へのメッセージはこちら\nメッセージフォーム\nzawa-thu@zf-web.com\nXハッシュタグは「#夜ザワ火曜日」\nXアカウントは「@jya__mane」\"",
+      "start_time": "2026-06-16T19:30:00+09:00",
+      "end_time": "2026-06-16T20:30:00+09:00",
+      "duration_sec": 3600,
+      "series_id": "rdk_65fe45fe92bf",
+      "series_name": "１スタは!? 夜もZawaZawa",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
+    },
+    {
       "id": "RN1-13481448",
       "service": "radiko:RN1",
       "title": "[ラジオNIKKEI第1] ＲａＮｉ Ｍｕｓｉｃ♪（再）",
@@ -9223,7 +9358,22 @@
       "series_name": "ＲａＮｉ Ｍｕｓｉｃ♪（再）",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
+    },
+    {
+      "id": "FMAICHI-13467955",
+      "service": "radiko:FMAICHI",
+      "title": "[FM AICHI] 高橋優のリアラジ",
+      "subtitle": "高橋優",
+      "content": "◆リアルタイム・シンガーシングライター高橋優がお届けする、“リアルタイム・ラジオプログラム「リアラジ」”。リスナーからの人生の進路相談に答えたり、時には高橋優のライブ音源もOA。◆\n\nXハッシュタグは「#エフエムアイチ」\nXアカウントは「@FMAICHI」",
+      "start_time": "2026-06-16T19:30:00+09:00",
+      "end_time": "2026-06-16T20:00:00+09:00",
+      "duration_sec": 1800,
+      "series_id": "rdk_8a458fc98b53",
+      "series_name": "高橋優のリアラジ",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
     },
     {
       "id": "JOCK-13495596",
@@ -9238,7 +9388,7 @@
       "series_name": "ＮＨＫやさしいことばニュース",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
       "id": "OBC-13463989",
@@ -9314,13 +9464,43 @@
       "subtitle": "梅原裕一郎(朗読)/礒野佑子(語り)",
       "content": "【朗読】梅原裕一郎，【語り】礒野佑子\n\n美濃に続いて伊勢方面へ進軍した信長軍でしたが、攻めあぐねて戦法について論争が二分。そんな中、藤吉郎がある進言をして、信長からその実行を託されるが・・・",
       "start_time": "2026-06-16T19:35:00+09:00",
-      "end_time": "2026-06-16T19:50:00+09:00",
-      "duration_sec": 900,
+      "end_time": "2026-06-16T19:47:00+09:00",
+      "duration_sec": 720,
       "series_id": "rdk_cf1709126ed2",
       "series_name": "まいにち朗読「ラジオも秀吉！新書太閤記」",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
+    },
+    {
+      "id": "JOCK-13528580",
+      "service": "radiko:JOCK",
+      "title": "[NHK AM（名古屋）] ニュース「群馬・埼玉で震度５弱」関連",
+      "subtitle": "",
+      "content": "",
+      "start_time": "2026-06-16T19:47:00+09:00",
+      "end_time": "2026-06-16T20:55:00+09:00",
+      "duration_sec": 4080,
+      "series_id": "rdk_a5da336ce651",
+      "series_name": "ニュース「群馬・埼玉で震度５弱」関連",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
+    },
+    {
+      "id": "JOAK-13528583",
+      "service": "radiko:JOAK",
+      "title": "[NHK AM（東京）] ニュース「群馬・埼玉で震度５弱」関連",
+      "subtitle": "",
+      "content": "",
+      "start_time": "2026-06-16T19:47:00+09:00",
+      "end_time": "2026-06-16T20:55:00+09:00",
+      "duration_sec": 4080,
+      "series_id": "rdk_bcf81495f551",
+      "series_name": "ニュース「群馬・埼玉で震度５弱」関連",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP13"
     },
     {
       "id": "r1-270-2026061667820",
@@ -9352,22 +9532,7 @@
       "series_name": "日経電子版NEWS",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
-    },
-    {
-      "id": "JOCK-13495598",
-      "service": "radiko:JOCK",
-      "title": "[NHK AM（名古屋）] 安心ラジオ 子どもの心配事 あおる情報に注意",
-      "subtitle": "原田裕和",
-      "content": "ＳＮＳなどには子どもの成長に関するさまざまな情報があふれていますが、不安をあおるものには注意が必要です。信頼できるかかりつけ医や専門医に相談することが大切です。\n\nいま、ＳＮＳなどには子どもの成長に関するさまざまな情報があふれています。ただ、不安をあおるものには注意が必要です。まずは信頼できるかかりつけ医や専門医に相談することが大切です。",
-      "start_time": "2026-06-16T19:50:00+09:00",
-      "end_time": "2026-06-16T19:55:00+09:00",
-      "duration_sec": 300,
-      "series_id": "rdk_f9bbb62d78bb",
-      "series_name": "安心ラジオ 子どもの心配事 あおる情報に注意",
-      "episode_name": "",
-      "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
       "id": "r1-270-2026061689148",
@@ -9385,49 +9550,19 @@
       "area": "NHK"
     },
     {
-      "id": "JOCK-13495599",
-      "service": "radiko:JOCK",
-      "title": "[NHK AM（名古屋）] 気象情報・海上予報・交通情報（東海・北陸）",
-      "subtitle": "",
-      "content": "",
-      "start_time": "2026-06-16T19:55:00+09:00",
-      "end_time": "2026-06-16T20:00:00+09:00",
-      "duration_sec": 300,
-      "series_id": "rdk_767548d3aa6b",
-      "series_name": "気象情報・海上予報・交通情報（東海・北陸）",
-      "episode_name": "",
-      "genre": [],
-      "area": "JP17"
-    },
-    {
-      "id": "JOAK-13495305",
-      "service": "radiko:JOAK",
-      "title": "[NHK AM（東京）] 気象情報・交通情報（関東甲信越）",
-      "subtitle": "",
-      "content": "",
-      "start_time": "2026-06-16T19:55:00+09:00",
-      "end_time": "2026-06-16T20:00:00+09:00",
-      "duration_sec": 300,
-      "series_id": "rdk_ee377370e4ee",
-      "series_name": "気象情報・交通情報（関東甲信越）",
-      "episode_name": "",
-      "genre": [],
-      "area": "JP13"
-    },
-    {
-      "id": "MRO-13481249",
-      "service": "radiko:MRO",
-      "title": "[MROラジオ] アフター6ジャンクション2",
-      "subtitle": "ライムスター宇多丸 日比麻音子 土井敏之",
-      "content": "",
+      "id": "TOKAIRADIO-13468389",
+      "service": "radiko:TOKAIRADIO",
+      "title": "[TOKAI RADIO] ガッツナイター (2)",
+      "subtitle": "【解説】八木裕 / 【実況】三ツ廣政輝（MBS）",
+      "content": "応援メッセージは コチラ\n\nXアカウントは「@guts1332」\nTOKAI RADIOのハッシュタグは「#TOKAIRADIO」\nTOKAI RADIO公式Xアカウントは「@tokairadio」",
       "start_time": "2026-06-16T20:00:00+09:00",
-      "end_time": "2026-06-16T21:00:00+09:00",
-      "duration_sec": 3600,
-      "series_id": "rdk_e8ae9ecd6488",
-      "series_name": "アフター6ジャンクション2",
+      "end_time": "2026-06-16T21:40:00+09:00",
+      "duration_sec": 6000,
+      "series_id": "rdk_4e2400c437f5",
+      "series_name": "ガッツナイター",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
       "id": "RN1-13487930",
@@ -9442,22 +9577,37 @@
       "series_name": "ミュージックアプリ",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
-      "id": "JOCK-13495600",
-      "service": "radiko:JOCK",
-      "title": "[NHK AM（名古屋）] ニュース",
-      "subtitle": "",
-      "content": "",
+      "id": "ZIP-FM-13481159",
+      "service": "radiko:ZIP-FM",
+      "title": "[ZIP-FM] Neue Musik",
+      "subtitle": "神原真理",
+      "content": "21:00 Toi Toi Toi (Tue:ドリームカプセル)\n\nGUEST：奇妙礼太郎",
       "start_time": "2026-06-16T20:00:00+09:00",
-      "end_time": "2026-06-16T20:05:00+09:00",
-      "duration_sec": 300,
-      "series_id": "rdk_0c1b71107178",
-      "series_name": "ニュース",
+      "end_time": "2026-06-16T22:00:00+09:00",
+      "duration_sec": 7200,
+      "series_id": "rdk_0e32f3cfaac5",
+      "series_name": "Neue Musik",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
+    },
+    {
+      "id": "FMAICHI-13467956",
+      "service": "radiko:FMAICHI",
+      "title": "[FM AICHI] エンジ名古屋 Road To Connect",
+      "subtitle": "川道良明",
+      "content": "◆パーソナリティ川道良明が、中部エリアの電気・電子・土木・建築・理系・工学系大学で勉学に取り組む現役のゼミ生、そして、ゼミの教授を対象に、今、取り組んでいることや未来に叶えたい夢など、週替わりでインタビューします。◆\n\nメッセージ・リクエストはこちら\n\nXハッシュタグは「#FMAICHI」\nXアカウントは「@FMAICHI」",
+      "start_time": "2026-06-16T20:00:00+09:00",
+      "end_time": "2026-06-16T20:30:00+09:00",
+      "duration_sec": 1800,
+      "series_id": "rdk_22581c00c061",
+      "series_name": "エンジ名古屋 Road To Connect",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
     },
     {
       "id": "TBS-13468242",
@@ -9590,21 +9740,6 @@
       "duration_sec": 3600,
       "series_id": "rdk_897d344fb3eb",
       "series_name": "菊地真衣のこんなんで、いいのかYO!?",
-      "episode_name": "",
-      "genre": [],
-      "area": "JP13"
-    },
-    {
-      "id": "JOAK-13495306",
-      "service": "radiko:JOAK",
-      "title": "[NHK AM（東京）] ニュース",
-      "subtitle": "",
-      "content": "",
-      "start_time": "2026-06-16T20:00:00+09:00",
-      "end_time": "2026-06-16T20:05:00+09:00",
-      "duration_sec": 300,
-      "series_id": "rdk_06b0df722680",
-      "series_name": "ニュース",
       "episode_name": "",
       "genre": [],
       "area": "JP13"
@@ -9766,21 +9901,6 @@
       "area": "NHK"
     },
     {
-      "id": "JOCK-13495601",
-      "service": "radiko:JOCK",
-      "title": "[NHK AM（名古屋）] 天才ピアニストの今夜もグッジョブ ＃５０「服飾デザイナー」にグッジョブ！",
-      "subtitle": "天才ピアニスト(出演)/奥野晶寛(ゲスト)/佐藤みか(ゲスト)",
-      "content": "お笑いコンビ・天才ピアニストが送る勤労感謝トークバラエティー。女性向けの洋服をデザインしている「服飾デザイナー」をゲストに迎え、お仕事の魅力やエピソードを伺う。\n\n【出演】天才ピアニスト，【ゲスト】服飾デザイナー…奥野晶寛，佐藤みか",
-      "start_time": "2026-06-16T20:05:00+09:00",
-      "end_time": "2026-06-16T20:55:00+09:00",
-      "duration_sec": 3000,
-      "series_id": "rdk_377acff01b02",
-      "series_name": "天才ピアニストの今夜もグッジョブ ＃５０「服飾デザイナー」にグッジョブ！",
-      "episode_name": "",
-      "genre": [],
-      "area": "JP17"
-    },
-    {
       "id": "RN1-13481451",
       "service": "radiko:RN1",
       "title": "[ラジオNIKKEI第1] ライダーズ",
@@ -9793,7 +9913,7 @@
       "series_name": "ライダーズ",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
       "id": "CRK-13472783",
@@ -9824,6 +9944,36 @@
       "episode_name": "",
       "genre": [],
       "area": "JP27"
+    },
+    {
+      "id": "GBS-13462998",
+      "service": "radiko:GBS",
+      "title": "[ぎふチャン] １スタは!? 夜もZawaZawa (3)",
+      "subtitle": "ジャーマネ",
+      "content": "▽ＵＦＯごとく、ぴゅぴゅ～と簡単！手抜きレシピ\n▽みんなでワッショイ！ 夜ザワかるた\n▽わたしのプレゼン！ジャーマネット・トゥトゥトゥ\n▽笑うジャーマネマン・懺悔コーナー\n番組へのメッセージはこちら\nメッセージフォーム\nzawa-thu@zf-web.com\nXハッシュタグは「#夜ザワ火曜日」\nXアカウントは「@jya__mane」\"",
+      "start_time": "2026-06-16T20:30:00+09:00",
+      "end_time": "2026-06-16T21:00:00+09:00",
+      "duration_sec": 1800,
+      "series_id": "rdk_65fe45fe92bf",
+      "series_name": "１スタは!? 夜もZawaZawa",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
+    },
+    {
+      "id": "FMAICHI-13467957",
+      "service": "radiko:FMAICHI",
+      "title": "[FM AICHI] Work Hard, Play Hard～ぴゃもラジ～",
+      "subtitle": "ENOYU / 岡田純弥",
+      "content": "◆ダンサー、振り付け師として活躍中のENOYU、ぴゃもの代表 岡田“Jayer”純弥がお届けします。◆\n\nXハッシュタグは「#エフエムアイチ」\nXアカウントは「@FMAICHI」",
+      "start_time": "2026-06-16T20:30:00+09:00",
+      "end_time": "2026-06-16T21:00:00+09:00",
+      "duration_sec": 1800,
+      "series_id": "rdk_2b45c9b272c9",
+      "series_name": "Work Hard, Play Hard～ぴゃもラジ～",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
     },
     {
       "id": "INT-13465703",
@@ -9943,7 +10093,7 @@
       "series_name": "ミュージックアプリ",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
       "id": "r1-270-2026061667825",
@@ -9963,21 +10113,6 @@
       "area": "NHK"
     },
     {
-      "id": "HELLOFIVE-13466321",
-      "service": "radiko:HELLOFIVE",
-      "title": "[エフエム石川] ハローファイブBOX",
-      "subtitle": "",
-      "content": "アーティストからのメッセージをお届けします",
-      "start_time": "2026-06-16T20:55:00+09:00",
-      "end_time": "2026-06-16T21:00:00+09:00",
-      "duration_sec": 300,
-      "series_id": "rdk_c95d82f32532",
-      "series_name": "ハローファイブBOX",
-      "episode_name": "",
-      "genre": [],
-      "area": "JP17"
-    },
-    {
       "id": "JOCK-13495602",
       "service": "radiko:JOCK",
       "title": "[NHK AM（名古屋）] 全国気象情報・全国交通情報",
@@ -9990,7 +10125,7 @@
       "series_name": "全国気象情報・全国交通情報",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
       "id": "FMT-13467034",
@@ -10038,19 +10173,34 @@
       "area": "JP27"
     },
     {
-      "id": "MRO-13481250",
-      "service": "radiko:MRO",
-      "title": "[MROラジオ] スタンド・バイ・見取り図",
-      "subtitle": "見取り図(盛山晋太郎 リリー)",
-      "content": "",
+      "id": "CBC-13481103",
+      "service": "radiko:CBC",
+      "title": "[CBCラジオ] CBCドラゴンズナイター goes on ドラ魂ナイト",
+      "subtitle": "戸井康成",
+      "content": "番組へのおたよりはこちら\n\nFAXは 052-263-6800 まで",
       "start_time": "2026-06-16T21:00:00+09:00",
       "end_time": "2026-06-16T22:00:00+09:00",
       "duration_sec": 3600,
-      "series_id": "rdk_6e4322b1f5a0",
-      "series_name": "スタンド・バイ・見取り図",
+      "series_id": "rdk_2e4190a0444d",
+      "series_name": "CBCドラゴンズナイター goes on ドラ魂ナイト",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
+    },
+    {
+      "id": "GBS-13462999",
+      "service": "radiko:GBS",
+      "title": "[ぎふチャン] ＨＯＴ ＳＰＩＣＥ!!",
+      "subtitle": "むらたたむ",
+      "content": "",
+      "start_time": "2026-06-16T21:00:00+09:00",
+      "end_time": "2026-06-16T21:30:00+09:00",
+      "duration_sec": 1800,
+      "series_id": "rdk_a94e2799aefb",
+      "series_name": "ＨＯＴ ＳＰＩＣＥ!!",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
     },
     {
       "id": "RN1-13481453",
@@ -10065,22 +10215,22 @@
       "series_name": "SBI証券 presents 大橋ひろこ×水谷隼のマーケットウイニングショット",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
-      "id": "HELLOFIVE-13466322",
-      "service": "radiko:HELLOFIVE",
-      "title": "[エフエム石川] REQ JAM【火曜】ハナコ",
-      "subtitle": "ハナコ",
-      "content": "出演者も、リスナーも全員が「ＲＥＱ（リクエスト）」権を持ち、思いの丈を言い合い、大声で笑える場所。\n悩みごと、お願いごと、ただ話したいこと、リスナーに協力してほしいこと、スタッフに協力してほしいことなど・・・。その「ＲＥＱ（リクエスト）」に各出演者、リスナー、そしてスタッフもが共鳴し、ラジオ上でＪＡＭっていきます。\n火曜担当は…ハナコ！\nSNSは#リクジャム #リクジャム火曜 でポスト！\n\n番組Webサイト：https://jfn-pods.com/program/300013344\nメッセージフォーム：https://form.jfn.co.jp/reqjam/message_tue\n\nXハッシュタグは「#リクジャム火曜」\nXアカウントは「@REQJAM_Tue」",
+      "id": "FMAICHI-13467958",
+      "service": "radiko:FMAICHI",
+      "title": "[FM AICHI] ounce 28.35g NEW ERA",
+      "subtitle": "Mr.OZ",
+      "content": "◆このエリアで頑張る新時代アーティストをゲストに招き、音楽のルーツ、活動などをインタビュー。番組を通じて音楽で元気を与えるプログラムです。◆\n\nXハッシュタグは「#エフエムアイチ」\nXアカウントは「@FMAICHI」",
       "start_time": "2026-06-16T21:00:00+09:00",
-      "end_time": "2026-06-16T21:55:00+09:00",
-      "duration_sec": 3300,
-      "series_id": "rdk_6e731d29822a",
-      "series_name": "REQ JAM【火曜】ハナコ",
+      "end_time": "2026-06-16T21:30:00+09:00",
+      "duration_sec": 1800,
+      "series_id": "rdk_61e51f6cb276",
+      "series_name": "ounce 28.35g NEW ERA",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
       "id": "JOCK-13495603",
@@ -10095,7 +10245,7 @@
       "series_name": "ニュース",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
       "id": "TBS-13468242",
@@ -10431,7 +10581,7 @@
       "series_name": "プラッと カタツムリのしっぽはどこ？＠千代田区",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
       "id": "r3-270-2026061667892",
@@ -10497,6 +10647,36 @@
         "ドラマ"
       ],
       "area": "NHK"
+    },
+    {
+      "id": "GBS-13463000",
+      "service": "radiko:GBS",
+      "title": "[ぎふチャン] ぬくもり Ｏｎ Ｔｉｍｅ",
+      "subtitle": "今尾ひな子",
+      "content": "",
+      "start_time": "2026-06-16T21:30:00+09:00",
+      "end_time": "2026-06-16T21:40:00+09:00",
+      "duration_sec": 600,
+      "series_id": "rdk_9d56517c2963",
+      "series_name": "ぬくもり Ｏｎ Ｔｉｍｅ",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
+    },
+    {
+      "id": "FMAICHI-13467959",
+      "service": "radiko:FMAICHI",
+      "title": "[FM AICHI] iPASSの「もっと好きになっちゃえよ」",
+      "subtitle": "iPASS",
+      "content": "◆世の中で絶対的に必要な「ID」と「PASSWORD」同様、みんなにとって絶対的な存在になる事を目指し活動する男性4人組名古屋メンズアイドルグループ、iPASS「あいぱす」!\nそんな彼らがステージとは違う素顔でいろんなトークを展開する音楽バラエティ番組。深夜放送ならではのちょっと〇〇〇な話題や、あなたが知らないメンバーの〇〇〇なお話などファンのみならず、深夜にクスッと笑える、明日の活力になる時間をお届けします。ラジオの電波でもみんなに「愛」をパスしちゃいます！！！◆\n\nXハッシュタグは「#エフエムアイチ」\nXアカウントは「@FMAICHI」",
+      "start_time": "2026-06-16T21:30:00+09:00",
+      "end_time": "2026-06-16T21:55:00+09:00",
+      "duration_sec": 1500,
+      "series_id": "rdk_6190de2c200c",
+      "series_name": "iPASSの「もっと好きになっちゃえよ」",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
     },
     {
       "id": "QRR-13525223",
@@ -10649,6 +10829,36 @@
       "area": "JP27"
     },
     {
+      "id": "TOKAIRADIO-13468390",
+      "service": "radiko:TOKAIRADIO",
+      "title": "[TOKAI RADIO] ガッツナイタープラス",
+      "subtitle": "平松伴康",
+      "content": "応援メッセージは コチラ\n\ntwitterアカウントは「@guts1332」\nTOKAI RADIOのハッシュタグは「#TOKAIRADIO」\nTOKAI RADIO公式Xアカウントは「@tokairadio」",
+      "start_time": "2026-06-16T21:40:00+09:00",
+      "end_time": "2026-06-16T21:45:00+09:00",
+      "duration_sec": 300,
+      "series_id": "rdk_9e4900398d33",
+      "series_name": "ガッツナイタープラス",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
+    },
+    {
+      "id": "GBS-13463001",
+      "service": "radiko:GBS",
+      "title": "[ぎふチャン] Ｓｏｎｇ ～リクエスト＆レコメンド～",
+      "subtitle": "ナビゲーター：野山わんこ",
+      "content": "リクエスト曲はこちらから",
+      "start_time": "2026-06-16T21:40:00+09:00",
+      "end_time": "2026-06-16T21:50:00+09:00",
+      "duration_sec": 600,
+      "series_id": "rdk_d2f003e116d2",
+      "series_name": "Ｓｏｎｇ ～リクエスト＆レコメンド～",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
+    },
+    {
       "id": "ABC-13524460",
       "service": "radiko:ABC",
       "title": "[ABCラジオ] ツギハギ～超能力戦士ドリアンのたのしいラジオ～(1)",
@@ -10697,6 +10907,21 @@
       "area": "NHK"
     },
     {
+      "id": "TOKAIRADIO-13468391",
+      "service": "radiko:TOKAIRADIO",
+      "title": "[TOKAI RADIO] SKE48 1+1は2じゃないよ!",
+      "subtitle": "SKE48",
+      "content": "番組へのメッセージは 【コチラ】\n番組ハッシュタグは「#SKE123じゃないよ」\nTOKAI RADIOの共通ハッシュタグは「#TOKAIRADIO」\nTOKAI RADIO公式X（旧twitter）\nアカウントは「@tokairadio」",
+      "start_time": "2026-06-16T21:45:00+09:00",
+      "end_time": "2026-06-16T21:55:00+09:00",
+      "duration_sec": 600,
+      "series_id": "rdk_8e1de045ca9a",
+      "series_name": "SKE48 1+1は2じゃないよ!",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
+    },
+    {
       "id": "JORF-13421766",
       "service": "radiko:JORF",
       "title": "[ラジオ日本] EACH TIME MUSIC",
@@ -10725,6 +10950,21 @@
       "episode_name": "",
       "genre": [],
       "area": "JP27"
+    },
+    {
+      "id": "GBS-13463002",
+      "service": "radiko:GBS",
+      "title": "[ぎふチャン] 平工靖也の今日もお疲れさマッスル！",
+      "subtitle": "平工靖也",
+      "content": "",
+      "start_time": "2026-06-16T21:50:00+09:00",
+      "end_time": "2026-06-16T21:55:00+09:00",
+      "duration_sec": 300,
+      "series_id": "rdk_99fbd5f2ee26",
+      "series_name": "平工靖也の今日もお疲れさマッスル！",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
     },
     {
       "id": "LFR-13473407",
@@ -10772,19 +11012,49 @@
       "area": "NHK"
     },
     {
-      "id": "HELLOFIVE-13466323",
-      "service": "radiko:HELLOFIVE",
-      "title": "[エフエム石川] FM石川ニュース（JFN）",
-      "subtitle": "",
-      "content": "---",
+      "id": "TOKAIRADIO-13468392",
+      "service": "radiko:TOKAIRADIO",
+      "title": "[TOKAI RADIO] 看板娘ホッピー・ミーナのHOPPY HAPPY BAR",
+      "subtitle": "石渡美奈",
+      "content": "番組へのメッセージはhoppy@1242.com",
       "start_time": "2026-06-16T21:55:00+09:00",
       "end_time": "2026-06-16T22:00:00+09:00",
       "duration_sec": 300,
-      "series_id": "rdk_5ed331f4d232",
-      "series_name": "FM石川ニュース（JFN）",
+      "series_id": "rdk_cc2e6219b42c",
+      "series_name": "看板娘ホッピー・ミーナのHOPPY HAPPY BAR",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
+    },
+    {
+      "id": "GBS-13463003",
+      "service": "radiko:GBS",
+      "title": "[ぎふチャン] Ｐｉｃｋ ｕｐ！",
+      "subtitle": "",
+      "content": "",
+      "start_time": "2026-06-16T21:55:00+09:00",
+      "end_time": "2026-06-16T22:00:00+09:00",
+      "duration_sec": 300,
+      "series_id": "rdk_f48ecd7f247d",
+      "series_name": "Ｐｉｃｋ ｕｐ！",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
+    },
+    {
+      "id": "FMAICHI-13467960",
+      "service": "radiko:FMAICHI",
+      "title": "[FM AICHI] 本田剛文の夜のカルチャー・デスク",
+      "subtitle": "本田剛文(BOYS AND MEN)",
+      "content": "◆名古屋を拠点に活躍するエンターテイメント集団、BOYS AND MENの本田剛文が、毎週一つのテーマを決めて映画、書籍、舞台、音楽、古典芸能に至るまで、様々なカルチャーの魅力をリスナーにプレゼンするプログラム。◆\n\nXハッシュタグは「#エフエムアイチ」\nXアカウントは「@FMAICHI」",
+      "start_time": "2026-06-16T21:55:00+09:00",
+      "end_time": "2026-06-16T22:00:00+09:00",
+      "duration_sec": 300,
+      "series_id": "rdk_765a49a2a466",
+      "series_name": "本田剛文の夜のカルチャー・デスク",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
     },
     {
       "id": "JOCK-13495605",
@@ -10799,7 +11069,7 @@
       "series_name": "ニュース・気象情報（東海・北陸）",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
       "id": "FMT-13467037",
@@ -10907,19 +11177,49 @@
       "area": "JP13"
     },
     {
-      "id": "MRO-13481251",
-      "service": "radiko:MRO",
-      "title": "[MROラジオ] オールナイトニッポンMUSIC10",
-      "subtitle": "鈴木杏樹",
-      "content": "",
+      "id": "CBC-13481104",
+      "service": "radiko:CBC",
+      "title": "[CBCラジオ] チュウモリ『＃むかいの喋り方』",
+      "subtitle": "向井慧（パンサー）",
+      "content": "パンサー・向井は、名古屋熱田区出身。\n\n中高生のころ、お笑い芸人のラジオにハマり、ＣＢＣラジオで放送していた、海砂利水魚（現くりぃむしちゅー）、ダイノジ、ブラックマヨネーズやココリコなどの番組を聴いて育ちました。\n\nイケメン芸人ランキングの上位常連、人気芸人となった今でも、移動中は必ずといっていいほどラジオを聴いているヘビリス向井が「ラジオ愛」を持ってアナタに語ります。\n\n番組記事を読む→こちら\n\n番組「X」アカウントはこちら\n\n番組へのおたよりは こちら\n\nFAXは 052-263-6800 まで",
       "start_time": "2026-06-16T22:00:00+09:00",
-      "end_time": "2026-06-17T00:00:00+09:00",
-      "duration_sec": 7200,
-      "series_id": "rdk_28d4bae819b2",
-      "series_name": "オールナイトニッポンMUSIC10",
+      "end_time": "2026-06-16T23:30:00+09:00",
+      "duration_sec": 5400,
+      "series_id": "rdk_6f949b8d3085",
+      "series_name": "チュウモリ『＃むかいの喋り方』",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
+    },
+    {
+      "id": "TOKAIRADIO-13468393",
+      "service": "radiko:TOKAIRADIO",
+      "title": "[TOKAI RADIO] オールナイトニッポンMUSIC 10 (1)",
+      "subtitle": "鈴木杏樹",
+      "content": "火曜日のパーソナリティは鈴木杏樹。\n\nあなたからのリクエストもお待ちしています。その曲の想い出・エピソードを添えてお寄せ下さい。\n\n番組へのメッセージは10@1242.com",
+      "start_time": "2026-06-16T22:00:00+09:00",
+      "end_time": "2026-06-16T23:00:00+09:00",
+      "duration_sec": 3600,
+      "series_id": "rdk_c9970be76ed0",
+      "series_name": "オールナイトニッポンMUSIC 10",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
+    },
+    {
+      "id": "GBS-13463004",
+      "service": "radiko:GBS",
+      "title": "[ぎふチャン] なにわ男子の初心ラジ！",
+      "subtitle": "なにわ男子",
+      "content": "番組へのメッセージはこちら\nnaniwa@1242.com\nXハッシュタグは「#初心ラジ」\"",
+      "start_time": "2026-06-16T22:00:00+09:00",
+      "end_time": "2026-06-16T23:00:00+09:00",
+      "duration_sec": 3600,
+      "series_id": "rdk_71adc43c5c07",
+      "series_name": "なにわ男子の初心ラジ！",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
     },
     {
       "id": "RN1-13481454",
@@ -10934,22 +11234,37 @@
       "series_name": "BIZ&TECH Terminal",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
-      "id": "HELLOFIVE-13466324",
-      "service": "radiko:HELLOFIVE",
-      "title": "[エフエム石川] SCHOOL OF LOCK!",
-      "subtitle": "アンジー校長 / たんぼ教頭",
-      "content": "＼\\君の話を聞かせて。掲示板逆電やります。/／\n\n未来の鍵を握るラジオの中の学校、SCHOOL OF LOCK!\n\n今夜の授業は……『掲示板逆電』\n\n我が校の1番のスタンダード授業、\n学校掲示板に書き込まれた書き込みの中から\n気になる生徒に電話で話を聞いていきます。\n\n学校掲示板はSCHOOL OF LOCK!の教室、\nそこではどんな事を話してもOK。\n今日あった事、楽しかった事、悩んでいる事、\nぜひ番組サイトの掲示板 [ 学校掲示板 ] に書き込んで下さい。\n(そして生放送で電話したいので電話番号の登録も忘れずに)\n\nそして「掲示板逆電」と言ってますが、\nもちろんメール、LINEからもメッセージを募集！\n君が今考えている事、教えてください。\n\n---番組へのメッセージはコチラから!---\n◇学校掲示板に書き込む（掲示板は登録無料のアプリです!）\n◇メールを送る\n◇公式LINEアカウントから送る\n◇FAXを送る：03-3221-1800\n★番組WEBサイトはコチラ!\n\n【今夜の時間割】\n▽22:00～『生放送教室①』＜アンジー校長・たんぼ教頭＞\n▽22:18頃～『INI LOCKS!』＜髙塚大夢＞\n▽22:30頃～『生放送教室②』＜アンジー校長・たんぼ教頭＞\n▽22:55頃～(一部地域を除き)『リズム＆メモリー』\n▽23:00～『描け！未来の青写真 Blue Print supported by MIZUHO』\n▽23:08頃～『Saucy LOCKS!』＜Saucy Dog＞\n▽23:30頃～『生放送教室③』＜アンジー校長・たんぼ教頭＞\nSCHOOL OF LOCK!は毎日入れ替わりでアーティスト講師が登場!\n各曜日の詳しい時間割はSCHOOL OF LOCK!の入学のしおりをチェック!\n\n---今夜の各LOCKS!の授業内容はコチラ!---\n▽22:15頃～『INI LOCKS! 』\n毎月3週目は、INI髙塚大夢先生が生徒の夢や進路などについて\n個人指導を担う“チュータールーム No.3”が開室!\n\n今夜は『音楽自由研究』の授業！\n紹介する楽曲は、JI BLUEの「景色」\n授業の感想や楽曲の感想、さらにこの授業への参加も待ってますʢ••ʡ~♪\n★INI LOCKS!掲示板へ\n★髙塚大夢先生へのメールはコチラ!\n★INI LOCKS!の放送後記は▶︎コチラから!\n\n▽22:55頃～(一部地域を除き)『リズム＆メモリー』\n日々の勉強で！受験勉強で！\nなかなか覚えられない “暗記もの” をリズム１つでメモリーしていく新授業。\nリズムに乗せて、どんどん暗記していこう！\n◇特設サイト\n\n▽23:00〜23:06 「描け！未来の青写真 Blue Print supported by MIZUHO」\n君の青さは、未来の可能性を示す挑戦者の証。\n君が描く青写真は、未来の君を映し出す。\n\n君が描いている青き \"夢\" に、\nアンジー校長・たんぼ教頭がエールを送っていきます！\n紹介した生徒には、オリジナルデザインの\nクオカードペイ3,000円分をプレゼント！\n\nメッセージは特設サイトのメールフォームか、\nSNSのXで受け付け中！\n\nXでポストする時はSCHOOL OF LOCK!の公式Xをフォローして、\n#スクールオブロック / #ブループリント をつけて\nエピソードとともにポストしてください。\nさらに君のエピソードが、みずほフィナンシャルグループの\n公式TiktokとInstagramで展開中のショートドラマ\n「青くていいんだ。」内でショートドラマ化されるかもしれません！\n\n▽23:08頃～『Saucy LOCKS!』＜Saucy Dog＞\n毎週火曜日は、みんなの普通を受け止める！\n普通の講師・Saucy Dog先生による「Saucy LOCKS!」\n\n「普通」ということは、生徒のみんなの「日常」であり、生徒のみんなの「全て」。\n日常の楽しかったことやうれしかったこと、しんどかったことなど、何でもOKです！\nSaucy LOCKS!掲示板への書き込み、またはメールで送ってください！\n\n普通のど真ん中を決める「普通of普通」\n生徒の「しんどいな～」と思っていることを聞く「普通にしんどい」\nSaucy Dog先生への質問や話したいことなどは「普通に聴きたい」まで。\n★Saucy LOCKS!掲示板へ\n★Saucy Dog先生へのメールはコチラ!\n★Saucy LOCKS!の放送後記は▶︎コチラから!\n\n◎番組公式SNSもチェックしてね!\n◇Twitter\n◇LINE\n◇YouTube\n◇TikTok\n◇Instagram\n\n▽22:15〜 【 INI LOCKS! 】\n3週目にだけ開室する、生徒の夢や進路などについて個人指導を担う“チュータールーム No.5”\nSCHOOL OF LOCK!の元生徒でもある、INIの髙塚大夢先生が担当！\n「夢」や「進路」などの悩み、大夢先生に話したいこと質問などなんでも、\n［INI LOCKS!掲示板］もしくは［INI LOCKS!宛のメール］から送ってください。待っています！\n\n▽22:55〜 【 リズム＆メモリー 】\n\"受験の極意 暗記の奥義 ビートで攻略 受験をチート リズムでメモリー 一歩一歩 みんなでつかもうビクトリー!!\"\n\nリズムに乗って、毎日暗記していこう！\n「君が暗記したいこと」や「君のオリジナルの暗記法」を番組特設サイトで募集中！\n\n番組Webサイト：https://www.tfm.co.jp/lock\nメッセージフォーム：https://www.tfm.co.jp/lock/mail/\nFAX：03-3221-1800\n\nXハッシュタグは「#スクールオブロック」\nXアカウントは「@sol_info」",
+      "id": "ZIP-FM-13481160",
+      "service": "radiko:ZIP-FM",
+      "title": "[ZIP-FM] SUPER CAST",
+      "subtitle": "町田こーすけ",
+      "content": "22:32 TODAY'S SUPER CAST from NITech 《Mon:中電シーティーアイ》",
       "start_time": "2026-06-16T22:00:00+09:00",
-      "end_time": "2026-06-16T23:00:00+09:00",
-      "duration_sec": 3600,
-      "series_id": "rdk_bb8bf5a29d2f",
-      "series_name": "SCHOOL OF LOCK!",
+      "end_time": "2026-06-17T00:00:00+09:00",
+      "duration_sec": 7200,
+      "series_id": "rdk_b98308575fa1",
+      "series_name": "SUPER CAST",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
+    },
+    {
+      "id": "FMAICHI-13467961",
+      "service": "radiko:FMAICHI",
+      "title": "[FM AICHI] SCHOOL OF LOCK！",
+      "subtitle": "アンジー校長 / たんぼ教頭",
+      "content": "◆未来の鍵を握る学校「SCHOOL OF LOCK!」◆\n\nXハッシュタグは「#スクールオブロック」\nXアカウントは「@sol_info」",
+      "start_time": "2026-06-16T22:00:00+09:00",
+      "end_time": "2026-06-16T23:55:00+09:00",
+      "duration_sec": 6900,
+      "series_id": "rdk_22e0f2af1506",
+      "series_name": "SCHOOL OF LOCK！",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
     },
     {
       "id": "JOCK-13495606",
@@ -10964,7 +11279,7 @@
       "series_name": "ＮＨＫジャーナル",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
       "id": "TBS-13468243",
@@ -11345,7 +11660,7 @@
       "series_name": "ドクターサロン",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
       "id": "QRR-13525225",
@@ -11405,7 +11720,7 @@
       "series_name": "医学講座",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
       "id": "BAYFM78-13467011",
@@ -11450,7 +11765,7 @@
       "series_name": "ニュース・気象情報（東海・北陸）",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
       "id": "TBS-13468244",
@@ -11483,6 +11798,36 @@
       "area": "JP13"
     },
     {
+      "id": "TOKAIRADIO-13468393",
+      "service": "radiko:TOKAIRADIO",
+      "title": "[TOKAI RADIO] オールナイトニッポンMUSIC 10 (2)",
+      "subtitle": "鈴木杏樹",
+      "content": "火曜日のパーソナリティは鈴木杏樹。\n\nあなたからのリクエストもお待ちしています。その曲の想い出・エピソードを添えてお寄せ下さい。\n\n番組へのメッセージは10@1242.com",
+      "start_time": "2026-06-16T23:00:00+09:00",
+      "end_time": "2026-06-17T00:00:00+09:00",
+      "duration_sec": 3600,
+      "series_id": "rdk_c9970be76ed0",
+      "series_name": "オールナイトニッポンMUSIC 10",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
+    },
+    {
+      "id": "GBS-13463005",
+      "service": "radiko:GBS",
+      "title": "[ぎふチャン] 松村邦洋のＯＨ－！邦自慢",
+      "subtitle": "松村邦洋",
+      "content": "",
+      "start_time": "2026-06-16T23:00:00+09:00",
+      "end_time": "2026-06-16T23:30:00+09:00",
+      "duration_sec": 1800,
+      "series_id": "rdk_9ab079529d8c",
+      "series_name": "松村邦洋のＯＨ－！邦自慢",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
+    },
+    {
       "id": "RN1-13481457",
       "service": "radiko:RN1",
       "title": "[ラジオNIKKEI第1] 番組休止中",
@@ -11495,22 +11840,7 @@
       "series_name": "番組休止中",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
-    },
-    {
-      "id": "HELLOFIVE-13466325",
-      "service": "radiko:HELLOFIVE",
-      "title": "[エフエム石川] SCHOOL OF LOCK!",
-      "subtitle": "アンジー校長 / たんぼ教頭",
-      "content": "＼\\君の話を聞かせて。掲示板逆電やります。/／\n\n未来の鍵を握るラジオの中の学校、SCHOOL OF LOCK!\n\n今夜の授業は……『掲示板逆電』\n\n我が校の1番のスタンダード授業、\n学校掲示板に書き込まれた書き込みの中から\n気になる生徒に電話で話を聞いていきます。\n\n学校掲示板はSCHOOL OF LOCK!の教室、\nそこではどんな事を話してもOK。\n今日あった事、楽しかった事、悩んでいる事、\nぜひ番組サイトの掲示板 [ 学校掲示板 ] に書き込んで下さい。\n(そして生放送で電話したいので電話番号の登録も忘れずに)\n\nそして「掲示板逆電」と言ってますが、\nもちろんメール、LINEからもメッセージを募集！\n君が今考えている事、教えてください。\n\n---番組へのメッセージはコチラから!---\n◇学校掲示板に書き込む（掲示板は登録無料のアプリです!）\n◇メールを送る\n◇公式LINEアカウントから送る\n◇FAXを送る：03-3221-1800\n★番組WEBサイトはコチラ!\n\n【今夜の時間割】\n▽22:00～『生放送教室①』＜アンジー校長・たんぼ教頭＞\n▽22:18頃～『INI LOCKS!』＜髙塚大夢＞\n▽22:30頃～『生放送教室②』＜アンジー校長・たんぼ教頭＞\n▽22:55頃～(一部地域を除き)『リズム＆メモリー』\n▽23:00～『描け！未来の青写真 Blue Print supported by MIZUHO』\n▽23:08頃～『Saucy LOCKS!』＜Saucy Dog＞\n▽23:30頃～『生放送教室③』＜アンジー校長・たんぼ教頭＞\nSCHOOL OF LOCK!は毎日入れ替わりでアーティスト講師が登場!\n各曜日の詳しい時間割はSCHOOL OF LOCK!の入学のしおりをチェック!\n\n---今夜の各LOCKS!の授業内容はコチラ!---\n▽22:15頃～『INI LOCKS! 』\n毎月3週目は、INI髙塚大夢先生が生徒の夢や進路などについて\n個人指導を担う“チュータールーム No.3”が開室!\n\n今夜は『音楽自由研究』の授業！\n紹介する楽曲は、JI BLUEの「景色」\n授業の感想や楽曲の感想、さらにこの授業への参加も待ってますʢ••ʡ~♪\n★INI LOCKS!掲示板へ\n★髙塚大夢先生へのメールはコチラ!\n★INI LOCKS!の放送後記は▶︎コチラから!\n\n▽22:55頃～(一部地域を除き)『リズム＆メモリー』\n日々の勉強で！受験勉強で！\nなかなか覚えられない “暗記もの” をリズム１つでメモリーしていく新授業。\nリズムに乗せて、どんどん暗記していこう！\n◇特設サイト\n\n▽23:00〜23:06 「描け！未来の青写真 Blue Print supported by MIZUHO」\n君の青さは、未来の可能性を示す挑戦者の証。\n君が描く青写真は、未来の君を映し出す。\n\n君が描いている青き \"夢\" に、\nアンジー校長・たんぼ教頭がエールを送っていきます！\n紹介した生徒には、オリジナルデザインの\nクオカードペイ3,000円分をプレゼント！\n\nメッセージは特設サイトのメールフォームか、\nSNSのXで受け付け中！\n\nXでポストする時はSCHOOL OF LOCK!の公式Xをフォローして、\n#スクールオブロック / #ブループリント をつけて\nエピソードとともにポストしてください。\nさらに君のエピソードが、みずほフィナンシャルグループの\n公式TiktokとInstagramで展開中のショートドラマ\n「青くていいんだ。」内でショートドラマ化されるかもしれません！\n\n▽23:08頃～『Saucy LOCKS!』＜Saucy Dog＞\n毎週火曜日は、みんなの普通を受け止める！\n普通の講師・Saucy Dog先生による「Saucy LOCKS!」\n\n「普通」ということは、生徒のみんなの「日常」であり、生徒のみんなの「全て」。\n日常の楽しかったことやうれしかったこと、しんどかったことなど、何でもOKです！\nSaucy LOCKS!掲示板への書き込み、またはメールで送ってください！\n\n普通のど真ん中を決める「普通of普通」\n生徒の「しんどいな～」と思っていることを聞く「普通にしんどい」\nSaucy Dog先生への質問や話したいことなどは「普通に聴きたい」まで。\n★Saucy LOCKS!掲示板へ\n★Saucy Dog先生へのメールはコチラ!\n★Saucy LOCKS!の放送後記は▶︎コチラから!\n\n◎番組公式SNSもチェックしてね!\n◇Twitter\n◇LINE\n◇YouTube\n◇TikTok\n◇Instagram\n\n▽23:00〜 【 描け！未来の青写真 Blue Print supported by MIZUHO 】\n君の青さは、未来の可能性を示す挑戦者の証。君が描く青写真は、未来の君を映し出す。\n\nこの授業では、生徒の君が描いている青き「夢」に大きなエールを送って行きます。\n\n番組でメッセージを紹介された生徒にはオリジナルQUOカードPay 3,000円分をプレゼント！\n\n▽23:10〜 【 Saucy LOCKS! 】\n毎週火曜日は、みんなの普通を受け止める！\n普通の講師・Saucy Dog先生による「Saucy LOCKS!」\n\n番組Webサイト：https://www.tfm.co.jp/lock\nメッセージフォーム：https://www.tfm.co.jp/lock/mail/\nFAX：03-3221-1800\n\nXハッシュタグは「#スクールオブロック」\nXアカウントは「@sol_info」",
-      "start_time": "2026-06-16T23:00:00+09:00",
-      "end_time": "2026-06-16T23:55:00+09:00",
-      "duration_sec": 3300,
-      "series_id": "rdk_bb8bf5a29d2f",
-      "series_name": "SCHOOL OF LOCK!",
-      "episode_name": "",
-      "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
       "id": "JOCK-13495608",
@@ -11525,7 +11855,7 @@
       "series_name": "ニュース",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
       "id": "TBS-13468245",
@@ -11831,7 +12161,7 @@
       "series_name": "ラジオ深夜便▽夜ばなし歌声喫茶",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
       "id": "r3-270-2026061667896",
@@ -11851,6 +12181,36 @@
         "趣味/教育"
       ],
       "area": "NHK"
+    },
+    {
+      "id": "CBC-13481105",
+      "service": "radiko:CBC",
+      "title": "[CBCラジオ] キュウ空想の間",
+      "subtitle": "キュウ",
+      "content": "愛知県出身のお笑いコンビ“キュウ”が、地元CBCラジオでお送りする番組。\n\nここで繰り広げられる話は、現実なのか、はたまた空想なのか――。\n\n2人の独特の間で創り出されるキュウの世界観を、あなたの耳で体感してください。\n\n番組へのおたよりはこちら\n\nFAXは 052-263-6800 まで",
+      "start_time": "2026-06-16T23:30:00+09:00",
+      "end_time": "2026-06-17T00:00:00+09:00",
+      "duration_sec": 1800,
+      "series_id": "rdk_f59636a3d4a0",
+      "series_name": "キュウ空想の間",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
+    },
+    {
+      "id": "GBS-13463006",
+      "service": "radiko:GBS",
+      "title": "[ぎふチャン] 松原健之と長谷川萌美の音茶メロらじお",
+      "subtitle": "松原健之 / 長谷川萌美",
+      "content": "",
+      "start_time": "2026-06-16T23:30:00+09:00",
+      "end_time": "2026-06-17T00:00:00+09:00",
+      "duration_sec": 1800,
+      "series_id": "rdk_8b9b6b64f4f4",
+      "series_name": "松原健之と長谷川萌美の音茶メロらじお",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
     },
     {
       "id": "TBS-13468246",
@@ -12026,19 +12386,19 @@
       "area": "NHK"
     },
     {
-      "id": "HELLOFIVE-13466326",
-      "service": "radiko:HELLOFIVE",
-      "title": "[エフエム石川] HELLO FIVE MUSIC NEXUS",
+      "id": "FMAICHI-13467962",
+      "service": "radiko:FMAICHI",
+      "title": "[FM AICHI] FM AICHI HOT TRACKS",
       "subtitle": "",
-      "content": "今月のおすすめ楽曲をお届けします\n\n番組Webサイト：https://hellofive.jp/pickup/",
+      "content": "◆FM AICHIのオススメの楽曲をご紹介！◆\n\nXハッシュタグは「#エフエムアイチ」\nXアカウントは「@FMAICHI」",
       "start_time": "2026-06-16T23:55:00+09:00",
       "end_time": "2026-06-17T00:00:00+09:00",
       "duration_sec": 300,
-      "series_id": "rdk_a161014360ff",
-      "series_name": "HELLO FIVE MUSIC NEXUS",
+      "series_id": "rdk_d5c0d3b6fbbf",
+      "series_name": "FM AICHI HOT TRACKS",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
       "id": "FMT-13467040",
@@ -12086,34 +12446,79 @@
       "area": "JP27"
     },
     {
-      "id": "MRO-13481252",
-      "service": "radiko:MRO",
-      "title": "[MROラジオ] レコメン!",
-      "subtitle": "佐藤勝利 原嘉孝(timelesz) Kis-My-Ft2",
+      "id": "CBC-13481106",
+      "service": "radiko:CBC",
+      "title": "[CBCラジオ] アルコ＆ピース D.C.GARAGE",
+      "subtitle": "アルコ＆ピース",
+      "content": "人気お笑いコンビ アルコ＆ピースのトーク番組！",
+      "start_time": "2026-06-17T00:00:00+09:00",
+      "end_time": "2026-06-17T01:00:00+09:00",
+      "duration_sec": 3600,
+      "series_id": "rdk_3d279b1925b0",
+      "series_name": "アルコ＆ピース D.C.GARAGE",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
+    },
+    {
+      "id": "TOKAIRADIO-13468394",
+      "service": "radiko:TOKAIRADIO",
+      "title": "[TOKAI RADIO] レコメン!",
+      "subtitle": "佐藤勝利（timelesz) / 原嘉孝(timelesz) ※週替わり",
+      "content": "番組へのメッセージはreco@joqr.net\n公式X（旧twitter）アカウントは、「@reco_oshirase」\n\n◆Kis-My-Ft2 キスマイRadio\nメッセージはkis@joqr.net",
+      "start_time": "2026-06-17T00:00:00+09:00",
+      "end_time": "2026-06-17T01:00:00+09:00",
+      "duration_sec": 3600,
+      "series_id": "rdk_1d7e3f879399",
+      "series_name": "レコメン!",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
+    },
+    {
+      "id": "GBS-13463007",
+      "service": "radiko:GBS",
+      "title": "[ぎふチャン] 放送休止中",
+      "subtitle": "",
+      "content": "",
+      "start_time": "2026-06-17T00:00:00+09:00",
+      "end_time": "2026-06-17T05:00:00+09:00",
+      "duration_sec": 18000,
+      "series_id": "rdk_913f86634ed0",
+      "series_name": "放送休止中",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
+    },
+    {
+      "id": "ZIP-FM-13481161",
+      "service": "radiko:ZIP-FM",
+      "title": "[ZIP-FM] NONSTOP CALLING",
+      "subtitle": "小林拓一郎",
       "content": "",
       "start_time": "2026-06-17T00:00:00+09:00",
       "end_time": "2026-06-17T01:00:00+09:00",
       "duration_sec": 3600,
-      "series_id": "rdk_1679381c3b0d",
-      "series_name": "レコメン!",
+      "series_id": "rdk_6fa48a49bb1d",
+      "series_name": "NONSTOP CALLING",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
-      "id": "HELLOFIVE-13466327",
-      "service": "radiko:HELLOFIVE",
-      "title": "[エフエム石川] JET STREAM",
+      "id": "FMAICHI-13467963",
+      "service": "radiko:FMAICHI",
+      "title": "[FM AICHI] JET STREAM",
       "subtitle": "福山雅治",
-      "content": "JET STREAM・・・作家が描く世界への旅。\n\n今週は、自然写真家・高砂淳二による書下ろしのエッセイを５日間にわたってお送りします。\n\n番組Webサイト：https://www.tfm.co.jp/jetstream/\nメッセージフォーム：https://www.tfm.co.jp/f/jetstream/message",
+      "content": "◆「旅への誘い」をテーマに、心地良い音楽とナレーションで綴る番組。◆\n\nXハッシュタグは「#エフエムアイチ」\nXアカウントは「@FMAICHI」",
       "start_time": "2026-06-17T00:00:00+09:00",
       "end_time": "2026-06-17T00:55:00+09:00",
       "duration_sec": 3300,
-      "series_id": "rdk_ce6931f5349a",
+      "series_id": "rdk_26640f03df56",
       "series_name": "JET STREAM",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
       "id": "JOCK-13495610",
@@ -12128,7 +12533,7 @@
       "series_name": "ニュース",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
       "id": "JOAK-FM-13495234",
@@ -12143,7 +12548,7 @@
       "series_name": "基礎英語 レベル１",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
       "id": "TBS-13468247",
@@ -12513,7 +12918,7 @@
       "series_name": "ラジオ深夜便▽夜ばなし歌声喫茶",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
       "id": "r3-270-2026061767996",
@@ -12680,19 +13085,19 @@
       "area": "NHK"
     },
     {
-      "id": "HELLOFIVE-13466328",
-      "service": "radiko:HELLOFIVE",
-      "title": "[エフエム石川] FM石川ニュース（JFN）",
+      "id": "FMAICHI-13467964",
+      "service": "radiko:FMAICHI",
+      "title": "[FM AICHI] JFN NEWS",
       "subtitle": "",
-      "content": "---",
+      "content": "Xハッシュタグは「#エフエムアイチ」\nXアカウントは「@FMAICHI」",
       "start_time": "2026-06-17T00:55:00+09:00",
       "end_time": "2026-06-17T01:00:00+09:00",
       "duration_sec": 300,
-      "series_id": "rdk_5ed331f4d232",
-      "series_name": "FM石川ニュース（JFN）",
+      "series_id": "rdk_e323af1b55c9",
+      "series_name": "JFN NEWS",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
       "id": "FMT-13467042",
@@ -12755,34 +13160,64 @@
       "area": "JP13"
     },
     {
-      "id": "MRO-13481253",
-      "service": "radiko:MRO",
-      "title": "[MROラジオ] サカナクション山口一郎のオールナイトニッポン",
-      "subtitle": "山口一郎(サカナクション)",
-      "content": "",
+      "id": "CBC-13481107",
+      "service": "radiko:CBC",
+      "title": "[CBCラジオ] オールナイトニッポン",
+      "subtitle": "山口一郎",
+      "content": "今夜はサカナクション山口一郎のオールナイトニッポン！",
       "start_time": "2026-06-17T01:00:00+09:00",
       "end_time": "2026-06-17T03:00:00+09:00",
       "duration_sec": 7200,
-      "series_id": "rdk_5c9299a7d8f9",
-      "series_name": "サカナクション山口一郎のオールナイトニッポン",
+      "series_id": "rdk_3a6c80acf1cd",
+      "series_name": "オールナイトニッポン",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
-      "id": "HELLOFIVE-13466329",
-      "service": "radiko:HELLOFIVE",
-      "title": "[エフエム石川] TOKYO SPEAKEASY",
-      "subtitle": "ひょっこりはん / 松井玲奈",
-      "content": "《ひょっこりはんさんと、松井玲奈さんがご来店 ！》\n\n禁酒法の時代に、こっそりひそかに経営していたBAR『SPEAKEASY』。\n東京の街にも、そんなひそかなバーが、まだあった。\nそれは、とある小さな本屋の奥の部屋に存在する。\n名前は『TOKYO SPEAKEASY』。\n\nここには、名だたる俳優・女優・アーティスト・政治家、\nまた起業家・メディアプロデューサーなどのスゴい方たちが訪れ、\n「ここでしか語れない」様々な話を繰り広げている。\nどうやら、あの秋元康が、このバーに彼らを招待しているらしい。\n\n果たしてどんなトークが繰り広げられるのか…\n\n番組Webサイト：https://www.tfm.co.jp/speakeasy/\nメッセージフォーム：https://www.tfm.co.jp/f/speakeasy/message\n\nXハッシュタグは「#speakeasy」\nXアカウントは「@TokyoSpeakeasy」",
+      "id": "TOKAIRADIO-13468395",
+      "service": "radiko:TOKAIRADIO",
+      "title": "[TOKAI RADIO] TOKAI RADIO MUSIC PROGRAM SESSIONS 929",
+      "subtitle": "MHRJ",
+      "content": "番組メッセージは コチラ\n\n公式X（旧twitter）アカウントは「@sessions929」\nTOKAI RADIOのハッシュタグは「#TOKAIRADIO」\nTOKAI RADIO公式X（旧twitter）\nアカウントは「@tokairadio」",
       "start_time": "2026-06-17T01:00:00+09:00",
       "end_time": "2026-06-17T02:00:00+09:00",
       "duration_sec": 3600,
-      "series_id": "rdk_0533775325dd",
+      "series_id": "rdk_3288714f3664",
+      "series_name": "TOKAI RADIO MUSIC PROGRAM SESSIONS 929",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
+    },
+    {
+      "id": "ZIP-FM-13481162",
+      "service": "radiko:ZIP-FM",
+      "title": "[ZIP-FM] Midnight Promenade",
+      "subtitle": "May Forth",
+      "content": "●オフィシャルウェブサイト\n\nhttps://forthmay.ryzm.jp/\n\n●X\n\nhttps://x.com/forthmay\n\n●Instagram\n\nhttps://www.instagram.com/mayforth.official\n\n● YouTube\n\nhttps://www.youtube.com/@mayforth4291",
+      "start_time": "2026-06-17T01:00:00+09:00",
+      "end_time": "2026-06-17T01:30:00+09:00",
+      "duration_sec": 1800,
+      "series_id": "rdk_ef830d9dc358",
+      "series_name": "Midnight Promenade",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
+    },
+    {
+      "id": "FMAICHI-13467965",
+      "service": "radiko:FMAICHI",
+      "title": "[FM AICHI] TOKYO SPEAKEASY",
+      "subtitle": "",
+      "content": "◆ここには、とんでもない俳優・女優・アーティスト・政治家、また起業家・メディアプロデューサーなどのスゴい方たちが訪れ、「ここでしか語れない」様々な話を繰り広げている。どうやら、日本が世界に誇るプロデューサーが、このバーに彼らを招待しているらしい。今日のお客は誰なのか？そしてどんな話をするのか…？◆\n\nXハッシュタグは「#エフエムアイチ」\nXアカウントは「@FMAICHI」",
+      "start_time": "2026-06-17T01:00:00+09:00",
+      "end_time": "2026-06-17T02:00:00+09:00",
+      "duration_sec": 3600,
+      "series_id": "rdk_fa930be40deb",
       "series_name": "TOKYO SPEAKEASY",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
       "id": "JOCK-13495612",
@@ -12797,7 +13232,7 @@
       "series_name": "ニュース",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
       "id": "JOAK-FM-13495239",
@@ -12812,7 +13247,7 @@
       "series_name": "まいにちハングル講座 反復階段～パンボクケダン～",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
       "id": "TBS-13468248",
@@ -13212,7 +13647,7 @@
       "series_name": "ラジオ深夜便▽深夜便アーカイブス",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
       "id": "r3-270-2026061768002",
@@ -13251,6 +13686,21 @@
         "趣味/教育"
       ],
       "area": "NHK"
+    },
+    {
+      "id": "ZIP-FM-13481163",
+      "service": "radiko:ZIP-FM",
+      "title": "[ZIP-FM] ON THE ROCK",
+      "subtitle": "岡本隆根",
+      "content": "岡本隆根 公式サイト",
+      "start_time": "2026-06-17T01:30:00+09:00",
+      "end_time": "2026-06-17T02:00:00+09:00",
+      "duration_sec": 1800,
+      "series_id": "rdk_9ec40ab9c887",
+      "series_name": "ON THE ROCK",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
     },
     {
       "id": "QRR-13473501",
@@ -13347,19 +13797,49 @@
       "area": "NHK"
     },
     {
-      "id": "HELLOFIVE-13466330",
-      "service": "radiko:HELLOFIVE",
-      "title": "[エフエム石川] P-CREW・おついちの乙な夜いち",
-      "subtitle": "おついち",
-      "content": "YouTubeチャンネル登録者数90万人を超える、人気ゲーム実況者・おついちによる初の冠ラジオ番組。ゲームの話題はもちろん、日々の活動の裏側、これまであまり語られてこなかったプライベートトークも!? 時にはゲームクリエイターをはじめとする多彩なゲストを迎えじっくりと語り合います。\n\n番組Webサイト：https://audee-membership.jp/otsuichich\nメッセージフォーム：https://www.tfm.co.jp/f/otsu_yoru/message\n\nXハッシュタグは「#おつよる」\nXアカウントは「@otsu_yoru」",
+      "id": "TOKAIRADIO-13468396",
+      "service": "radiko:TOKAIRADIO",
+      "title": "[TOKAI RADIO] ONE ROOF RADIO",
+      "subtitle": "JUNK",
+      "content": "TOKAI RADIOの共通twitterハッシュタグは「#TOKAIRADIO」\nTOKAI RADIO公式twitterアカウントは「@tokairadio」",
       "start_time": "2026-06-17T02:00:00+09:00",
       "end_time": "2026-06-17T02:30:00+09:00",
       "duration_sec": 1800,
-      "series_id": "rdk_040b21d22d65",
-      "series_name": "P-CREW・おついちの乙な夜いち",
+      "series_id": "rdk_0a63e2cee07c",
+      "series_name": "ONE ROOF RADIO",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
+    },
+    {
+      "id": "ZIP-FM-13481164",
+      "service": "radiko:ZIP-FM",
+      "title": "[ZIP-FM] MUSIC FLOW",
+      "subtitle": "",
+      "content": "ノンDJ&ピュア・ミュージック・プログラム【MUSIC FLOW】\n\n♪オンエア曲目は、こちらでチェック♪\n\n＊過去1週間前まで表示\n\n番組Xでリクエスト受付中！\n\nときどき、中の人がつぶやくかも。",
+      "start_time": "2026-06-17T02:00:00+09:00",
+      "end_time": "2026-06-17T05:00:00+09:00",
+      "duration_sec": 10800,
+      "series_id": "rdk_01792b3c8f94",
+      "series_name": "MUSIC FLOW",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
+    },
+    {
+      "id": "FMAICHI-13467966",
+      "service": "radiko:FMAICHI",
+      "title": "[FM AICHI] 甘党男子 石塚のウマい話",
+      "subtitle": "石塚利彦（甘党男子)",
+      "content": "◆スイーツをコンセプトに活動する6人組アイドルユニット甘党男子のメンバー石塚利彦をメインパーソナリティに、ゲストを招いたり、芸人「ひよしなかよし」としても活動している石塚利彦ならではのトークをお届けするプログラム。\n◆\n\nXハッシュタグは「#エフエムアイチ」\nXアカウントは「@FMAICHI」",
+      "start_time": "2026-06-17T02:00:00+09:00",
+      "end_time": "2026-06-17T02:30:00+09:00",
+      "duration_sec": 1800,
+      "series_id": "rdk_b61d141c2e13",
+      "series_name": "甘党男子 石塚のウマい話",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
     },
     {
       "id": "JOCK-13495614",
@@ -13374,7 +13854,7 @@
       "series_name": "ニュース",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
       "id": "JOAK-FM-13495243",
@@ -13389,7 +13869,7 @@
       "series_name": "まいにちフランス語 初級編 つながる！自己表現の会話術",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
       "id": "QRR-13473502",
@@ -13654,7 +14134,7 @@
       "series_name": "ラジオ深夜便▽ロマンチックコンサート",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
       "id": "r3-270-2026061768007",
@@ -13695,19 +14175,34 @@
       "area": "NHK"
     },
     {
-      "id": "HELLOFIVE-13466331",
-      "service": "radiko:HELLOFIVE",
-      "title": "[エフエム石川] P-CREW・18TRIP Talk Studio",
-      "subtitle": "18TRIP",
-      "content": "パーソナリティ：北片來人役 石谷春貴\n\n今回も夕班キャストがパーソナリティを担当！\n番組後半ではメンバーシップ特典も発表！\n\n番組Webサイト：https://audee-membership.jp/18trip/\nメッセージフォーム：https://www.tfm.co.jp/f/18trip/message\n\nXハッシュタグは「#エイトーク」",
+      "id": "TOKAIRADIO-13468397",
+      "service": "radiko:TOKAIRADIO",
+      "title": "[TOKAI RADIO] ハロー！ダイバーシティ",
+      "subtitle": "本間幸子",
+      "content": "TOKAI RADIOの共通twitterハッシュタグは「#TOKAIRADIO」\nTOKAI RADIO公式twitterアカウントは「@tokairadio」",
       "start_time": "2026-06-17T02:30:00+09:00",
       "end_time": "2026-06-17T03:00:00+09:00",
       "duration_sec": 1800,
-      "series_id": "rdk_d55b47f7a7b2",
-      "series_name": "P-CREW・18TRIP Talk Studio",
+      "series_id": "rdk_8a263ece9f91",
+      "series_name": "ハロー！ダイバーシティ",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
+    },
+    {
+      "id": "FMAICHI-13467967",
+      "service": "radiko:FMAICHI",
+      "title": "[FM AICHI] Multiply Radio",
+      "subtitle": "鈴木明",
+      "content": "◆“大人が真に楽しめる”をコンセプトにしたゆる～くノリで進行する番組。豪華ゲストが参加する書籍『MULTIPLY』とタイアップし、毎月ゲストMCとして女優さんやグラビアアイドルも登場!Facebookには、更に裏話も更新中。◆\n\nメッセージ・リクエストはこちら\n\nXハッシュタグは「#エフエムアイチ」\nXアカウントは「@FMAICHI」\nMultiply Radiofacebook",
+      "start_time": "2026-06-17T02:30:00+09:00",
+      "end_time": "2026-06-17T03:00:00+09:00",
+      "duration_sec": 1800,
+      "series_id": "rdk_d31f787d02c2",
+      "series_name": "Multiply Radio",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
     },
     {
       "id": "QRR-13473503",
@@ -13832,34 +14327,49 @@
       "area": "NHK"
     },
     {
-      "id": "MRO-13481254",
-      "service": "radiko:MRO",
-      "title": "[MROラジオ] 松田好花のオールナイトニッポン0(ZERO)",
+      "id": "CBC-13481108",
+      "service": "radiko:CBC",
+      "title": "[CBCラジオ] CITY CHILL CLUB",
+      "subtitle": "",
+      "content": "アーティストやクリエイターがひと月ごとに曜日担当し、「CHILL」（癒し・すばらしい・かっこいい）をコンセプトに2時間のミュージックプレイリストを作成しOAするプログラムです。",
+      "start_time": "2026-06-17T03:00:00+09:00",
+      "end_time": "2026-06-17T05:00:00+09:00",
+      "duration_sec": 7200,
+      "series_id": "rdk_856b12ee1dd5",
+      "series_name": "CITY CHILL CLUB",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
+    },
+    {
+      "id": "TOKAIRADIO-13468398",
+      "service": "radiko:TOKAIRADIO",
+      "title": "[TOKAI RADIO] オールナイトニッポン0（ZERO）",
       "subtitle": "松田好花",
-      "content": "",
+      "content": "番組公式X（旧twitter）アカウントは「@konoka_annX」\n番組ハッシュタグは「#松田好花ANN0」\n番組へのメッセージはkonoka@allnightnippon.com",
       "start_time": "2026-06-17T03:00:00+09:00",
       "end_time": "2026-06-17T04:30:00+09:00",
       "duration_sec": 5400,
-      "series_id": "rdk_53d23cab261b",
-      "series_name": "松田好花のオールナイトニッポン0(ZERO)",
+      "series_id": "rdk_40e8031b4d27",
+      "series_name": "オールナイトニッポン0（ZERO）",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
-      "id": "HELLOFIVE-13466332",
-      "service": "radiko:HELLOFIVE",
-      "title": "[エフエム石川] THE GREAT TRACKSTAR",
-      "subtitle": "蒲田健",
-      "content": "名曲＝スター（STAR）な楽曲たち（TRACKS）や音楽界のスター（STAR）たちの楽曲（TRACKS）をピックアップして、最高のストリームをお届けするミュージックプログラム。\n\nレジェンド・アーティストや名盤をはじめ、\n番組中盤では様々なテーマで日替わりで音楽特集をお届けします。\n夜明け前のひととき、名曲が生まれた背景、歌詞、つながりなども\nひもときながら、心地よい選曲でお楽しみください。\n\n◆テーマ：Movie Hits!\n\n番組Webサイト：https://jfn-pods.com/program/300013354\nメッセージフォーム：https://form.jfn.co.jp/trackstar/message",
+      "id": "FMAICHI-13467968",
+      "service": "radiko:FMAICHI",
+      "title": "[FM AICHI] とりまバリ3でナイト！",
+      "subtitle": "RIRIKA / Koyoka",
+      "content": "◆リバイバルトレンド“Y2Kブーム”の気になるモノの紹介と、その元祖である“平成ブーム”を遡って回顧しお送りする番組。流行の曲から色褪せない平成の名曲まで、気になるアーティストや楽曲もピックアップしていきます。◆\n\nXハッシュタグは「#エフエムアイチ」\nXアカウントは「@FMAICHI」",
       "start_time": "2026-06-17T03:00:00+09:00",
-      "end_time": "2026-06-17T04:00:00+09:00",
-      "duration_sec": 3600,
-      "series_id": "rdk_6dc163121b97",
-      "series_name": "THE GREAT TRACKSTAR",
+      "end_time": "2026-06-17T03:30:00+09:00",
+      "duration_sec": 1800,
+      "series_id": "rdk_c17dc0d8f6aa",
+      "series_name": "とりまバリ3でナイト！",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
       "id": "JOCK-13495616",
@@ -13874,7 +14384,7 @@
       "series_name": "ニュース",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
       "id": "JOAK-FM-13495247",
@@ -13889,7 +14399,7 @@
       "series_name": "ＮＨＫ高校講座 文学国語 私と本（１）中江有里",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
       "id": "TBS-13468249",
@@ -14244,7 +14754,7 @@
       "series_name": "ラジオ深夜便▽にっぽんの歌こころの歌",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
       "id": "r3-270-2026061768012",
@@ -14264,6 +14774,21 @@
         "趣味/教育"
       ],
       "area": "NHK"
+    },
+    {
+      "id": "FMAICHI-13467969",
+      "service": "radiko:FMAICHI",
+      "title": "[FM AICHI] AI Not So Different",
+      "subtitle": "AI",
+      "content": "◆アンダーグラウンドからオーバーグラウンドまでミュージックシーンで圧倒的な支持を得るAIがお届けするラジオ番組。音楽、人柄、その溢れ出る愛を通してアジアや世界の架け橋となっているAIが、明るく楽しく、時には真面目に、アナタとラジオで繋がっていきます！◆\n\nXハッシュタグは「#エフエムアイチ」\nXアカウントは「@FMAICHI」",
+      "start_time": "2026-06-17T03:30:00+09:00",
+      "end_time": "2026-06-17T04:00:00+09:00",
+      "duration_sec": 1800,
+      "series_id": "rdk_f58573a718c8",
+      "series_name": "AI Not So Different",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
     },
     {
       "id": "QRR-13473505",
@@ -14360,19 +14885,19 @@
       "area": "NHK"
     },
     {
-      "id": "HELLOFIVE-13466333",
-      "service": "radiko:HELLOFIVE",
-      "title": "[エフエム石川] Memories＆Discoveries",
-      "subtitle": "早見沙織",
-      "content": "【4時台】\n◇Today's Playlist\n「踊ってばかりの国」のみなさんが選曲する、\n『チルで甘美な朝』！\n\n【5時台】\n◇Classic Playlist\n音楽之友社の中沢十志幸さんが、\n『梅雨空を吹き飛ばす元気が出る音楽』というテーマで選曲。\n\n第一線で活躍するミュージシャン、著名クリエイター、文化人が、それぞれのリコメンド楽曲で素敵な音楽空間をプロデュース。\n懐かしさを感じるナンバー、新たな出会いとなるようなナンバー等、幅広い世代に、時代を超えた邦・洋楽の名曲をお届け！\n\n番組Webサイト：https://jfn-pods.com/program/27337\nメッセージフォーム：https://form.jfn.co.jp/memories/message",
+      "id": "FMAICHI-13467970",
+      "service": "radiko:FMAICHI",
+      "title": "[FM AICHI] monthly album recommend(再)",
+      "subtitle": "山内智貴",
+      "content": "◆早起きで音楽好きなあなたにFM AICHIオススメのアルバムを紹介！◆\n\nXハッシュタグは「#エフエムアイチ」\nXアカウントは「@FMAICHI」",
       "start_time": "2026-06-17T04:00:00+09:00",
       "end_time": "2026-06-17T05:00:00+09:00",
       "duration_sec": 3600,
-      "series_id": "rdk_ea831632fb03",
-      "series_name": "Memories＆Discoveries",
+      "series_id": "rdk_b8d20c49328f",
+      "series_name": "monthly album recommend(再)",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
       "id": "JOCK-13495618",
@@ -14387,7 +14912,7 @@
       "series_name": "ニュース",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
       "id": "JOAK-FM-13495250",
@@ -14402,7 +14927,7 @@
       "series_name": "リワインドタイム 会話",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
       "id": "QRR-13473506",
@@ -14652,7 +15177,7 @@
       "series_name": "ラジオ深夜便▽明日へのことば",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
       "id": "ABC-13480976",
@@ -14670,19 +15195,19 @@
       "area": "JP27"
     },
     {
-      "id": "MRO-13481255",
-      "service": "radiko:MRO",
-      "title": "[MROラジオ] 上柳昌彦 あさぼらけ",
-      "subtitle": "上柳昌彦",
-      "content": "",
+      "id": "TOKAIRADIO-13468399",
+      "service": "radiko:TOKAIRADIO",
+      "title": "[TOKAI RADIO] 早起きエール！",
+      "subtitle": "",
+      "content": "TOKAI RADIOの共通twitterハッシュタグは「#TOKAIRADIO」\nTOKAI RADIO公式twitterアカウントは「@tokairadio」",
       "start_time": "2026-06-17T04:30:00+09:00",
-      "end_time": "2026-06-17T05:00:00+09:00",
-      "duration_sec": 1800,
-      "series_id": "rdk_5109558b8eb7",
-      "series_name": "上柳昌彦 あさぼらけ",
+      "end_time": "2026-06-17T04:45:00+09:00",
+      "duration_sec": 900,
+      "series_id": "rdk_2686d528c868",
+      "series_name": "早起きエール！",
       "episode_name": "",
       "genre": [],
-      "area": "JP17"
+      "area": "JP23"
     },
     {
       "id": "QRR-13473507",
@@ -14788,6 +15313,21 @@
       "episode_name": "",
       "genre": [],
       "area": "JP27"
+    },
+    {
+      "id": "TOKAIRADIO-13468400",
+      "service": "radiko:TOKAIRADIO",
+      "title": "[TOKAI RADIO] RUSH HOUR!",
+      "subtitle": "",
+      "content": "TOKAI RADIOのハッシュタグは「#TOKAIRADIO」\nTOKAI RADIOの公式X（旧twitter）アカウントは「@tokairadio」",
+      "start_time": "2026-06-17T04:45:00+09:00",
+      "end_time": "2026-06-17T05:00:00+09:00",
+      "duration_sec": 900,
+      "series_id": "rdk_5789702d60cb",
+      "series_name": "RUSH HOUR!",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
     },
     {
       "id": "QRR-13473508",
