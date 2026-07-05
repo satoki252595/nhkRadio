@@ -456,12 +456,28 @@ def download_ondemand(
 
     ytdlp_bin = shutil.which("yt-dlp")
     if ytdlp_bin:
-        if _try_ytdlp(ytdlp_bin, playlist_url, output_path, timeout_sec):
+        ytdlp_result = _try_ytdlp(ytdlp_bin, playlist_url, output_path, timeout_sec)
+        if ytdlp_result:
             logger.info(
                 "radiru DL 完了 (yt-dlp): %s (%.1f MB)",
                 output_path.name, output_path.stat().st_size / 1024 / 1024,
             )
             return True
+        if ytdlp_result is None:
+            # yt-dlp が timeout_sec (600s) 経ってもセグメントを取得できなかった
+            # 場合、ffmpeg フォールバックは同一 URL・同一 VPN 経路を再度叩く
+            # だけなので、帯域不足/CDN 側の絞り込みが原因なら同じ理由で
+            # 再度タイムアウトする。2026-06〜07 の障害ログで実測: yt-dlp
+            # タイムアウト後の ffmpeg フォールバックは 100% (観測した全件) が
+            # 同様にタイムアウトするか「出力サイズ過小」で失敗しており、
+            # 1 件あたり 600s → 1200s に倍化するだけで成功に繋がったことが
+            # ない。fail-fast して次の VPN パス (=別サーバー/別経路) に
+            # 賭けた方が時間対効果が高いので、ここでは ffmpeg を試さない。
+            logger.warning(
+                "yt-dlp が %ds でタイムアウト、同一経路の ffmpeg 再試行は"
+                "スキップして次の VPN パスに委ねる", timeout_sec,
+            )
+            return False
         logger.warning("yt-dlp 失敗、ffmpeg フォールバック試行")
 
     # Fallback: ffmpeg direct HLS. 上述の Multiple RDBs 問題で長尺番組は
@@ -490,12 +506,18 @@ def download_ondemand(
 
 def _try_ytdlp(
     ytdlp_bin: str, stream_url: str, output_path: Path, timeout_sec: int,
-) -> bool:
+) -> bool | None:
     """yt-dlp で HLS を取得し M4A で保存する。
 
     yt-dlp はデフォルトで拡張子を自動付与するため、`-o <path_without_ext>`
     で拡張子を指定しない形式で渡し、実際の出力は `<path>.mp4` か `.m4a`
     で生成される。取得後に期待パスへ rename する。
+
+    Returns:
+        True: 成功
+        False: 失敗 (タイムアウト以外。バイナリ不在・非 0 終了・出力異常等)
+        None: timeout_sec 経過によるタイムアウト (呼び出し元はこれを見て
+              ffmpeg フォールバックを打ち切るかどうか判断する)
     """
     # yt-dlp は拡張子をコンテナから決めるので、出力名を拡張子抜きにする
     tmp_base = output_path.with_suffix("")
@@ -518,7 +540,10 @@ def _try_ytdlp(
     ]
     try:
         proc = subprocess.run(cmd, capture_output=True, timeout=timeout_sec)
-    except (FileNotFoundError, subprocess.TimeoutExpired) as e:
+    except subprocess.TimeoutExpired as e:
+        logger.warning("yt-dlp タイムアウト: %s", e)
+        return None
+    except FileNotFoundError as e:
         logger.warning("yt-dlp 実行失敗: %s", e)
         return False
     if proc.returncode != 0:

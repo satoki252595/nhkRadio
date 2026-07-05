@@ -23,6 +23,7 @@ import json
 import logging
 import sys
 import threading
+import time
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
@@ -45,6 +46,23 @@ BROADCAST_DAY_HOUR = 5
 
 # VPN 接続の最大試行回数 (足りない area を探し続ける上限)
 MAX_VPN_ATTEMPTS = 15
+
+# radiru (NHK) フェーズ全体に許す累計時間予算 (秒)。
+#
+# 2026-06-08〜07-04 にほぼ毎日発生した障害の実測: VPN Gate の JP サーバーは
+# どれに繋いでも vod-stream.nhk.jp の HLS 取得が yt-dlp/ffmpeg 双方で
+# 600 秒タイムアウトに達し、15 回の VPN 試行のうち事実上すべての時間が
+# radiru の空振りリトライに溶けて、民放 (Radiko) が一度も DL される前に
+# runner が "shutdown signal" (preemption) で強制終了されていた
+# (2026-07-04 run 28720634773: 21:47 開始 → 22:20 に shutdown、その間
+# radiko の DL 試行はエリア不一致で 0 件のまま)。
+#
+# radiru は日本国内 IP 限定で VPN 自体は必要 (b99ae7d で実測済み) だが、
+# 同じ理由で失敗し続ける番組を 15 回すべての VPN セッションで律儀に
+# リトライする価値はない。累計 radiru 処理時間がこの予算を超えたら、
+# 残り試行はすべて Radiko 専用にして (未取得の NHK 番組は翌日 cron の
+# 2 日分フォールバックに委ねる)、民放が全滅する事故を防ぐ。
+RADIRU_TIME_BUDGET_SEC = 40 * 60
 
 
 def _broadcast_date(dt: datetime) -> str:
@@ -712,10 +730,20 @@ def main() -> None:
 
     attempted_radiko_areas: set[str] = set()
     vpn_config_path = Path(args.vpn_config)
+    radiru_budget_start = time.monotonic()
+    radiru_budget_exhausted = False
 
     for attempt_idx, server in enumerate(vpn_servers, start=1):
         if not nhk_pending and not radiko_pending:
             logger.info("全番組 DL 完了、VPN ループ終了")
+            break
+        if not radiko_pending and radiru_budget_exhausted:
+            # 民放は完了済み、NHK は時間予算切れで以降トライしないので
+            # これ以上 VPN を張り替えても得るものがない。
+            logger.info(
+                "民放 DL 完了 + radiru 予算切れ、VPN ループ終了 (NHK %d 件は翌日 cron へ)",
+                len(nhk_pending),
+            )
             break
         if attempt_idx > args.max_vpn_attempts:
             logger.warning(
@@ -744,33 +772,53 @@ def main() -> None:
             continue
 
         try:
-            # 1) NHK radiru: 日本 IP でさえあれば area に依存しないので、
-            #    Radiko auth より先に処理する (Radiko 認証失敗で session を
-            #    捨ててしまうのを避ける)。
-            if nhk_pending:
-                logger.info("--- radiru で NHK %d 件を取得 ---", len(nhk_pending))
-                nhk_pending = _run_radiru_pass(
-                    nhk_pending, config, keywords, counters, counters_lock,
-                )
+            # 1) 民放 Radiko を先に処理する (2026-07 障害対応で順序を反転)。
+            #    radiru は 1 件あたり最大 timeout_sec 秒 (現状 600s) を
+            #    3 並列で溶かし得るのに対し、Radiko 認証・番組表取得は
+            #    数秒〜数十秒で完了/失敗が判明する。radiru を先にすると、
+            #    VPN Gate の回線が細くて radiru が長時間スタックした場合に
+            #    runner preemption ("shutdown signal") で job ごと落ちて
+            #    Radiko が一度も試されない事故が起きる (2026-07-04
+            #    run 28720634773 で実測)。Radiko を先に試すことで、この
+            #    セッションの Japan IP を無駄にせず民放分だけでも稼げる。
+            #    area 多様性のためエリア重複は skip。
+            if radiko_pending:
+                auth = radiko_mod.authenticate()
+                if not auth:
+                    logger.warning("Radiko 認証失敗、Radiko パートはスキップ")
+                elif auth.area_id in attempted_radiko_areas:
+                    logger.info(
+                        "既に試した area=%s、Radiko パートはスキップ", auth.area_id,
+                    )
+                else:
+                    logger.info("area=%s (%s) に接続", auth.area_id, auth.area_name)
+                    attempted_radiko_areas.add(auth.area_id)
+                    radiko_pending = _run_one_pass(
+                        radiko_pending, auth, config, keywords, counters,
+                        counters_lock, verify_schedule=not args.no_verify_schedule,
+                    )
 
-            # 2) 民放 Radiko: area 多様性のためエリア重複は skip
-            if not radiko_pending:
-                continue
-            auth = radiko_mod.authenticate()
-            if not auth:
-                logger.warning("Radiko 認証失敗、Radiko パートはスキップ")
-                continue
-            logger.info("area=%s (%s) に接続", auth.area_id, auth.area_name)
-            if auth.area_id in attempted_radiko_areas:
-                logger.info(
-                    "既に試した area=%s、Radiko パートはスキップ", auth.area_id,
-                )
-                continue
-            attempted_radiko_areas.add(auth.area_id)
-            radiko_pending = _run_one_pass(
-                radiko_pending, auth, config, keywords, counters, counters_lock,
-                verify_schedule=not args.no_verify_schedule,
-            )
+            # 2) NHK radiru: 日本 IP でさえあれば area に依存しないので
+            #    Radiko の結果に関わらず試す。ただし累計処理時間が
+            #    RADIRU_TIME_BUDGET_SEC を超えたら、同じ理由 (VPN 回線の
+            #    帯域不足) で今後も失敗し続ける可能性が高いと判断し、
+            #    残り試行は Radiko 専用にする (未取得分は翌日 cron の
+            #    2 日分フォールバックに委ねる)。
+            if nhk_pending:
+                if not radiru_budget_exhausted and (
+                    time.monotonic() - radiru_budget_start < RADIRU_TIME_BUDGET_SEC
+                ):
+                    logger.info("--- radiru で NHK %d 件を取得 ---", len(nhk_pending))
+                    nhk_pending = _run_radiru_pass(
+                        nhk_pending, config, keywords, counters, counters_lock,
+                    )
+                elif not radiru_budget_exhausted:
+                    radiru_budget_exhausted = True
+                    logger.warning(
+                        "radiru 累計処理時間が予算 %ds を超過、残り NHK %d 件は"
+                        "以降の VPN 試行では取得せず翌日 cron に委ねる",
+                        RADIRU_TIME_BUDGET_SEC, len(nhk_pending),
+                    )
         finally:
             vpn_manager.disconnect()
 
