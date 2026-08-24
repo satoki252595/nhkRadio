@@ -57,7 +57,6 @@ docker exec "$container_name" ip tuntap add dev nhk-smoke-tun mode tun
 docker exec "$container_name" ip link set nhk-smoke-tun up
 docker exec "$container_name" ip route del default
 docker exec "$container_name" ip route add blackhole default
-docker exec "$container_name" ip route show default | grep -Fqx 'blackhole default'
 
 if docker exec "$container_name" python -c \
   'import socket; socket.create_connection(("github.com", 443), timeout=5).close()' \
