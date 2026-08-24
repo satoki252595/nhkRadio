@@ -16,7 +16,21 @@ trap cleanup EXIT INT TERM
 
 cleanup
 docker image inspect "$runtime_image" >/dev/null
-test -c /dev/net/tun
+
+if [[ ! -c /dev/net/tun ]]; then
+  sudo install -d -m 0755 /dev/net
+  sudo modprobe tun
+  if [[ -e /dev/net/tun ]]; then
+    echo "/dev/net/tun exists but is not a character device" >&2
+    exit 1
+  fi
+  sudo mknod /dev/net/tun c 10 200
+fi
+if [[ ! -c /dev/net/tun ]]; then
+  echo "/dev/net/tun is unavailable" >&2
+  exit 1
+fi
+sudo chmod 0600 /dev/net/tun
 
 host_route_before="$(ip -json route show default | sha256sum | awk '{print $1}')"
 test -n "$host_route_before"
