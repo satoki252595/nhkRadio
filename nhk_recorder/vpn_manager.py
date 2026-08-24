@@ -7,10 +7,14 @@ openvpn を Popen でフォアグラウンド実行し、stderr を threading �
 """
 
 import logging
+import os
+import shutil
 import subprocess
 import threading
 import time
 from pathlib import Path
+
+from .subprocess_utils import allowlisted_env, terminate_process_group
 
 logger = logging.getLogger(__name__)
 
@@ -18,7 +22,12 @@ logger = logging.getLogger(__name__)
 _current_proc: subprocess.Popen | None = None
 
 
-def connect(config_path: Path, wait_sec: int = 45) -> bool:
+def connect(
+    config_path: Path,
+    wait_sec: int = 45,
+    *,
+    deadline: float | None = None,
+) -> bool:
     """openvpn を起動し、"Initialization Sequence Completed" を待つ。
 
     stderr をリアルタイムで threading 監視する。
@@ -30,18 +39,27 @@ def connect(config_path: Path, wait_sec: int = 45) -> bool:
     global _current_proc
     disconnect()
 
-    cmd = ["sudo", "openvpn", "--config", str(config_path)]
+    if deadline is not None and time.monotonic() >= deadline:
+        logger.warning("VPN 接続前に全体期限へ到達")
+        return False
 
+    openvpn_bin = shutil.which("openvpn") or "openvpn"
+    cmd = ([] if os.geteuid() == 0 else ["sudo", "--"]) + [
+        openvpn_bin, "--config", str(config_path), "--script-security", "1",
+    ]
     try:
-        _current_proc = subprocess.Popen(
+        proc = subprocess.Popen(
             cmd,
             stdin=subprocess.DEVNULL,
             stdout=subprocess.PIPE,   # openvpn は stdout にログ出力する
             stderr=subprocess.STDOUT,  # stderr も stdout に統合
+            env=allowlisted_env(),
+            start_new_session=True,
         )
     except (OSError, subprocess.SubprocessError) as e:
         logger.error("openvpn 起動失敗: %s", e)
         return False
+    _current_proc = proc
 
     # stdout を非同期で読むスレッド
     output_lines: list[str] = []
@@ -49,9 +67,9 @@ def connect(config_path: Path, wait_sec: int = 45) -> bool:
     error_event = threading.Event()
 
     def _reader():
-        assert _current_proc is not None and _current_proc.stdout is not None
+        assert proc.stdout is not None
         try:
-            for raw_line in _current_proc.stdout:
+            for raw_line in proc.stdout:
                 line = raw_line.decode(errors="replace").rstrip()
                 output_lines.append(line)
                 if "Initialization Sequence Completed" in line:
@@ -65,24 +83,34 @@ def connect(config_path: Path, wait_sec: int = 45) -> bool:
     reader_thread.start()
 
     # 待機: connected / error / timeout
-    deadline = time.time() + wait_sec
-    while time.time() < deadline:
+    wait_deadline = time.monotonic() + wait_sec
+    if deadline is not None:
+        wait_deadline = min(wait_deadline, deadline)
+    while time.monotonic() < wait_deadline:
         if connected_event.is_set():
-            time.sleep(2)  # route 安定化
+            settle_sec = 2.0
+            if deadline is not None:
+                settle_sec = min(settle_sec, max(0.0, deadline - time.monotonic()))
+            time.sleep(settle_sec)  # route 安定化
+            if deadline is not None and time.monotonic() >= deadline:
+                logger.warning("VPN route 安定化中に全体期限へ到達")
+                disconnect()
+                return False
             logger.info("VPN 接続成功")
             return True
         if error_event.is_set():
             logger.error("openvpn エラー: %s", output_lines[-1] if output_lines else "unknown")
             disconnect()
             return False
-        if _current_proc.poll() is not None:
+        if proc.poll() is not None:
             reader_thread.join(timeout=3)
             logger.error(
                 "openvpn が即終了 (code=%d), 出力:\n  %s",
-                _current_proc.returncode,
+                proc.returncode,
                 "\n  ".join(output_lines[-15:]),
             )
-            _current_proc = None
+            if _current_proc is proc:
+                _current_proc = None
             return False
         time.sleep(0.5)
 
@@ -95,27 +123,13 @@ def connect(config_path: Path, wait_sec: int = 45) -> bool:
 
 
 def disconnect() -> None:
-    """openvpn プロセスを停止する。"""
+    """このモジュールが起動した openvpn process group だけを停止する。"""
     global _current_proc
 
-    if _current_proc is not None:
+    proc = _current_proc
+    _current_proc = None
+    if proc is not None:
         try:
-            _current_proc.terminate()
-            try:
-                _current_proc.wait(timeout=10)
-            except subprocess.TimeoutExpired:
-                _current_proc.kill()
-                _current_proc.wait(timeout=5)
+            terminate_process_group(proc)
         except OSError:
             pass
-        _current_proc = None
-
-    # 念のため残存 openvpn を全停止
-    try:
-        subprocess.run(
-            ["sudo", "pkill", "-TERM", "-x", "openvpn"],
-            check=False, capture_output=True, timeout=5,
-        )
-    except subprocess.TimeoutExpired:
-        pass
-    time.sleep(2)

@@ -21,6 +21,7 @@ VPN 戦略:
 import argparse
 import json
 import logging
+import signal
 import sys
 import threading
 import time
@@ -63,6 +64,11 @@ MAX_VPN_ATTEMPTS = 15
 # 残り試行はすべて Radiko 専用にして (未取得の NHK 番組は翌日 cron の
 # 2 日分フォールバックに委ねる)、民放が全滅する事故を防ぐ。
 RADIRU_TIME_BUDGET_SEC = 40 * 60
+
+
+def _handle_sigterm(signum, _frame) -> None:
+    """SIGTERM を通常の例外経路へ載せ、finally で子プロセスを回収する。"""
+    raise SystemExit(128 + signum)
 
 
 def _broadcast_date(dt: datetime) -> str:
@@ -199,6 +205,8 @@ def _download_nhk_via_radiru(
     keywords: list[str],
     counters: dict,
     counters_lock: threading.Lock,
+    *,
+    deadline: float | None = None,
 ) -> str:
     """NHK 番組を らじる★らじる 聴き逃し API で取得して Notion にアップする。
 
@@ -244,9 +252,21 @@ def _download_nhk_via_radiru(
     )
     ok = radiru_mod.download_ondemand(
         episode.stream_url, output_path, config.ffmpeg_path,
+        deadline=deadline,
     )
     if not ok:
         logger.error("radiru DL 失敗: %s", program.title[:50])
+        return "dl_failed"
+
+    if deadline is not None and time.monotonic() >= deadline:
+        logger.warning(
+            "radiru DL 後に全体期限へ到達、upload を開始しない: %s",
+            program.title[:50],
+        )
+        try:
+            output_path.unlink(missing_ok=True)
+        except OSError:
+            pass
         return "dl_failed"
 
     uploaded = _upload_to_notion(program, output_path, config, keywords)
@@ -272,6 +292,8 @@ def _download_and_upload(
     keywords: list[str],
     counters: dict,
     counters_lock: threading.Lock,
+    *,
+    deadline: float | None = None,
 ) -> None:
     """1 番組を Radiko タイムフリーで DL して Notion にアップする (民放向け)。
 
@@ -286,9 +308,23 @@ def _download_and_upload(
         auth, station_id,
         program.start_time, program.end_time,
         output_path, config.ffmpeg_path,
+        deadline=deadline,
     )
     if not ok:
         logger.error("DL 失敗: %s", program.title[:50])
+        with counters_lock:
+            counters["failed"] += 1
+        return
+
+    if deadline is not None and time.monotonic() >= deadline:
+        logger.warning(
+            "Radiko DL 後に全体期限へ到達、upload を開始しない: %s",
+            program.title[:50],
+        )
+        try:
+            output_path.unlink(missing_ok=True)
+        except OSError:
+            pass
         with counters_lock:
             counters["failed"] += 1
         return
@@ -328,6 +364,8 @@ def _run_radiru_pass(
     counters: dict,
     counters_lock: threading.Lock,
     max_workers: int = RADIRU_PARALLELISM,
+    *,
+    deadline: float | None = None,
 ) -> list[Program]:
     """現 VPN セッションで NHK 番組を radiru 経由で並列 DL する。
 
@@ -375,6 +413,7 @@ def _run_radiru_pass(
             ex.submit(
                 _download_nhk_via_radiru,
                 p, config, keywords, counters, counters_lock,
+                deadline=deadline,
             ): p
             for p in eligible
         }
@@ -419,6 +458,8 @@ def _run_one_pass(
     counters: dict,
     counters_lock: threading.Lock,
     verify_schedule: bool = True,
+    *,
+    deadline: float | None = None,
 ) -> list[Program]:
     """現在の VPN セッションで取得可能な番組を並列 DL し、残りを返す。
 
@@ -527,6 +568,7 @@ def _run_one_pass(
         t = threading.Thread(
             target=_download_and_upload,
             args=(program, station_id, auth, config, keywords, counters, counters_lock),
+            kwargs={"deadline": deadline},
             daemon=True,
             name=f"dl-{program.id[:8]}",
         )
@@ -557,7 +599,11 @@ def main() -> None:
     )
     parser.add_argument(
         "--max-vpn-attempts", type=int, default=MAX_VPN_ATTEMPTS,
-        help="最大 VPN 試行回数 (デフォルト: 10)",
+        help=f"最大 VPN 試行回数 (デフォルト: {MAX_VPN_ATTEMPTS})",
+    )
+    parser.add_argument(
+        "--max-runtime-sec", type=int,
+        help="全体実行時間の上限秒数 (未指定なら制限なし)",
     )
     parser.add_argument(
         "--vpn-config", default="vpn.ovpn",
@@ -573,6 +619,13 @@ def main() -> None:
              "(デフォルト: 有効。差し替え番組の誤録音を防止)",
     )
     args = parser.parse_args()
+    signal.signal(signal.SIGTERM, _handle_sigterm)
+    if args.max_runtime_sec is not None and args.max_runtime_sec <= 0:
+        parser.error("--max-runtime-sec は正の整数を指定してください")
+    run_deadline = (
+        time.monotonic() + args.max_runtime_sec
+        if args.max_runtime_sec is not None else None
+    )
 
     try:
         config = load_config(args.config)
@@ -674,10 +727,16 @@ def main() -> None:
         )
 
     if args.dry_run:
+        if run_deadline is not None and time.monotonic() >= run_deadline:
+            logger.error("全体実行期限へ到達")
+            sys.exit(124)
         logger.info("ドライラン完了")
         return
 
     if not matched:
+        if run_deadline is not None and time.monotonic() >= run_deadline:
+            logger.error("全体実行期限へ到達")
+            sys.exit(124)
         logger.info("対象番組なし、終了")
         return
 
@@ -708,8 +767,14 @@ def main() -> None:
     # ================================================================
     # マルチ VPN パス: 各セッションで NHK (radiru) → 民放 (Radiko) の順に DL
     # ================================================================
+    if run_deadline is not None and time.monotonic() >= run_deadline:
+        logger.error("全体実行期限へ到達")
+        sys.exit(124)
     logger.info("VPN Gate サーバーリスト取得中...")
     vpn_servers = fetch_jp_servers(limit=50)
+    if run_deadline is not None and time.monotonic() >= run_deadline:
+        logger.error("VPN Gate サーバー取得中に全体実行期限へ到達")
+        sys.exit(124)
     if not vpn_servers:
         logger.error("VPN Gate サーバー取得失敗")
         sys.exit(2)
@@ -730,10 +795,16 @@ def main() -> None:
 
     attempted_radiko_areas: set[str] = set()
     vpn_config_path = Path(args.vpn_config)
-    radiru_budget_start = time.monotonic()
+    radiru_deadline = time.monotonic() + RADIRU_TIME_BUDGET_SEC
+    if run_deadline is not None:
+        radiru_deadline = min(radiru_deadline, run_deadline)
     radiru_budget_exhausted = False
+    deadline_exhausted = False
 
     for attempt_idx, server in enumerate(vpn_servers, start=1):
+        if run_deadline is not None and time.monotonic() >= run_deadline:
+            deadline_exhausted = True
+            break
         if not nhk_pending and not radiko_pending:
             logger.info("全番組 DL 完了、VPN ループ終了")
             break
@@ -741,7 +812,8 @@ def main() -> None:
             # 民放は完了済み、NHK は時間予算切れで以降トライしないので
             # これ以上 VPN を張り替えても得るものがない。
             logger.info(
-                "民放 DL 完了 + radiru 予算切れ、VPN ループ終了 (NHK %d 件は翌日 cron へ)",
+                "民放 DL 完了 + radiru 予算切れ、VPN ループ終了 "
+                "(NHK %d 件は翌日 cron へ)",
                 len(nhk_pending),
             )
             break
@@ -753,7 +825,8 @@ def main() -> None:
             break
 
         logger.info(
-            "=== VPN 試行 %d/%d: %s (IP=%s score=%d) [pending NHK %d / 民放 %d] ===",
+            "=== VPN 試行 %d/%d: %s (IP=%s score=%d) "
+            "[pending NHK %d / 民放 %d] ===",
             attempt_idx, args.max_vpn_attempts,
             server.hostname, server.ip, server.score,
             len(nhk_pending), len(radiko_pending),
@@ -762,16 +835,16 @@ def main() -> None:
         # Config を書き出し
         try:
             server.write_ovpn(vpn_config_path)
-        except OSError as e:
+        except (OSError, ValueError) as e:
             logger.error("ovpn 書き出し失敗: %s", e)
             continue
 
-        # VPN 接続
-        if not vpn_manager.connect(vpn_config_path):
-            logger.warning("VPN 接続失敗、次へ")
-            continue
-
         try:
+            # VPN 接続も try 内に置き、接続中の SIGTERM/例外でも回収する。
+            if not vpn_manager.connect(vpn_config_path, deadline=run_deadline):
+                logger.warning("VPN 接続失敗、次へ")
+                continue
+
             # 1) 民放 Radiko を先に処理する (2026-07 障害対応で順序を反転)。
             #    radiru は 1 件あたり最大 timeout_sec 秒 (現状 600s) を
             #    3 並列で溶かし得るのに対し、Radiko 認証・番組表取得は
@@ -795,8 +868,14 @@ def main() -> None:
                     attempted_radiko_areas.add(auth.area_id)
                     radiko_pending = _run_one_pass(
                         radiko_pending, auth, config, keywords, counters,
-                        counters_lock, verify_schedule=not args.no_verify_schedule,
+                        counters_lock,
+                        verify_schedule=not args.no_verify_schedule,
+                        deadline=run_deadline,
                     )
+
+            if run_deadline is not None and time.monotonic() >= run_deadline:
+                deadline_exhausted = True
+                continue
 
             # 2) NHK radiru: 日本 IP でさえあれば area に依存しないので
             #    Radiko の結果に関わらず試す。ただし累計処理時間が
@@ -806,11 +885,14 @@ def main() -> None:
             #    2 日分フォールバックに委ねる)。
             if nhk_pending:
                 if not radiru_budget_exhausted and (
-                    time.monotonic() - radiru_budget_start < RADIRU_TIME_BUDGET_SEC
+                    time.monotonic() < radiru_deadline
                 ):
-                    logger.info("--- radiru で NHK %d 件を取得 ---", len(nhk_pending))
+                    logger.info(
+                        "--- radiru で NHK %d 件を取得 ---", len(nhk_pending),
+                    )
                     nhk_pending = _run_radiru_pass(
                         nhk_pending, config, keywords, counters, counters_lock,
+                        deadline=radiru_deadline,
                     )
                 elif not radiru_budget_exhausted:
                     radiru_budget_exhausted = True
@@ -823,7 +905,15 @@ def main() -> None:
             vpn_manager.disconnect()
 
     pending = nhk_pending + radiko_pending
-    _report_and_exit(counters, len(pending), logger, pending)
+    deadline_exhausted = deadline_exhausted or (
+        run_deadline is not None and time.monotonic() >= run_deadline
+    )
+    if deadline_exhausted:
+        logger.error("全体実行期限へ到達、残り %d 件", len(pending))
+    _report_and_exit(
+        counters, len(pending), logger, pending,
+        deadline_exhausted=deadline_exhausted,
+    )
 
 
 def _report_and_exit(
@@ -831,6 +921,8 @@ def _report_and_exit(
     remaining_count: int,
     logger: logging.Logger,
     pending: list[Program] | None = None,
+    *,
+    deadline_exhausted: bool = False,
 ) -> None:
     """最終レポートを出して、全滅していれば非ゼロで終了する。"""
     if pending:
@@ -859,6 +951,8 @@ def _report_and_exit(
         remaining_count,
     )
 
+    if deadline_exhausted:
+        sys.exit(124)
     if (
         counters["success"] == 0
         and counters["failed"] > 0

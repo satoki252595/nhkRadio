@@ -40,6 +40,8 @@ from pathlib import Path
 
 import httpx
 
+from .subprocess_utils import run_captured
+
 logger = logging.getLogger(__name__)
 
 JST = timezone(timedelta(hours=9))
@@ -426,6 +428,8 @@ def download_ondemand(
     output_path: Path,
     ffmpeg_path: str = "ffmpeg",
     timeout_sec: int = 600,
+    *,
+    deadline: float | None = None,
 ) -> bool:
     """聴き逃し m3u8 を yt-dlp で M4A に保存する。
 
@@ -456,7 +460,10 @@ def download_ondemand(
 
     ytdlp_bin = shutil.which("yt-dlp")
     if ytdlp_bin:
-        ytdlp_result = _try_ytdlp(ytdlp_bin, playlist_url, output_path, timeout_sec)
+        ytdlp_result = _try_ytdlp(
+            ytdlp_bin, playlist_url, output_path, timeout_sec,
+            deadline=deadline,
+        )
         if ytdlp_result:
             logger.info(
                 "radiru DL 完了 (yt-dlp): %s (%.1f MB)",
@@ -474,8 +481,8 @@ def download_ondemand(
             # ない。fail-fast して次の VPN パス (=別サーバー/別経路) に
             # 賭けた方が時間対効果が高いので、ここでは ffmpeg を試さない。
             logger.warning(
-                "yt-dlp が %ds でタイムアウト、同一経路の ffmpeg 再試行は"
-                "スキップして次の VPN パスに委ねる", timeout_sec,
+                "yt-dlp がタイムアウト、同一経路の ffmpeg 再試行は"
+                "スキップして次の VPN パスに委ねる",
             )
             return False
         logger.warning("yt-dlp 失敗、ffmpeg フォールバック試行")
@@ -491,7 +498,7 @@ def download_ondemand(
         "-bsf:a", "aac_adtstoasc",
         str(output_path),
     ]
-    if _try_ffmpeg(copy_cmd, output_path, timeout_sec):
+    if _try_ffmpeg(copy_cmd, output_path, timeout_sec, deadline=deadline):
         logger.info(
             "radiru DL 完了 (ffmpeg copy): %s (%.1f MB)",
             output_path.name, output_path.stat().st_size / 1024 / 1024,
@@ -506,6 +513,8 @@ def download_ondemand(
 
 def _try_ytdlp(
     ytdlp_bin: str, stream_url: str, output_path: Path, timeout_sec: int,
+    *,
+    deadline: float | None = None,
 ) -> bool | None:
     """yt-dlp で HLS を取得し M4A で保存する。
 
@@ -539,7 +548,7 @@ def _try_ytdlp(
         stream_url,
     ]
     try:
-        proc = subprocess.run(cmd, capture_output=True, timeout=timeout_sec)
+        proc = run_captured(cmd, timeout_sec=timeout_sec, deadline=deadline)
     except subprocess.TimeoutExpired as e:
         logger.warning("yt-dlp タイムアウト: %s", e)
         return None
@@ -571,7 +580,7 @@ def _try_ytdlp(
             logger.warning("yt-dlp 出力 rename 失敗: %s", e)
             return False
 
-    duration = _probe_duration(output_path)
+    duration = _probe_duration(output_path, deadline=deadline)
     if duration is not None and duration < 60.0:
         logger.warning(
             "yt-dlp 出力の実尺が短すぎる (%.1f 秒)", duration,
@@ -580,10 +589,16 @@ def _try_ytdlp(
     return True
 
 
-def _try_ffmpeg(cmd: list, output_path: Path, timeout_sec: int) -> bool:
+def _try_ffmpeg(
+    cmd: list[str],
+    output_path: Path,
+    timeout_sec: int,
+    *,
+    deadline: float | None = None,
+) -> bool:
     """ffmpeg を実行し、出力が「妥当」なら True を返す (フォールバック用)。"""
     try:
-        proc = subprocess.run(cmd, capture_output=True, timeout=timeout_sec)
+        proc = run_captured(cmd, timeout_sec=timeout_sec, deadline=deadline)
     except (FileNotFoundError, subprocess.TimeoutExpired) as e:
         logger.error("ffmpeg 実行失敗: %s", e)
         return False
@@ -596,22 +611,22 @@ def _try_ffmpeg(cmd: list, output_path: Path, timeout_sec: int) -> bool:
     if not (output_path.exists() and output_path.stat().st_size > 100_000):
         logger.warning("ffmpeg 出力サイズ過小")
         return False
-    duration = _probe_duration(output_path)
+    duration = _probe_duration(output_path, deadline=deadline)
     if duration is not None and duration < 60.0:
         logger.warning("ffmpeg 出力の実尺が短すぎる (%.1f 秒)", duration)
         return False
     return True
 
 
-def _probe_duration(path: Path) -> float | None:
+def _probe_duration(path: Path, *, deadline: float | None = None) -> float | None:
     """ffprobe で duration を秒数で取得する。失敗したら None。"""
     try:
-        proc = subprocess.run(
+        proc = run_captured(
             ["ffprobe", "-v", "error",
              "-show_entries", "format=duration",
              "-of", "default=noprint_wrappers=1:nokey=1",
              str(path)],
-            capture_output=True, timeout=30, text=True,
+            timeout_sec=30, deadline=deadline, text=True,
         )
     except (FileNotFoundError, subprocess.TimeoutExpired):
         return None

@@ -370,3 +370,20 @@ def test_fetch_series_episodes_handles_invalid_json():
     with patch.object(httpx, "get", return_value=_BadResp()):
         eps = radiru.fetch_series_episodes("X")
     assert eps == []
+
+
+def test_download_ondemand_forwards_deadline_and_skips_fallback_after_timeout(tmp_path):
+    output = tmp_path / "episode.m4a"
+    with (
+        patch.object(radiru.shutil, "which", return_value="/bin/yt-dlp"),
+        patch.object(radiru, "_try_ytdlp", return_value=None) as ytdlp,
+        patch.object(radiru, "_try_ffmpeg") as ffmpeg,
+    ):
+        assert not radiru.download_ondemand(
+            "https://example.test/episode.m3u8",
+            output,
+            deadline=123.0,
+        )
+
+    assert ytdlp.call_args.kwargs["deadline"] == 123.0
+    ffmpeg.assert_not_called()

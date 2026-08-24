@@ -58,11 +58,14 @@ def test_run_radiru_pass_filters_unaired_programs():
     with patch(
         "nhk_recorder.main._download_nhk_via_radiru", return_value="uploaded",
     ) as m:
-        remaining = _run_radiru_pass([aired, future], cfg, [], counters, lock)
+        remaining = _run_radiru_pass(
+            [aired, future], cfg, [], counters, lock, deadline=123.0,
+        )
 
     # future は _download_nhk_via_radiru に渡らない
     called_ids = [c.args[0].id for c in m.call_args_list]
     assert called_ids == ["aired"]
+    assert m.call_args.kwargs["deadline"] == 123.0
     # 未放送は skipped カウンタに +1
     assert counters["skipped"] == 1
     # uploaded は次パス対象から外れる
@@ -86,7 +89,7 @@ def test_run_radiru_pass_status_mapping_matches_sequential():
         "upload_failed": "upload_failed",
     }
 
-    def fake_dl(p, cfg, kw, ctrs, lock):
+    def fake_dl(p, cfg, kw, ctrs, lock, *, deadline=None):
         return status_map[p.id]
 
     cfg = _empty_config()
@@ -122,7 +125,7 @@ def test_run_radiru_pass_parallel_invokes_all_in_parallel():
     progs = [_program(f"p{i}") for i in range(3)]
     barrier = threading.Barrier(3, timeout=5)
 
-    def fake_dl(p, cfg, kw, ctrs, lock):
+    def fake_dl(p, cfg, kw, ctrs, lock, *, deadline=None):
         # 全 thread がここに到達して初めて先へ進める。直列なら Barrier が
         # 集まらず TimeoutError で test 失敗する。
         barrier.wait()
@@ -140,7 +143,7 @@ def test_run_radiru_pass_isolates_exceptions_as_dl_failed():
     """_download_nhk_via_radiru から漏れた例外は dl_failed 扱い (次パス再試行)。"""
     progs = [_program("ok"), _program("boom")]
 
-    def fake_dl(p, cfg, kw, ctrs, lock):
+    def fake_dl(p, cfg, kw, ctrs, lock, *, deadline=None):
         if p.id == "boom":
             raise RuntimeError("simulated thread failure")
         return "uploaded"
