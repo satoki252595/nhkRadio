@@ -28,17 +28,19 @@ Radikoは「放送対象地域外の聴取を目的としたVPNの使用」を�
 ## アーキテクチャ
 
 ```
-┌──────────────────────────────────────────────────────┐
-│ GitHub Actions Runner (Ubuntu, 米国IP)               │
-│                                                      │
-│  Step 1: VPN Gate CSV から日本サーバーを取得         │
-│  Step 2: OpenVPN で接続 → 以降は日本IPに             │
-│  Step 3: Radiko 認証 (auth1 → auth2)                 │
-│  Step 4: ffmpeg で HLS 録音                          │
-│  Step 5: Notion アップロード                         │
-│  Step 6: VPN 切断                                    │
-└──────────────────────────────────────────────────────┘
+┌──────────────── GitHub Actions runner ────────────────┐
+│ checkout / Nix build / Git commit・push（ホスト経路） │
+│                                                       │
+│  ┌──────── VPN network namespace ────────┐            │
+│  │ OpenVPN → Radiko/radiru → ffmpeg      │            │
+│  │ 必要時のみ Notion upload              │            │
+│  └───────────────────────────────────────┘            │
+└───────────────────────────────────────────────────────┘
 ```
+
+録音は OpenVPN と Python を同じ隔離コンテナで実行する。番組表更新は
+OpenVPN sidecar と非特権 exporter を分離し、exporter だけが sidecar の
+network namespace を共有する。どちらも runner 自身の default route は変更しない。
 
 ## 実装の構成要素
 
@@ -59,26 +61,18 @@ CSV API: `https://www.vpngate.net/api/iphone/`
 
 ### 2. OpenVPN 接続
 
-**GitHub Action**: `kota65535/github-openvpn-connect-action@v2`
-
 ```yaml
-- name: Fetch VPN Gate JP server
-  id: vpn
-  run: |
-    curl -s https://www.vpngate.net/api/iphone/ | \
-      tail -n +3 | \
-      awk -F',' '$7 == "JP" {print}' | \
-      sort -t',' -k3 -n -r | \
-      head -1 > server.csv
-    awk -F',' '{print $15}' server.csv | base64 -d > vpn.ovpn
-
-- name: Connect to VPN
-  uses: kota65535/github-openvpn-connect-action@v2
-  with:
-    config_file: vpn.ovpn
+docker run --detach \
+  --cap-drop ALL --cap-add NET_ADMIN --device /dev/net/tun \
+  --security-opt no-new-privileges \
+  nhk-radio-runtime:local \
+  openvpn --config /vpn/vpn.ovpn --script-security 1 --auth-nocache
 ```
 
-注意: VPN Gateのサーバーは**匿名認証**のため、username/passwordは不要。
+実際の引数・mount・cleanup は `.github/workflows/record.yml` と
+`.github/workflows/data-update.yml` を正とする。VPN Gateのサーバーは匿名認証のため
+username/passwordは不要。外部 `.ovpn` は標準接続 directive の allowlist で検証し、
+`0600` で保存してから OpenVPN に渡す。
 
 ### 3. Radiko 認証フロー
 
@@ -153,16 +147,17 @@ ffmpeg -headers "X-Radiko-AuthToken: {authtoken}" \
 
 | リスク | 対策 |
 |---|---|
-| VPN Gate日本サーバーが停止・不安定 | スコア上位3台を試行、失敗時は次候補へ |
+| VPN Gate日本サーバーが停止・不安定 | スコア上位から最大15台を順に試行 |
 | VPN接続後のRadiko認証失敗 | area_idが `JP` プレフィックスか確認 |
 | 録音中のVPN切断 | タイムアウト設定、リトライロジック |
+| VPN が runner の制御通信を切断 | VPN を専用 network namespace に隔離し、host route の不変性を smoke test |
+| 外部 `.ovpn` の危険な directive | allowlist 検証、`--script-security 1`、secret 非継承、最小 capability |
 | Radiko側でVPN IPを検出・ブロック | 検出されたら別サーバーに切り替え |
 | Radiko規約変更 | 定期的に規約確認 |
 
 ## 関連リンク
 
 - [VPN Gate](https://www.vpngate.net/)
-- [kota65535/github-openvpn-connect-action](https://github.com/kota65535/github-openvpn-connect-action)
 - [Radiko API解説記事(Qiita)](https://qiita.com/miyama_daily/items/4f5cd4d4ce6bbe654de3)
 
 ## 注意事項 (必読)

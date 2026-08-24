@@ -1,9 +1,5 @@
 name: NHK Radio Recorder (Timefree)
 
-# v2 アーキテクチャ: Radiko タイムフリー API からの日次バッチダウンロード。
-# VPN は Python 側で管理 (vpn_manager.py) し、複数の Radiko area を
-# 順次カバーする multi-pass 方式で area 固定局の取得率を高める。
-
 on:
   schedule:
     # JST 06:00 (= UTC 21:00) に前日の放送分をまとめて取得。
@@ -22,63 +18,169 @@ on:
         description: '最大 VPN 試行回数 (area カバーのため複数回接続試行)'
         type: string
         default: '15'
+      smoke_only:
+        description: '隔離確認のみ実行し、録音・Notion更新を行わない'
+        type: boolean
+        default: false
 
-# checkout と Python 実行のみで、Notion / NHK API は env 経由なので
-# token への書き込み権限は不要。デフォルトの read-write-all を絞る。
 permissions:
   contents: read
 
-# scheduled cron と手動 dispatch が重なると VPN・Notion・録音ファイルを
-# 奪い合うため直列化する。前のジョブを殺すと中途半端な状態で Notion に
-# 残るので cancel-in-progress: false。
 concurrency:
   group: nhk-recorder
   cancel-in-progress: false
 
+env:
+  RUNTIME_IMAGE: nhk-radio-runtime:local
+  RECORDER_CONTAINER: nhk-recorder-${{ github.run_id }}-${{ github.run_attempt }}
+  RECORDER_VOLUME: nhk-recorder-work-${{ github.run_id }}-${{ github.run_attempt }}
+  CACHE_PROBE_CONTAINER: nhk-runtime-cache-probe-${{ github.run_id }}-${{ github.run_attempt }}
+  SMOKE_CONTAINER: nhk-recorder-smoke-${{ github.run_id }}-${{ github.run_attempt }}
+
 jobs:
   download:
     runs-on: ubuntu-latest
-    # 最長 2h 番組 + 複数 VPN 張り直し + setup + upload
-    timeout-minutes: 240
+    # cold build と always cleanup の余白を含む最終防壁。
+    timeout-minutes: 320
 
     steps:
-      - uses: actions/checkout@v6
-
-      - uses: actions/setup-python@v6
+      - name: Checkout source
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
         with:
-          python-version: '3.12'
-          cache: 'pip'
+          persist-credentials: false
 
-      - name: Install ffmpeg and openvpn
-        run: sudo apt-get update && sudo apt-get install -y ffmpeg openvpn
+      - name: Restore content-addressed runtime image
+        id: runtime-cache
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        timeout-minutes: 10
+        continue-on-error: true
+        with:
+          path: ${{ runner.temp }}/nhk-radio-runtime-cache
+          key: nhk-radio-runtime-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('flake.nix', 'flake.lock', 'nhk_recorder/**/*.py') }}
 
-      - name: Install Python dependencies
-        # yt-dlp は NHK らじる★らじる の HLS 取得用。ffmpeg の AAC デコーダが
-        # 一部番組 (115 分の音楽番組など) で Multiple RDBs + CRC を扱えず
-        # 途中停止するため、代替として yt-dlp の native HLS downloader を使う。
-        # pycryptodomex は AES-128 暗号化された HLS セグメントの復号に必須
-        # (未インストールだと yt-dlp が ffmpeg に委譲してしまい同じ問題が再発する)。
-        run: pip install httpx pyyaml yt-dlp pycryptodomex
-
-      - name: Verify sudo without password
-        run: sudo -n true
-
-      - name: Download timefree recordings (multi-VPN-pass)
-        run: |
-          # schedule 実行時のフォールバックは 2 日分。前日 cron が runner
-          # preemption 等で失敗した場合、翌日 cron が自動 retry する
-          # (pre-dedup フィルタで既登録の再 DL は走らないので無駄なし)。
-          ARGS="--subscriptions data/subscriptions.json --days ${{ inputs.days || '2' }}"
-          ARGS="$ARGS --max-vpn-attempts ${{ inputs.max_vpn_attempts || '15' }}"
-          if [ -n "${{ inputs.target_date }}" ]; then
-            ARGS="$ARGS --target-date ${{ inputs.target_date }}"
-          fi
-          python -m nhk_recorder $ARGS
+      - name: Validate restored runtime image
+        id: runtime-archive
+        timeout-minutes: 5
+        shell: bash
         env:
-          NHK_API_KEY: ${{ secrets.NHK_API_KEY }}
-          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
-          NOTION_DATABASE_ID: ${{ secrets.NOTION_DATABASE_ID }}
+          CACHE_HIT: ${{ steps.runtime-cache.outputs.cache-hit }}
+        run: |
+          set -Eeuo pipefail
+          archive="$RUNNER_TEMP/nhk-radio-runtime-cache/runtime-image.tar.gz"
+          hit=false
+          if [[ "$CACHE_HIT" == "true" && -s "$archive" ]] && gzip --test "$archive"; then
+            if docker load --input "$archive" >/dev/null && \
+              timeout --signal=TERM --kill-after=5s 30s docker run \
+                --name "$CACHE_PROBE_CONTAINER" --rm --network none --read-only \
+                --tmpfs /tmp:rw,nosuid,nodev,noexec,size=16m \
+                --cap-drop ALL --security-opt no-new-privileges \
+                --entrypoint /bin/python "$RUNTIME_IMAGE" \
+                -c 'import httpx, yaml, Cryptodome, nhk_recorder'; then
+              hit=true
+            fi
+          fi
+          if [[ "$hit" != "true" ]]; then
+            docker rm --force "$CACHE_PROBE_CONTAINER" >/dev/null 2>&1 || true
+            docker image rm --force "$RUNTIME_IMAGE" >/dev/null 2>&1 || true
+            rm --force "$archive"
+          fi
+          echo "hit=$hit" >> "$GITHUB_OUTPUT"
 
-      - name: Cleanup VPN on job end
+      - name: Install Nix
+        if: steps.runtime-archive.outputs.hit != 'true'
+        uses: cachix/install-nix-action@8aa03977d8d733052d78f4e008a241fd1dbf36b3 # v31.10.6
+        timeout-minutes: 10
+
+      - name: Build isolated runtime image
+        if: steps.runtime-archive.outputs.hit != 'true'
+        timeout-minutes: 30
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          image_archive="$(nix build .#packages.x86_64-linux.runtime-image --no-link --no-update-lock-file --print-out-paths)"
+          mkdir -p "$RUNNER_TEMP/nhk-radio-runtime-cache"
+          cp --dereference "$image_archive" "$RUNNER_TEMP/nhk-radio-runtime-cache/runtime-image.tar.gz"
+
+      - name: Load isolated runtime image
+        timeout-minutes: 5
+        shell: bash
+        env:
+          CACHE_HIT: ${{ steps.runtime-archive.outputs.hit }}
+        run: |
+          set -Eeuo pipefail
+          if [[ "$CACHE_HIT" != "true" ]]; then
+            docker load --input "$RUNNER_TEMP/nhk-radio-runtime-cache/runtime-image.tar.gz"
+            timeout --signal=TERM --kill-after=5s 30s docker run \
+              --name "$CACHE_PROBE_CONTAINER" --rm --network none --read-only \
+              --tmpfs /tmp:rw,nosuid,nodev,noexec,size=16m \
+              --cap-drop ALL --security-opt no-new-privileges \
+              --entrypoint /bin/python "$RUNTIME_IMAGE" \
+              -c 'import httpx, yaml, Cryptodome, nhk_recorder'
+          fi
+          docker image inspect "$RUNTIME_IMAGE" >/dev/null
+
+      - name: Verify network namespace isolation
+        if: github.event_name == 'workflow_dispatch' && inputs.smoke_only == true
+        timeout-minutes: 5
+        shell: bash
+        run: bash scripts/network-namespace-smoke.sh "$RUNTIME_IMAGE" "$SMOKE_CONTAINER"
+
+      - name: Download timefree recordings in isolated VPN runtime
+        if: github.event_name != 'workflow_dispatch' || inputs.smoke_only != true
+        timeout-minutes: 220
+        shell: bash
+        env:
+          DAYS: ${{ inputs.days || '2' }}
+          MAX_VPN_ATTEMPTS: ${{ inputs.max_vpn_attempts || '15' }}
+          NHK_API_KEY: ${{ secrets.NHK_API_KEY }}
+          NOTION_DATABASE_ID: ${{ secrets.NOTION_DATABASE_ID }}
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+          TARGET_DATE: ${{ inputs.target_date || '' }}
+        run: |
+          set -Eeuo pipefail
+          docker volume create "$RECORDER_VOLUME" >/dev/null
+
+          args=(
+            --subscriptions /app/data/subscriptions.json
+            --days "$DAYS"
+            --max-vpn-attempts "$MAX_VPN_ATTEMPTS"
+            --max-runtime-sec 12600
+            --vpn-config /work/vpn.ovpn
+          )
+          if [[ -n "$TARGET_DATE" ]]; then
+            args+=(--target-date "$TARGET_DATE")
+          fi
+
+          # OpenVPN and Python intentionally share this one network namespace.
+          # The host checkout and Git credentials are never mounted here.
+          timeout --signal=TERM --kill-after=20s 215m docker run \
+            --name "$RECORDER_CONTAINER" \
+            --init \
+            --stop-timeout 20 \
+            --read-only \
+            --tmpfs /tmp:rw,nosuid,nodev,noexec,size=512m \
+            --tmpfs /run:rw,nosuid,nodev,noexec,size=32m \
+            --cap-drop ALL \
+            --cap-add NET_ADMIN \
+            --device /dev/net/tun \
+            --security-opt no-new-privileges \
+            --mount "type=bind,source=${GITHUB_WORKSPACE}/data,target=/app/data,readonly" \
+            --mount "type=volume,source=${RECORDER_VOLUME},target=/work" \
+            --env NHK_API_KEY \
+            --env NOTION_DATABASE_ID \
+            --env NOTION_TOKEN \
+            "$RUNTIME_IMAGE" \
+            python -m nhk_recorder "${args[@]}"
+
+      - name: Cleanup exact recorder resources
         if: always()
-        run: sudo pkill -TERM openvpn 2>/dev/null || true
+        timeout-minutes: 5
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          docker stop --time 20 "$RECORDER_CONTAINER" >/dev/null 2>&1 || true
+          docker rm --force "$RECORDER_CONTAINER" >/dev/null 2>&1 || true
+          docker rm --force "$CACHE_PROBE_CONTAINER" >/dev/null 2>&1 || true
+          docker rm --force "$SMOKE_CONTAINER" >/dev/null 2>&1 || true
+          docker volume rm "$RECORDER_VOLUME" >/dev/null 2>&1 || true
+          curl --fail --silent --show-error --max-time 10 https://github.com/robots.txt >/dev/null

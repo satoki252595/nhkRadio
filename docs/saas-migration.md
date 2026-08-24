@@ -61,8 +61,7 @@
   steps:
     - run: |
         python -m nhk_recorder \
-          --subscriptions https://api.example.com/users/${{ matrix.user_id }}/subscriptions \
-          --within 65
+          --subscriptions https://api.example.com/users/${{ matrix.user_id }}/subscriptions
   ```
 - [ ] 事前 job でユーザー一覧を API から取得して `outputs` に流す
 - [ ] ユーザーごとの Notion 設定（token / DB）を Actions Secrets or API で供給

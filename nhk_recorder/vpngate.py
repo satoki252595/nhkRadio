@@ -1,7 +1,7 @@
 """VPN Gate クライアント (筑波大学の無料VPNサービス)。
 
-CSV API からJapan serverリストを取得し、OpenVPN設定ファイル(.ovpn)を生成する。
-GitHub Actions では別途 openvpn-connect-action 等で接続する。
+CSV API からJapan serverリストを取得し、安全性を検証したOpenVPN設定
+ファイル(.ovpn)を生成する。
 
 詳細: docs/radiko-vpn-setup.md
 """
@@ -9,6 +9,7 @@ GitHub Actions では別途 openvpn-connect-action 等で接続する。
 import base64
 import csv
 import logging
+import os
 from dataclasses import dataclass
 from io import StringIO
 from pathlib import Path
@@ -18,6 +19,51 @@ import httpx
 logger = logging.getLogger(__name__)
 
 VPNGATE_CSV_URL = "https://www.vpngate.net/api/iphone/"
+
+_ALLOWED_OVPN_DIRECTIVES = frozenset({
+    "auth",
+    "cipher",
+    "client",
+    "data-ciphers",
+    "dev",
+    "nobind",
+    "persist-key",
+    "persist-tun",
+    "proto",
+    "remote",
+    "resolv-retry",
+    "verb",
+})
+_ALLOWED_INLINE_BLOCKS = frozenset({"ca", "cert", "key", "tls-auth", "tls-crypt"})
+
+
+def _validate_ovpn_config(config: str) -> None:
+    """VPN Gate の標準的な接続設定以外を root の OpenVPN へ渡さない。"""
+    inline_block: str | None = None
+    for line_number, raw_line in enumerate(config.splitlines(), start=1):
+        line = raw_line.strip()
+        if not line or line.startswith(("#", ";")):
+            continue
+        if inline_block is not None:
+            if line.casefold() == f"</{inline_block}>":
+                inline_block = None
+            continue
+        if line.startswith("<") and line.endswith(">"):
+            block = line[1:-1].strip().casefold()
+            if block.startswith("/") or block not in _ALLOWED_INLINE_BLOCKS:
+                raise ValueError(
+                    "許可されていない OpenVPN inline block "
+                    f"({line_number}行目): {line}"
+                )
+            inline_block = block
+            continue
+        directive = line.split(maxsplit=1)[0].casefold()
+        if directive not in _ALLOWED_OVPN_DIRECTIVES:
+            raise ValueError(
+                f"許可されていない OpenVPN directive ({line_number}行目): {directive}"
+            )
+    if inline_block is not None:
+        raise ValueError(f"OpenVPN inline block が閉じていません: <{inline_block}>")
 
 
 @dataclass
@@ -39,13 +85,22 @@ class VpnGateServer:
         """
         path.parent.mkdir(parents=True, exist_ok=True)
         config = base64.b64decode(self.ovpn_config_b64).decode("utf-8", errors="replace")
+        _validate_ovpn_config(config)
 
         # OpenVPN 2.6+ 互換: VPN Gate が使う AES-128-CBC を data-ciphers に追加
         if "data-ciphers" not in config:
             config += "\ndata-ciphers AES-256-GCM:AES-128-GCM:CHACHA20-POLY1305:AES-128-CBC\n"
 
-        with open(path, "w", encoding="utf-8") as f:
-            f.write(config)
+        flags = os.O_WRONLY | os.O_CREAT | os.O_TRUNC | getattr(os, "O_NOFOLLOW", 0)
+        fd = os.open(path, flags, 0o600)
+        try:
+            os.fchmod(fd, 0o600)
+            with os.fdopen(fd, "w", encoding="utf-8") as f:
+                fd = -1
+                f.write(config)
+        finally:
+            if fd >= 0:
+                os.close(fd)
 
 
 def fetch_jp_servers(limit: int = 5) -> list[VpnGateServer]:

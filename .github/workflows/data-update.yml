@@ -10,83 +10,266 @@ on:
         description: 'Radiko (民放) の番組表も取得する'
         type: boolean
         default: true
+      smoke_only:
+        description: '隔離確認のみ実行し、データ生成・commit・pushを行わない'
+        type: boolean
+        default: false
 
 permissions:
   contents: write  # data/*.json を自動コミット
 
-# scheduled cron と手動 dispatch が重なると、git push 同士が衝突して
-# 片方が落ちる。直列化して常に最新状態を維持する。
 concurrency:
   group: data-update
   cancel-in-progress: false
 
+env:
+  RUNTIME_IMAGE: nhk-radio-runtime:local
+  VPN_CONFIG_CONTAINER: nhk-data-vpn-config-${{ github.run_id }}-${{ github.run_attempt }}
+  VPN_CONTAINER: nhk-data-vpn-${{ github.run_id }}-${{ github.run_attempt }}
+  EXPORT_CONTAINER: nhk-data-export-${{ github.run_id }}-${{ github.run_attempt }}
+  CACHE_PROBE_CONTAINER: nhk-runtime-cache-probe-${{ github.run_id }}-${{ github.run_attempt }}
+  SMOKE_CONTAINER: nhk-data-smoke-${{ github.run_id }}-${{ github.run_attempt }}
+
 jobs:
   update-data:
     runs-on: ubuntu-latest
+    # cold build と commit 前の always cleanup に十分な余白を確保する。
+    timeout-minutes: 160
+
     steps:
-      - uses: actions/checkout@v6
-
-      - uses: actions/setup-python@v6
+      - name: Checkout source
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
         with:
-          python-version: '3.12'
-          cache: 'pip'
+          # smoke_only は commit/push しないため、token を checkout に残さない。
+          persist-credentials: ${{ github.event_name != 'workflow_dispatch' || inputs.smoke_only != true }}
 
-      - name: Install openvpn
-        run: sudo apt-get update && sudo apt-get install -y openvpn
-
-      - name: Install Python dependencies
-        run: pip install httpx pyyaml
-
-      # VPN Gate 経由でRadiko番組表も取得
-      - name: Fetch VPN Gate JP server
-        if: github.event_name == 'schedule' || inputs.include_radiko
-        run: python -m nhk_recorder.vpngate vpn.ovpn
-
-      - name: Connect to VPN Gate
-        id: vpn_connect
-        if: github.event_name == 'schedule' || inputs.include_radiko
-        uses: kota65535/github-openvpn-connect-action@v3
-        with:
-          config_file: vpn.ovpn
-        # VPN 失敗を fatal にしない (NHK 部分だけでも更新したいため)。
-        # 後続 step は steps.vpn_connect.outcome を見て --include-radiko を
-        # 出し分けることで、国外 IP のまま Radiko を取りに行く事故を防ぐ。
+      - name: Restore content-addressed runtime image
+        id: runtime-cache
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        timeout-minutes: 10
         continue-on-error: true
+        with:
+          path: ${{ runner.temp }}/nhk-radio-runtime-cache
+          key: nhk-radio-runtime-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('flake.nix', 'flake.lock', 'nhk_recorder/**/*.py') }}
 
-      - name: Generate data files (NHK + Radiko)
-        # JP13=東京, JP27=大阪 両方の番組表を取得してシリーズ一覧を充実。
-        # VPN 接続失敗 or 手動 dispatch で include_radiko=false の場合は
-        # NHK のみを取得し、Radiko 部分はスキップする (誤データ commit 防止)。
+      - name: Validate restored runtime image
+        id: runtime-archive
+        timeout-minutes: 5
+        shell: bash
+        env:
+          CACHE_HIT: ${{ steps.runtime-cache.outputs.cache-hit }}
         run: |
-          ARGS="--days 7 --past-days 7 --output-dir ./data"
-          if [ "${{ steps.vpn_connect.outcome }}" = "success" ]; then
-            ARGS="$ARGS --include-radiko --radiko-areas JP13,JP27"
-            echo "VPN OK: NHK + Radiko を取得"
-          else
-            echo "VPN 未接続 (outcome=${{ steps.vpn_connect.outcome }}): NHK のみ取得、Radiko スキップ"
+          set -Eeuo pipefail
+          archive="$RUNNER_TEMP/nhk-radio-runtime-cache/runtime-image.tar.gz"
+          hit=false
+          if [[ "$CACHE_HIT" == "true" && -s "$archive" ]] && gzip --test "$archive"; then
+            if docker load --input "$archive" >/dev/null && \
+              timeout --signal=TERM --kill-after=5s 30s docker run \
+                --name "$CACHE_PROBE_CONTAINER" --rm --network none --read-only \
+                --tmpfs /tmp:rw,nosuid,nodev,noexec,size=16m \
+                --cap-drop ALL --security-opt no-new-privileges \
+                --entrypoint /bin/python "$RUNTIME_IMAGE" \
+                -c 'import httpx, yaml, Cryptodome, nhk_recorder'; then
+              hit=true
+            fi
           fi
-          python -m nhk_recorder.data_export $ARGS
+          if [[ "$hit" != "true" ]]; then
+            docker rm --force "$CACHE_PROBE_CONTAINER" >/dev/null 2>&1 || true
+            docker image rm --force "$RUNTIME_IMAGE" >/dev/null 2>&1 || true
+            rm --force "$archive"
+          fi
+          echo "hit=$hit" >> "$GITHUB_OUTPUT"
+
+      - name: Install Nix
+        if: steps.runtime-archive.outputs.hit != 'true'
+        uses: cachix/install-nix-action@8aa03977d8d733052d78f4e008a241fd1dbf36b3 # v31.10.6
+        timeout-minutes: 10
+
+      - name: Build isolated runtime image
+        if: steps.runtime-archive.outputs.hit != 'true'
+        timeout-minutes: 30
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          image_archive="$(nix build .#packages.x86_64-linux.runtime-image --no-link --no-update-lock-file --print-out-paths)"
+          mkdir -p "$RUNNER_TEMP/nhk-radio-runtime-cache"
+          cp --dereference "$image_archive" "$RUNNER_TEMP/nhk-radio-runtime-cache/runtime-image.tar.gz"
+
+      - name: Load isolated runtime image
+        timeout-minutes: 5
+        shell: bash
+        env:
+          CACHE_HIT: ${{ steps.runtime-archive.outputs.hit }}
+        run: |
+          set -Eeuo pipefail
+          if [[ "$CACHE_HIT" != "true" ]]; then
+            docker load --input "$RUNNER_TEMP/nhk-radio-runtime-cache/runtime-image.tar.gz"
+            timeout --signal=TERM --kill-after=5s 30s docker run \
+              --name "$CACHE_PROBE_CONTAINER" --rm --network none --read-only \
+              --tmpfs /tmp:rw,nosuid,nodev,noexec,size=16m \
+              --cap-drop ALL --security-opt no-new-privileges \
+              --entrypoint /bin/python "$RUNTIME_IMAGE" \
+              -c 'import httpx, yaml, Cryptodome, nhk_recorder'
+          fi
+          docker image inspect "$RUNTIME_IMAGE" >/dev/null
+
+      - name: Verify network namespace isolation
+        if: github.event_name == 'workflow_dispatch' && inputs.smoke_only == true
+        timeout-minutes: 5
+        shell: bash
+        run: bash scripts/network-namespace-smoke.sh "$RUNTIME_IMAGE" "$SMOKE_CONTAINER"
+
+      - name: Start isolated VPN sidecar when requested
+        id: vpn
+        if: github.event_name != 'workflow_dispatch' || inputs.smoke_only != true
+        timeout-minutes: 5
+        shell: bash
+        env:
+          WANT_RADIKO: ${{ github.event_name == 'schedule' || inputs.include_radiko == true }}
+        run: |
+          set -Eeuo pipefail
+          connected=false
+          echo "connected=false" >> "$GITHUB_OUTPUT"
+
+          if [[ "$WANT_RADIKO" != "true" ]]; then
+            echo "Radiko disabled: exporter will fetch NHK only"
+            exit 0
+          fi
+
+          vpn_dir="$RUNNER_TEMP/nhk-radio-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          vpn_config="$vpn_dir/vpn.ovpn"
+          install -d -m 700 "$vpn_dir"
+
+          # This one-shot, unprivileged container receives no secrets or checkout mount.
+          if docker run \
+            --name "$VPN_CONFIG_CONTAINER" \
+            --user "$(id -u):$(id -g)" \
+            --read-only \
+            --tmpfs /tmp:rw,nosuid,nodev,noexec,size=64m \
+            --cap-drop ALL \
+            --security-opt no-new-privileges \
+            --mount "type=bind,source=${vpn_dir},target=/vpn" \
+            "$RUNTIME_IMAGE" \
+            python -m nhk_recorder.vpngate /vpn/vpn.ovpn; then
+            docker rm "$VPN_CONFIG_CONTAINER" >/dev/null
+          else
+            echo "VPN Gate config unavailable: exporter will fetch NHK only"
+            docker rm --force "$VPN_CONFIG_CONTAINER" >/dev/null 2>&1 || true
+            exit 0
+          fi
+
+          # Only this sidecar gets NET_ADMIN and /dev/net/tun. It receives no secrets,
+          # source checkout, output directory, or Git credentials.
+          if ! docker run --detach \
+            --name "$VPN_CONTAINER" \
+            --init \
+            --stop-timeout 20 \
+            --read-only \
+            --tmpfs /tmp:rw,nosuid,nodev,noexec,size=64m \
+            --tmpfs /run:rw,nosuid,nodev,noexec,size=32m \
+            --cap-drop ALL \
+            --cap-add NET_ADMIN \
+            --device /dev/net/tun \
+            --security-opt no-new-privileges \
+            --mount "type=bind,source=${vpn_config},target=/vpn/vpn.ovpn,readonly" \
+            "$RUNTIME_IMAGE" \
+            openvpn --config /vpn/vpn.ovpn --script-security 1 --auth-nocache >/dev/null; then
+            echo "VPN sidecar failed to start: exporter will fetch NHK only"
+            exit 0
+          fi
+
+          for ((attempt = 1; attempt <= 45; attempt++)); do
+            if docker logs "$VPN_CONTAINER" 2>&1 | grep -Fq 'Initialization Sequence Completed'; then
+              connected=true
+              break
+            fi
+            if [[ "$(docker inspect --format '{{.State.Running}}' "$VPN_CONTAINER" 2>/dev/null || true)" != "true" ]]; then
+              break
+            fi
+            sleep 1
+          done
+
+          if [[ "$connected" == "true" ]]; then
+            echo "connected=true" >> "$GITHUB_OUTPUT"
+            echo "VPN sidecar connected: Radiko export enabled"
+          else
+            echo "VPN sidecar did not connect: exporter will fetch NHK only"
+            docker logs --tail 20 "$VPN_CONTAINER" 2>&1 || true
+            docker rm --force "$VPN_CONTAINER" >/dev/null 2>&1 || true
+          fi
+
+      - name: Generate data with non-privileged exporter
+        if: github.event_name != 'workflow_dispatch' || inputs.smoke_only != true
+        timeout-minutes: 45
+        shell: bash
         env:
           NHK_API_KEY: ${{ secrets.NHK_API_KEY }}
+          VPN_CONNECTED: ${{ steps.vpn.outputs.connected }}
+        run: |
+          set -Eeuo pipefail
+          network_args=()
+          export_args=(--days 7 --past-days 7 --output-dir /output)
+
+          if [[ "$VPN_CONNECTED" == "true" ]]; then
+            network_args=(--network "container:${VPN_CONTAINER}")
+            export_args+=(--include-radiko --radiko-areas "JP13,JP27")
+            echo "VPN OK: NHK + Radiko data export"
+          else
+            echo "VPN unavailable: NHK-only data export"
+          fi
+
+          # This exporter has no capabilities and receives only the NHK API key.
+          # It shares the sidecar network only when OpenVPN reported ready.
+          docker run \
+            --name "$EXPORT_CONTAINER" \
+            --user "$(id -u):$(id -g)" \
+            --read-only \
+            --tmpfs /tmp:rw,nosuid,nodev,noexec,size=256m \
+            --tmpfs /run:rw,nosuid,nodev,noexec,size=16m \
+            --cap-drop ALL \
+            --security-opt no-new-privileges \
+            "${network_args[@]}" \
+            --mount "type=bind,source=${GITHUB_WORKSPACE}/data,target=/output" \
+            --env NHK_API_KEY \
+            "$RUNTIME_IMAGE" \
+            python -m nhk_recorder.data_export "${export_args[@]}"
+
+      - name: Cleanup exact data containers
+        if: always()
+        timeout-minutes: 5
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          docker stop --time 20 "$VPN_CONFIG_CONTAINER" >/dev/null 2>&1 || true
+          docker stop --time 20 "$EXPORT_CONTAINER" >/dev/null 2>&1 || true
+          docker stop --time 20 "$VPN_CONTAINER" >/dev/null 2>&1 || true
+          docker rm --force "$VPN_CONFIG_CONTAINER" >/dev/null 2>&1 || true
+          docker rm --force "$EXPORT_CONTAINER" >/dev/null 2>&1 || true
+          docker rm --force "$VPN_CONTAINER" >/dev/null 2>&1 || true
+          docker rm --force "$CACHE_PROBE_CONTAINER" >/dev/null 2>&1 || true
+          docker rm --force "$SMOKE_CONTAINER" >/dev/null 2>&1 || true
+          vpn_dir="$RUNNER_TEMP/nhk-radio-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          rm --force "$vpn_dir/vpn.ovpn"
+          rmdir "$vpn_dir" 2>/dev/null || true
+          curl --fail --silent --show-error --max-time 10 https://github.com/robots.txt >/dev/null
 
       - name: Copy data to web static
+        if: github.event_name != 'workflow_dispatch' || inputs.smoke_only != true
+        timeout-minutes: 5
+        shell: bash
         run: |
+          set -Eeuo pipefail
           mkdir -p web/static/data
           cp -f data/series.json web/static/data/
           cp -f data/programs-latest.json web/static/data/
           cp -f data/programs-*.json web/static/data/ 2>/dev/null || true
 
-      - name: Disconnect VPN
-        if: always()
-        run: |
-          sudo pkill -f openvpn || true
-          # ルーティングが戻るのを少し待つ
-          sleep 3
-          # github.com への到達確認
-          curl -sSfI --max-time 10 https://github.com > /dev/null
-
       - name: Commit updated data
+        if: github.event_name != 'workflow_dispatch' || inputs.smoke_only != true
+        timeout-minutes: 10
+        shell: bash
         run: |
+          set -Eeuo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add data/ web/static/data/

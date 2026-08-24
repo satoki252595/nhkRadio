@@ -13,6 +13,8 @@ from pathlib import Path
 
 import httpx
 
+from .subprocess_utils import run_captured
+
 logger = logging.getLogger(__name__)
 
 JST = timezone(timedelta(hours=9))
@@ -294,6 +296,8 @@ def download_timefree(
     output_path: Path,
     ffmpeg_path: str = "ffmpeg",
     parallel: int = 8,
+    *,
+    deadline: float | None = None,
 ) -> bool:
     """Radiko タイムフリー API で放送済み番組をダウンロードする。
 
@@ -397,7 +401,7 @@ def download_timefree(
         str(output_path),
     ]
     try:
-        proc = subprocess.run(cmd, capture_output=True, timeout=300)
+        proc = run_captured(cmd, timeout_sec=300, deadline=deadline)
     except (FileNotFoundError, subprocess.TimeoutExpired) as e:
         logger.error("ffmpeg リミックス失敗: %s", e)
         tmp_aac.unlink(missing_ok=True)
@@ -420,5 +424,4 @@ def download_timefree(
         output_path.name, output_path.stat().st_size / 1024 / 1024,
     )
     return True
-
 

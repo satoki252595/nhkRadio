@@ -269,7 +269,7 @@ sequenceDiagram
 
 ### 設計上の重要ポイント
 
-- **VPN は GitHub Actions 内で完結**: `radiru` の m3u8 (`vod-stream.nhk.jp`) も Radiko も日本 IP 必須。Actions ランナーは国外なので、`vpn_manager.py` が OpenVPN を起動して経路を上書きする。
+- **VPN は隔離コンテナ内で完結**: `radiru` の m3u8 (`vod-stream.nhk.jp`) も Radiko も日本 IP 必須。Nix で固定した OCI ランタイム内だけで OpenVPN の経路を変更し、Actions runner の制御通信と Git 操作はホスト経路に残す。
 - **取得元の完全分離**: NHK は `radiru` のみ、民放は `radiko` のみ (Radiko の NHK 同時配信枠は配信停止アナウンスで上書きされる事故があるため、絶対に Radiko に落とさない)。
 - **multi-VPN-pass による area カバー**: Radiko は出口 IP の area しか取れないため、別 VPN サーバー (= 別 area) で接続し直して未取得の局を順に拾う。1 ループで最大 15 回まで張り直す。
 - **yt-dlp 優先 + ffmpeg フォールバック**: 長尺音楽番組などで ffmpeg の AAC デコーダが Multiple RDBs を扱えず途中停止する事故があるため、HLS は基本 yt-dlp の native downloader を使い、AES-128 復号には `pycryptodomex` が必須。
@@ -278,16 +278,15 @@ sequenceDiagram
 
 ## 必要なもの
 
-- Python 3.10+
-- ffmpeg
+- Nix (Python・ffmpeg・OpenVPN・開発ツールは `flake.lock` から提供)
 - NHK APIキー (https://api-portal.nhk.or.jp/ で無料取得)
 - Notion Integrationトークン (https://www.notion.so/profile/integrations で作成)
 
 ## ローカルセットアップ
 
 ```bash
-# 1. 依存インストール
-pip install -e ".[dev]"
+# 1. 固定された開発環境へ入る
+nix develop
 
 # 2. 認証情報を設定
 cp .env.example .env
@@ -297,10 +296,10 @@ cp .env.example .env
 # Notionでデータベースを開く → 右上「…」→「接続」→ あなたのIntegrationを選択
 
 # 4. 動作確認 (録音せず対象番組だけ表示)
-python -m nhk_recorder --dry-run
+python -m nhk_recorder --subscriptions data/subscriptions.json --dry-run
 
-# 5. 録音実行 (開始時刻までTimerで待機)
-python -m nhk_recorder
+# 5. タイムフリー録音を実行
+python -m nhk_recorder --subscriptions data/subscriptions.json
 ```
 
 ## 設定
@@ -332,22 +331,19 @@ keywords: ["落語", "らくご", "英語"]
 
 3. **動作確認**: Actionsタブ → "NHK Radio Recorder" → "Run workflow" で手動実行
 
-これで毎時0分(UTC 0-14 = JST 9-23)に自動起動し、直近65分以内に開始する対象番組を録音します。
+これで毎日 06:00 JST に起動し、前日分（失敗時は翌日のフォールバック対象）を録音します。
 
-録音対象は `data/subscriptions.json`（シリーズ購読方式）をデフォルトで参照します。
-WebUI の「☁ GitHubへプッシュ」で更新するか、キーワード方式に切り替えたい場合は
-手動実行の `mode` を `keywords` に変更してください。
+録音対象は必須入力の `data/subscriptions.json`（シリーズ購読・キーワード方式）から
+読みます。WebUI の「☁ GitHubへプッシュ」でこのファイルを更新できます。
 
 ## コマンド
 
 | コマンド | 説明 |
 |---|---|
-| `python -m nhk_recorder --dry-run` | 対象番組の確認のみ |
-| `python -m nhk_recorder` | Timer待機モード(ローカル用) |
-| `python -m nhk_recorder --within 65` | 直近65分以内の番組を即時録音(GitHub Actions用) |
+| `python -m nhk_recorder --subscriptions data/subscriptions.json --dry-run` | 対象番組の確認のみ |
 | `python -m nhk_recorder --subscriptions data/subscriptions.json` | 購読ベースで録音 (ローカルパス) |
 | `python -m nhk_recorder --subscriptions https://.../subscriptions.json` | 購読ベースで録音 (URL 経由、SaaS 移行時用) |
-| `python -m nhk_recorder --date 2026-04-10` | 指定日の番組を対象にする |
+| `python -m nhk_recorder --subscriptions data/subscriptions.json --target-date 2026-04-10` | 指定日の番組を対象にする |
 | `python -m nhk_recorder.data_export` | 番組データJSONを生成 (Web UI用) |
 
 ## プロジェクト構成
@@ -358,7 +354,7 @@ WebUI の「☁ GitHubへプッシュ」で更新するか、キーワード方�
 ├── .env.example
 ├── config.yaml.example
 ├── .github/workflows/
-│   ├── record.yml            # 録音ワークフロー (毎時実行)
+│   ├── record.yml            # 録音ワークフロー (毎日 06:00 JST)
 │   ├── data-update.yml       # 番組データ更新 (毎日早朝)
 │   └── deploy-pages.yml      # GitHub Pagesデプロイ
 ├── data/                     # 番組データ (GitHub Actionsが生成)
@@ -370,9 +366,10 @@ WebUI の「☁ GitHubへプッシュ」で更新するか、キーワード方�
 │   ├── config.py             # 設定ローダ(.env + config.yaml)
 │   ├── api.py                # NHK番組表API v3 クライアント
 │   ├── matcher.py            # キーワード/シリーズマッチング
-│   ├── streams.py            # ストリームURL取得
-│   ├── recorder.py           # ffmpeg録音
-│   ├── scheduler.py          # Timer待機スケジューラ
+│   ├── radiru.py             # NHK聴き逃し取得
+│   ├── radiko.py             # Radikoタイムフリー取得
+│   ├── vpn_manager.py        # 所有OpenVPNプロセスの管理
+│   ├── vpngate.py            # VPN Gate設定取得・検証
 │   ├── notion.py             # Notionアップロード
 │   └── data_export.py        # Web UI向けJSON生成
 ├── web/                      # SvelteKit フロントエンド (GitHub Pages)
