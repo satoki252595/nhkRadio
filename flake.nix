@@ -13,18 +13,30 @@
       ];
       forAllSystems = nixpkgs.lib.genAttrs systems;
       mkPkgs = system: import nixpkgs { inherit system; };
+      mkYtDlp = pkgs:
+        let
+          python3Packages = pkgs.python312Packages;
+          # Native HLS needs neither curl impersonation nor OS keyring support.
+          baseApplication = pkgs.yt-dlp-light.override { inherit python3Packages; };
+          application = baseApplication.overridePythonAttrs (previous: {
+            dependencies = builtins.filter
+              (dependency: !builtins.elem (dependency.pname or "") [ "curl-cffi" "secretstorage" ])
+              previous.dependencies;
+          });
+        in
+        python3Packages.toPythonModule application;
       mkPython = pkgs: with pkgs.python312Packages; pkgs.python312.withPackages (_: [
         httpx
         pyyaml
         pycryptodomex
-        yt-dlp-light
+        (mkYtDlp pkgs)
       ]);
       mkCheckPython = pkgs: with pkgs.python312Packages; pkgs.python312.withPackages (_: [
         httpx
         pyyaml
         pycryptodomex
         pytest
-        yt-dlp-light
+        (mkYtDlp pkgs)
       ]);
       mkRuntimeImage = pkgs:
         let
