@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 set -Eeuo pipefail
+set -x
 
 runtime_image="${1:?usage: network-namespace-smoke.sh IMAGE [CONTAINER_NAME]}"
 container_name="${2:-nhk-network-smoke-${GITHUB_RUN_ID:-local}-${GITHUB_RUN_ATTEMPT:-0}}"
