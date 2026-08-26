@@ -9,13 +9,40 @@ if [[ ! "$container_name" =~ ^[A-Za-z0-9][A-Za-z0-9_.-]*$ ]]; then
   exit 2
 fi
 
+smoke_dir="$(mktemp -d "${RUNNER_TEMP:-/tmp}/nhk-radio-smoke.XXXXXX")"
+output_dir="$smoke_dir/output"
+vpn_config="$smoke_dir/vpn.ovpn"
+
 cleanup() {
   docker rm --force "$container_name" >/dev/null 2>&1 || true
+  rm --force "$output_dir/series.json" "$vpn_config"
+  rmdir "$output_dir" "$smoke_dir" 2>/dev/null || true
 }
 trap cleanup EXIT INT TERM
 
-cleanup
+docker rm --force "$container_name" >/dev/null 2>&1 || true
 docker image inspect "$runtime_image" >/dev/null
+
+install -d -m 0700 "$output_dir"
+install -m 0600 /dev/null "$vpn_config"
+printf 'client\n' > "$vpn_config"
+chgrp "$(id -g)" "$vpn_config"
+chmod 0640 "$vpn_config"
+
+# Exercise the data exporter's production read-only boundary without network calls.
+docker run \
+  --name "$container_name" --rm --network none \
+  --user "$(id -u):$(id -g)" \
+  --read-only \
+  --tmpfs /tmp:rw,nosuid,nodev,noexec,size=64m \
+  --tmpfs /run:rw,nosuid,nodev,noexec,size=16m \
+  --cap-drop ALL \
+  --security-opt no-new-privileges \
+  --mount "type=bind,source=${output_dir},target=/output" \
+  --env NHK_API_KEY=smoke-key \
+  "$runtime_image" \
+  python -m nhk_recorder.data_export --days 0 --past-days 0 --output-dir /output
+test -s "$output_dir/series.json"
 
 if [[ ! -c /dev/net/tun ]]; then
   sudo install -d -m 0755 /dev/net
@@ -35,6 +62,7 @@ sudo chmod 0600 /dev/net/tun
 host_route_before="$(ip -json route show default | sha256sum | awk '{print $1}')"
 test -n "$host_route_before"
 
+# The initial sidecar process must read the config with the production security flags.
 docker run --detach \
   --name "$container_name" \
   --init \
@@ -43,10 +71,13 @@ docker run --detach \
   --tmpfs /run:rw,nosuid,nodev,noexec,size=16m \
   --cap-drop ALL \
   --cap-add NET_ADMIN \
+  --group-add "$(id -g)" \
   --device /dev/net/tun \
   --security-opt no-new-privileges \
+  --mount "type=bind,source=${vpn_config},target=/vpn/vpn.ovpn,readonly" \
   "$runtime_image" \
-  sleep 120 >/dev/null
+  python -c 'from pathlib import Path; import time; Path("/vpn/vpn.ovpn").read_bytes(); time.sleep(120)' \
+  >/dev/null
 
 # The container can reach GitHub before its own route is changed.
 docker exec "$container_name" python -c \

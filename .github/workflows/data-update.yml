@@ -157,6 +157,8 @@ jobs:
             docker rm --force "$VPN_CONFIG_CONTAINER" >/dev/null 2>&1 || true
             exit 0
           fi
+          chgrp "$(id -g)" "$vpn_config"
+          chmod 0640 "$vpn_config"
 
           # Only this sidecar gets NET_ADMIN and /dev/net/tun. It receives no secrets,
           # source checkout, output directory, or Git credentials.
@@ -169,6 +171,7 @@ jobs:
             --tmpfs /run:rw,nosuid,nodev,noexec,size=32m \
             --cap-drop ALL \
             --cap-add NET_ADMIN \
+            --group-add "$(id -g)" \
             --device /dev/net/tun \
             --security-opt no-new-privileges \
             --mount "type=bind,source=${vpn_config},target=/vpn/vpn.ovpn,readonly" \
