@@ -3,6 +3,7 @@ set -Eeuo pipefail
 
 runtime_image="${1:?usage: network-namespace-smoke.sh IMAGE [CONTAINER_NAME]}"
 container_name="${2:-nhk-network-smoke-${GITHUB_RUN_ID:-local}-${GITHUB_RUN_ATTEMPT:-0}}"
+peer_name="${container_name}-peer"
 
 if [[ ! "$container_name" =~ ^[A-Za-z0-9][A-Za-z0-9_.-]*$ ]]; then
   echo "invalid smoke container name: $container_name" >&2
@@ -14,6 +15,7 @@ output_dir="$smoke_dir/output"
 vpn_config="$smoke_dir/vpn.ovpn"
 
 cleanup() {
+  docker rm --force "$peer_name" >/dev/null 2>&1 || true
   docker rm --force "$container_name" >/dev/null 2>&1 || true
   rm --force "$output_dir/series.json" "$vpn_config"
   rmdir "$output_dir" "$smoke_dir" 2>/dev/null || true
@@ -21,6 +23,7 @@ cleanup() {
 trap cleanup EXIT INT TERM
 
 docker rm --force "$container_name" >/dev/null 2>&1 || true
+docker rm --force "$peer_name" >/dev/null 2>&1 || true
 docker image inspect "$runtime_image" >/dev/null
 
 install -d -m 0700 "$output_dir"
@@ -67,6 +70,8 @@ docker run --detach \
   --name "$container_name" \
   --init \
   --read-only \
+  --dns 8.8.8.8 \
+  --dns 1.1.1.1 \
   --tmpfs /tmp:rw,nosuid,nodev,noexec,size=64m \
   --tmpfs /run:rw,nosuid,nodev,noexec,size=16m \
   --cap-drop ALL \
@@ -79,9 +84,18 @@ docker run --detach \
   python -c 'from pathlib import Path; import time; Path("/vpn/vpn.ovpn").read_bytes(); time.sleep(120)' \
   >/dev/null
 
-# The container can reach GitHub before its own route is changed.
-docker exec "$container_name" python -c \
-  'import socket; socket.create_connection(("github.com", 443), timeout=10).close()'
+# A capability-free peer inherits the sidecar DNS and can use the shared namespace.
+timeout --signal=TERM --kill-after=5s 30s docker run \
+  --name "$peer_name" \
+  --rm \
+  --network "container:${container_name}" \
+  --user "$(id -u):$(id -g)" \
+  --read-only \
+  --cap-drop ALL \
+  --security-opt no-new-privileges \
+  --entrypoint /bin/python \
+  "$runtime_image" \
+  -c 'from pathlib import Path; import socket; resolv = Path("/etc/resolv.conf").read_text(); assert "nameserver 8.8.8.8" in resolv, resolv; [socket.create_connection((host, 443), timeout=10).close() for host in ("program-api.nhk.jp", "radiko.jp")]'
 
 # Prove that NET_ADMIN and /dev/net/tun are scoped to this namespace.
 docker exec "$container_name" ip tuntap add dev nhk-smoke-tun mode tun

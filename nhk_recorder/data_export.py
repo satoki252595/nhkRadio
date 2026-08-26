@@ -415,7 +415,8 @@ def main():
         if radiko_auth:
             logger.info("Radiko認証成功: %s (%s)", radiko_auth.area_id, radiko_auth.area_name)
         else:
-            logger.warning("Radiko認証失敗 (日本IPではない可能性)。Radiko番組はスキップ")
+            logger.error("Radiko認証失敗: 既存番組を欠落させないため更新を中止")
+            sys.exit(1)
 
     # 対象日の計算 (過去→未来の順)
     base_date = (
@@ -428,6 +429,7 @@ def main():
 
     total_programs = 0
     total_deduped = 0
+    fresh_nhk_programs = 0
     for i in range(start_offset, end_offset):
         target = (base_date + timedelta(days=i)).strftime("%Y-%m-%d")
         is_past = i < 0
@@ -435,6 +437,8 @@ def main():
         programs = fetch_programs(config, target)
         nhk_count = len(programs)
         total_programs += nhk_count
+        if not is_past:
+            fresh_nhk_programs += nhk_count
 
         # 過去日は NHK API v3 が 400 を返すことがあり、その場合は
         # 既存キャッシュから NHK 部分を継承して保持する (null 上書き防止)。
@@ -457,6 +461,12 @@ def main():
                         radiko_area_list.append(a)
             for area in radiko_area_list:
                 rp = radiko.fetch_programs(area, target)
+                if not rp:
+                    logger.error(
+                        "Radiko番組表が0件 (%s, %s): 既存番組を欠落させないため更新を中止",
+                        area, target,
+                    )
+                    sys.exit(1)
                 for p in rp:
                     programs.append(_radiko_to_program(p))
                 total_programs += len(rp)
@@ -527,6 +537,10 @@ def main():
                 # エリア情報を補完
                 if p.area and not entry.get("area"):
                     entry["area"] = p.area
+
+    if args.days > 0 and fresh_nhk_programs == 0:
+        logger.error("NHKの当日以降の番組取得が0件: 既存番組を欠落させないため更新を中止")
+        sys.exit(1)
 
     # シリーズレベルの重複排除: 同名シリーズがNHKとradiko:JOBK両方にある場合、radiko側を削除
     series_index = _dedupe_series_index(series_index)
