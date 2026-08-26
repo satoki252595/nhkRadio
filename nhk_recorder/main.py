@@ -632,6 +632,7 @@ def main() -> None:
     except (FileNotFoundError, ValueError) as e:
         print(f"エラー: {e}", file=sys.stderr)
         sys.exit(1)
+    config.output_dir.mkdir(parents=True, exist_ok=True)
 
     logging.basicConfig(
         level=getattr(logging, config.log_level, logging.INFO),

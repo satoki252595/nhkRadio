@@ -78,5 +78,4 @@ def load_config(config_path: str | None = None) -> Config:
         notion_database_id=notion_database_id,
     )
 
-    config.output_dir.mkdir(parents=True, exist_ok=True)
     return config
