@@ -26,6 +26,7 @@ env:
   RUNTIME_IMAGE: nhk-radio-runtime:local
   VPN_CONFIG_CONTAINER: nhk-data-vpn-config-${{ github.run_id }}-${{ github.run_attempt }}
   VPN_CONTAINER: nhk-data-vpn-${{ github.run_id }}-${{ github.run_attempt }}
+  VPN_PROBE_CONTAINER: nhk-data-vpn-probe-${{ github.run_id }}-${{ github.run_attempt }}
   EXPORT_CONTAINER: nhk-data-export-${{ github.run_id }}-${{ github.run_attempt }}
   CACHE_PROBE_CONTAINER: nhk-runtime-cache-probe-${{ github.run_id }}-${{ github.run_attempt }}
   SMOKE_CONTAINER: nhk-data-smoke-${{ github.run_id }}-${{ github.run_attempt }}
@@ -153,9 +154,9 @@ jobs:
             python -m nhk_recorder.vpngate /vpn/vpn.ovpn; then
             docker rm "$VPN_CONFIG_CONTAINER" >/dev/null
           else
-            echo "VPN Gate config unavailable: exporter will fetch NHK only"
+            echo "VPN Gate config unavailable: aborting Radiko data update" >&2
             docker rm --force "$VPN_CONFIG_CONTAINER" >/dev/null 2>&1 || true
-            exit 0
+            exit 1
           fi
           chgrp "$(id -g)" "$vpn_config"
           chmod 0640 "$vpn_config"
@@ -167,6 +168,8 @@ jobs:
             --init \
             --stop-timeout 20 \
             --read-only \
+            --dns 8.8.8.8 \
+            --dns 1.1.1.1 \
             --tmpfs /tmp:rw,nosuid,nodev,noexec,size=64m \
             --tmpfs /run:rw,nosuid,nodev,noexec,size=32m \
             --cap-drop ALL \
@@ -177,8 +180,8 @@ jobs:
             --mount "type=bind,source=${vpn_config},target=/vpn/vpn.ovpn,readonly" \
             "$RUNTIME_IMAGE" \
             openvpn --config /vpn/vpn.ovpn --script-security 1 --auth-nocache >/dev/null; then
-            echo "VPN sidecar failed to start: exporter will fetch NHK only"
-            exit 0
+            echo "VPN sidecar failed to start: aborting Radiko data update" >&2
+            exit 1
           fi
 
           for ((attempt = 1; attempt <= 45; attempt++)); do
@@ -192,13 +195,27 @@ jobs:
             sleep 1
           done
 
-          if [[ "$connected" == "true" ]]; then
+          # OpenVPN readiness alone is insufficient: verify the exact exporter
+          # namespace can resolve and connect through the redirected route.
+          if [[ "$connected" == "true" ]] && timeout --signal=TERM --kill-after=5s 30s docker run \
+            --name "$VPN_PROBE_CONTAINER" \
+            --rm \
+            --network "container:${VPN_CONTAINER}" \
+            --user "$(id -u):$(id -g)" \
+            --read-only \
+            --cap-drop ALL \
+            --security-opt no-new-privileges \
+            --entrypoint /bin/python \
+            "$RUNTIME_IMAGE" \
+            -c 'import socket; [socket.create_connection((host, 443), timeout=10).close() for host in ("program-api.nhk.jp", "radiko.jp")]'; then
             echo "connected=true" >> "$GITHUB_OUTPUT"
-            echo "VPN sidecar connected: Radiko export enabled"
+            echo "VPN sidecar DNS/TCP preflight passed: Radiko export enabled"
           else
-            echo "VPN sidecar did not connect: exporter will fetch NHK only"
+            echo "VPN sidecar DNS/TCP preflight failed: aborting Radiko data update" >&2
+            docker rm --force "$VPN_PROBE_CONTAINER" >/dev/null 2>&1 || true
             docker logs --tail 20 "$VPN_CONTAINER" 2>&1 || true
             docker rm --force "$VPN_CONTAINER" >/dev/null 2>&1 || true
+            exit 1
           fi
 
       - name: Generate data with non-privileged exporter
@@ -244,9 +261,11 @@ jobs:
         run: |
           set -Eeuo pipefail
           docker stop --time 20 "$VPN_CONFIG_CONTAINER" >/dev/null 2>&1 || true
+          docker stop --time 20 "$VPN_PROBE_CONTAINER" >/dev/null 2>&1 || true
           docker stop --time 20 "$EXPORT_CONTAINER" >/dev/null 2>&1 || true
           docker stop --time 20 "$VPN_CONTAINER" >/dev/null 2>&1 || true
           docker rm --force "$VPN_CONFIG_CONTAINER" >/dev/null 2>&1 || true
+          docker rm --force "$VPN_PROBE_CONTAINER" >/dev/null 2>&1 || true
           docker rm --force "$EXPORT_CONTAINER" >/dev/null 2>&1 || true
           docker rm --force "$VPN_CONTAINER" >/dev/null 2>&1 || true
           docker rm --force "$CACHE_PROBE_CONTAINER" >/dev/null 2>&1 || true
