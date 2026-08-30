@@ -1,9 +1,11 @@
 import base64
 import stat
+import sys
+from unittest.mock import patch
 
 import pytest
 
-from nhk_recorder.vpngate import VpnGateServer
+from nhk_recorder.vpngate import VpnGateServer, main
 
 
 def _server(config: bytes) -> VpnGateServer:
@@ -40,3 +42,21 @@ def test_write_ovpn_rejects_unsafe_directives(tmp_path, directive):
         _server(f"client\n{directive}\n".encode()).write_ovpn(path)
 
     assert not path.exists()
+
+
+@pytest.mark.parametrize("rank", range(5))
+def test_main_writes_requested_server_rank(tmp_path, rank):
+    servers = [_server(f"client\n# server {i}\n".encode()) for i in range(5)]
+    output = tmp_path / "vpn.ovpn"
+
+    with (
+        patch.object(sys, "argv", ["vpngate", str(output), "--rank", str(rank)]),
+        patch(
+            "nhk_recorder.vpngate.fetch_jp_servers",
+            return_value=servers[: rank + 1],
+        ) as fetch,
+    ):
+        main()
+
+    fetch.assert_called_once_with(limit=rank + 1)
+    assert f"# server {rank}" in output.read_text()
