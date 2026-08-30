@@ -141,6 +141,11 @@ jobs:
           vpn_config="$vpn_dir/vpn.ovpn"
           install -d -m 700 "$vpn_dir"
 
+          # Both GitHub counters start at 1, so this deterministically rotates
+          # through ranks 0..4 without adding another VPN connection attempt.
+          vpn_rank=$(( (GITHUB_RUN_NUMBER + GITHUB_RUN_ATTEMPT - 2) % 5 ))
+          echo "VPN Gate candidate: run=$GITHUB_RUN_NUMBER attempt=$GITHUB_RUN_ATTEMPT rank=$vpn_rank/4 (single connection)"
+
           # This one-shot, unprivileged container receives no secrets or checkout mount.
           if docker run \
             --name "$VPN_CONFIG_CONTAINER" \
@@ -151,7 +156,7 @@ jobs:
             --security-opt no-new-privileges \
             --mount "type=bind,source=${vpn_dir},target=/vpn" \
             "$RUNTIME_IMAGE" \
-            python -m nhk_recorder.vpngate /vpn/vpn.ovpn; then
+            python -m nhk_recorder.vpngate /vpn/vpn.ovpn --rank "$vpn_rank"; then
             docker rm "$VPN_CONFIG_CONTAINER" >/dev/null
           else
             echo "VPN Gate config unavailable: aborting Radiko data update" >&2
