@@ -1,7 +1,7 @@
 {
   "date": "2026-09-12",
   "area": "270",
-  "updated_at": "2026-09-06T06:30:17.516603+09:00",
+  "updated_at": "2026-09-07T06:32:34.319319+09:00",
   "programs": [
     {
       "id": "CBC-13889852",
@@ -104,6 +104,36 @@
       "duration_sec": 900,
       "series_id": "rdk_cd734a59befe",
       "series_name": "旬！SHUN！ピックアップ",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
+    },
+    {
+      "id": "JOCK-13902904",
+      "service": "radiko:JOCK",
+      "title": "[NHK AM（名古屋）] マイあさ！",
+      "subtitle": "",
+      "content": "",
+      "start_time": "2026-09-12T05:00:00+09:00",
+      "end_time": "2026-09-12T05:55:00+09:00",
+      "duration_sec": 3300,
+      "series_id": "rdk_cde100bed482",
+      "series_name": "マイあさ！",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
+    },
+    {
+      "id": "JOAK-FM-13902863",
+      "service": "radiko:JOAK-FM",
+      "title": "[NHK FM（東京）] 音楽の泉 マーラーの交響曲第８番「千人の交響曲」から",
+      "subtitle": "奥田佳道",
+      "content": "奥田佳道\n\n\n\n「交響曲 第８番 変ホ長調「一千人の交響曲」から 第１部 賛歌「来たれ、創造主である聖霊よ」」\nマーラー:作曲\n（ソプラノ）ジェーン・イーグレン、（ソプラノ）アンネ・シュヴァネヴィルムス、（アルト）サラ・フルゴーニ、（アルト）アンナ・ラーション、（テノール）ベン・ヘップナー、（バリトン）ペーター・マッテイ、（バス）ヤン・ヘンドリック・ロータリング、（合唱）プラハ・フィルハーモニー合唱団、（合唱）オランダ放送合唱団、（合唱）聖バーヴォ大聖堂少年合唱団、（合唱）ブレダ・サクラメント少年合唱団、（管弦楽）ロイヤル・コンセルトヘボウ管弦楽団、（指揮）リッカルド・シャイー\n２４分２８秒\n＜ユニバーサル UCCD-1026/7＞\n\n「交響曲 第８番 変ホ長調「一千人の交響曲」第２部 ファウストの終幕の場から」\nマーラー:作曲\n過ちを悔いる女…（ソプラノ）アンネ・シュヴァネヴィルムス、栄光の聖母…（ソプラノ）ルート・ツィーザク、マリアをあがめる博士…（テノール）ベン・ヘップナー、（合唱）プラハ・フィルハーモニー合唱団、（合唱）オランダ放送合唱団、（合唱）聖バーヴォ大聖堂少年合唱団、（合唱）ブレダ・サクラメント少年合唱団、（管弦楽）ロイヤル・コンセルトヘボウ管弦楽団、（指揮）リッカルド・シャイー\n１７分２３秒\n＜ユニバーサル UCCD-1026/7＞",
+      "start_time": "2026-09-12T05:00:00+09:00",
+      "end_time": "2026-09-12T05:50:00+09:00",
+      "duration_sec": 3000,
+      "series_id": "rdk_929a4880254f",
+      "series_name": "音楽の泉 マーラーの交響曲第８番「千人の交響曲」から",
       "episode_name": "",
       "genre": [],
       "area": "JP23"
@@ -269,6 +299,21 @@
       "duration_sec": 3300,
       "series_id": "rdk_bfb03a9a304b",
       "series_name": "テスト音楽",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP13"
+    },
+    {
+      "id": "JOAK-13902599",
+      "service": "radiko:JOAK",
+      "title": "[NHK AM（東京）] マイあさ！",
+      "subtitle": "",
+      "content": "",
+      "start_time": "2026-09-12T05:00:00+09:00",
+      "end_time": "2026-09-12T05:55:00+09:00",
+      "duration_sec": 3300,
+      "series_id": "rdk_8d08942f1fc3",
+      "series_name": "マイあさ！",
       "episode_name": "",
       "genre": [],
       "area": "JP13"
@@ -1050,6 +1095,36 @@
       "area": "JP23"
     },
     {
+      "id": "JOCK-13902905",
+      "service": "radiko:JOCK",
+      "title": "[NHK AM（名古屋）] 気象情報（東海・北陸）",
+      "subtitle": "",
+      "content": "",
+      "start_time": "2026-09-12T05:55:00+09:00",
+      "end_time": "2026-09-12T06:00:00+09:00",
+      "duration_sec": 300,
+      "series_id": "rdk_52ad0ac139a8",
+      "series_name": "気象情報（東海・北陸）",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
+    },
+    {
+      "id": "JOAK-FM-13902865",
+      "service": "radiko:JOAK-FM",
+      "title": "[NHK FM（東京）] 気象情報（関東甲信越）",
+      "subtitle": "",
+      "content": "",
+      "start_time": "2026-09-12T05:55:00+09:00",
+      "end_time": "2026-09-12T06:00:00+09:00",
+      "duration_sec": 300,
+      "series_id": "rdk_9c8de968a5e3",
+      "series_name": "気象情報（関東甲信越）",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
+    },
+    {
       "id": "FMT-13872064",
       "service": "radiko:FMT",
       "title": "[TOKYO FM] ＪＡタウンまるかじり",
@@ -1155,6 +1230,36 @@
       "area": "JP23"
     },
     {
+      "id": "JOCK-13902906",
+      "service": "radiko:JOCK",
+      "title": "[NHK AM（名古屋）] マイあさ！",
+      "subtitle": "",
+      "content": "",
+      "start_time": "2026-09-12T06:00:00+09:00",
+      "end_time": "2026-09-12T06:25:00+09:00",
+      "duration_sec": 1500,
+      "series_id": "rdk_cde100bed482",
+      "series_name": "マイあさ！",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
+    },
+    {
+      "id": "JOAK-FM-13902866",
+      "service": "radiko:JOAK-FM",
+      "title": "[NHK FM（東京）] 現代の音楽 現代音楽 １００年のレガシー６８ フェルドマン１",
+      "subtitle": "白石美雪",
+      "content": "白石美雪\n\n「オンリー」\nフェルドマン:作曲\n（テノール）ロジャーズ・カヴィ・クランプ\n０１分４５秒\n＜ＥＣＭ ＮＥＷ ＳＥＲＩＥＳ POCC-1045/6＞\n\n「デンマークの王」\nフェルドマン:作曲\n（エレクトロニクス＆パーカッション）マックス・ニューハウス\n０６分２０秒\n＜ＳＯＮＹ ＣＬＡＳＳＩＣＡＬ SICC79＞\n\n「マダム・プレスは先週９０歳で亡くなった」\nフェルドマン:作曲\n（指揮）ジョン・アダムズ、（管弦楽）聖ルカ管弦楽団\n０４分１０秒\n＜ＷＡＲＮＥＲ ＭＵＳＩＣ WPCC-4098＞\n\n「コプトの光」\nフェルドマン:作曲\n（指揮）マイケル・ティルソン・トーマス、（管弦楽）ニュー・ワールド・シンフォニー\n２９分５０秒\n＜ＰＯＬＹＧＲＡＭ POCL-8018＞",
+      "start_time": "2026-09-12T06:00:00+09:00",
+      "end_time": "2026-09-12T06:50:00+09:00",
+      "duration_sec": 3000,
+      "series_id": "rdk_03dc95cda1de",
+      "series_name": "現代の音楽 現代音楽 １００年のレガシー６８ フェルドマン１",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
+    },
+    {
       "id": "TBS-13890148",
       "service": "radiko:TBS",
       "title": "[TBSラジオ] 土曜朝6時 木梨の会。",
@@ -1255,6 +1360,21 @@
       "duration_sec": 10800,
       "series_id": "rdk_055a9f2e090e",
       "series_name": "Morningナビ！！",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP13"
+    },
+    {
+      "id": "JOAK-13902601",
+      "service": "radiko:JOAK",
+      "title": "[NHK AM（東京）] マイあさ！",
+      "subtitle": "",
+      "content": "",
+      "start_time": "2026-09-12T06:00:00+09:00",
+      "end_time": "2026-09-12T06:25:00+09:00",
+      "duration_sec": 1500,
+      "series_id": "rdk_8d08942f1fc3",
+      "series_name": "マイあさ！",
       "episode_name": "",
       "genre": [],
       "area": "JP13"
@@ -1566,6 +1686,21 @@
       "area": "NHK"
     },
     {
+      "id": "JOCK-13902907",
+      "service": "radiko:JOCK",
+      "title": "[NHK AM（名古屋）] ニュース・気象情報（東海・北陸）",
+      "subtitle": "",
+      "content": "",
+      "start_time": "2026-09-12T06:25:00+09:00",
+      "end_time": "2026-09-12T06:30:00+09:00",
+      "duration_sec": 300,
+      "series_id": "rdk_3cbbd4f7adfe",
+      "series_name": "ニュース・気象情報（東海・北陸）",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
+    },
+    {
       "id": "QRR-13872731",
       "service": "radiko:QRR",
       "title": "[文化放送] せんねん灸プレゼンツ しあわせ演歌・石原詢子です",
@@ -1576,6 +1711,21 @@
       "duration_sec": 1500,
       "series_id": "rdk_f2d4d5b2ab72",
       "series_name": "せんねん灸プレゼンツ しあわせ演歌・石原詢子です",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP13"
+    },
+    {
+      "id": "JOAK-13902602",
+      "service": "radiko:JOAK",
+      "title": "[NHK AM（東京）] ニュース・気象情報・交通情報（関東甲信越）",
+      "subtitle": "",
+      "content": "",
+      "start_time": "2026-09-12T06:25:00+09:00",
+      "end_time": "2026-09-12T06:30:00+09:00",
+      "duration_sec": 300,
+      "series_id": "rdk_70450127e510",
+      "series_name": "ニュース・気象情報・交通情報（関東甲信越）",
       "episode_name": "",
       "genre": [],
       "area": "JP13"
@@ -1625,6 +1775,21 @@
       "duration_sec": 900,
       "series_id": "rdk_4d1fac3517f3",
       "series_name": "大森和代の生きてるだけでまるもうけ",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
+    },
+    {
+      "id": "JOCK-13902908",
+      "service": "radiko:JOCK",
+      "title": "[NHK AM（名古屋）] ラジオ体操",
+      "subtitle": "鈴木大輔(出演)/幅しげみ(出演)",
+      "content": "鈴木大輔，幅しげみ\n\nおなじみの「ラジオ体操の歌」に続いて、「ラジオ体操第１」「ラジオ体操第２」をお送りします。",
+      "start_time": "2026-09-12T06:30:00+09:00",
+      "end_time": "2026-09-12T06:40:00+09:00",
+      "duration_sec": 600,
+      "series_id": "rdk_fffb776ecbb4",
+      "series_name": "ラジオ体操",
       "episode_name": "",
       "genre": [],
       "area": "JP23"
@@ -1754,6 +1919,21 @@
       "area": "NHK"
     },
     {
+      "id": "JOCK-13902909",
+      "service": "radiko:JOCK",
+      "title": "[NHK AM（名古屋）] マイあさ！",
+      "subtitle": "",
+      "content": "",
+      "start_time": "2026-09-12T06:40:00+09:00",
+      "end_time": "2026-09-12T06:55:00+09:00",
+      "duration_sec": 900,
+      "series_id": "rdk_cde100bed482",
+      "series_name": "マイあさ！",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
+    },
+    {
       "id": "WBS-13890772",
       "service": "radiko:WBS",
       "title": "[wbs和歌山放送] wbs朗読の時間",
@@ -1878,6 +2058,36 @@
       "area": "NHK"
     },
     {
+      "id": "JOCK-13902910",
+      "service": "radiko:JOCK",
+      "title": "[NHK AM（名古屋）] 気象情報（東海・北陸）",
+      "subtitle": "",
+      "content": "",
+      "start_time": "2026-09-12T06:55:00+09:00",
+      "end_time": "2026-09-12T07:00:00+09:00",
+      "duration_sec": 300,
+      "series_id": "rdk_52ad0ac139a8",
+      "series_name": "気象情報（東海・北陸）",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
+    },
+    {
+      "id": "JOAK-FM-13902868",
+      "service": "radiko:JOAK-FM",
+      "title": "[NHK FM（東京）] 気象情報・交通情報（関東甲信越）",
+      "subtitle": "",
+      "content": "",
+      "start_time": "2026-09-12T06:55:00+09:00",
+      "end_time": "2026-09-12T07:00:00+09:00",
+      "duration_sec": 300,
+      "series_id": "rdk_3da8e8f16e57",
+      "series_name": "気象情報・交通情報（関東甲信越）",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
+    },
+    {
       "id": "WBS-13890773",
       "service": "radiko:WBS",
       "title": "[wbs和歌山放送] おはようの一曲",
@@ -1948,6 +2158,36 @@
       "duration_sec": 1800,
       "series_id": "rdk_7abf381d7afa",
       "series_name": "ASAHI INTECC Dream Together",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
+    },
+    {
+      "id": "JOCK-13902911",
+      "service": "radiko:JOCK",
+      "title": "[NHK AM（名古屋）] マイあさ！ ▽ＮＨＫけさのニュース",
+      "subtitle": "",
+      "content": "",
+      "start_time": "2026-09-12T07:00:00+09:00",
+      "end_time": "2026-09-12T07:15:00+09:00",
+      "duration_sec": 900,
+      "series_id": "rdk_500e653ebab6",
+      "series_name": "マイあさ！ ▽ＮＨＫけさのニュース",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
+    },
+    {
+      "id": "JOAK-FM-13902869",
+      "service": "radiko:JOAK-FM",
+      "title": "[NHK FM（東京）] マイあさ！ ▽ＮＨＫけさのニュース",
+      "subtitle": "",
+      "content": "",
+      "start_time": "2026-09-12T07:00:00+09:00",
+      "end_time": "2026-09-12T07:15:00+09:00",
+      "duration_sec": 900,
+      "series_id": "rdk_3c3971d04307",
+      "series_name": "マイあさ！ ▽ＮＨＫけさのニュース",
       "episode_name": "",
       "genre": [],
       "area": "JP23"
@@ -2257,6 +2497,36 @@
       "area": "JP23"
     },
     {
+      "id": "JOCK-13902912",
+      "service": "radiko:JOCK",
+      "title": "[NHK AM（名古屋）] ニュース・気象情報（東海・北陸）",
+      "subtitle": "",
+      "content": "",
+      "start_time": "2026-09-12T07:15:00+09:00",
+      "end_time": "2026-09-12T07:20:00+09:00",
+      "duration_sec": 300,
+      "series_id": "rdk_3cbbd4f7adfe",
+      "series_name": "ニュース・気象情報（東海・北陸）",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
+    },
+    {
+      "id": "JOAK-FM-13902870",
+      "service": "radiko:JOAK-FM",
+      "title": "[NHK FM（東京）] ニュース・気象情報（関東甲信越）",
+      "subtitle": "",
+      "content": "",
+      "start_time": "2026-09-12T07:15:00+09:00",
+      "end_time": "2026-09-12T07:20:00+09:00",
+      "duration_sec": 300,
+      "series_id": "rdk_8fbad71cd6ee",
+      "series_name": "ニュース・気象情報（関東甲信越）",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
+    },
+    {
       "id": "KISSFMKOBE-13872977",
       "service": "radiko:KISSFMKOBE",
       "title": "[Kiss FM KOBE] ヒマワリらじお",
@@ -2322,6 +2592,21 @@
         "音楽"
       ],
       "area": "NHK"
+    },
+    {
+      "id": "JOCK-13902913",
+      "service": "radiko:JOCK",
+      "title": "[NHK AM（名古屋）] マイあさ！",
+      "subtitle": "",
+      "content": "",
+      "start_time": "2026-09-12T07:20:00+09:00",
+      "end_time": "2026-09-12T07:50:00+09:00",
+      "duration_sec": 1800,
+      "series_id": "rdk_cde100bed482",
+      "series_name": "マイあさ！",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
     },
     {
       "id": "JORF-13848681",
@@ -2624,6 +2909,21 @@
       "area": "NHK"
     },
     {
+      "id": "JOCK-13902914",
+      "service": "radiko:JOCK",
+      "title": "[NHK AM（名古屋）] 気象情報・ニュース（東海・北陸）",
+      "subtitle": "",
+      "content": "",
+      "start_time": "2026-09-12T07:50:00+09:00",
+      "end_time": "2026-09-12T07:58:00+09:00",
+      "duration_sec": 480,
+      "series_id": "rdk_b9ec7850afbb",
+      "series_name": "気象情報・ニュース（東海・北陸）",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
+    },
+    {
       "id": "JORF-13848682",
       "service": "radiko:JORF",
       "title": "[ラジオ日本] ラジオ日本ニュース・天気予報・交通情報",
@@ -2634,6 +2934,21 @@
       "duration_sec": 600,
       "series_id": "rdk_6b871b1c8cb8",
       "series_name": "ラジオ日本ニュース・天気予報・交通情報",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP13"
+    },
+    {
+      "id": "JOAK-13902609",
+      "service": "radiko:JOAK",
+      "title": "[NHK AM（東京）] ニュース・気象情報・交通情報（関東甲信越）",
+      "subtitle": "",
+      "content": "",
+      "start_time": "2026-09-12T07:50:00+09:00",
+      "end_time": "2026-09-12T08:00:00+09:00",
+      "duration_sec": 600,
+      "series_id": "rdk_70450127e510",
+      "series_name": "ニュース・気象情報・交通情報（関東甲信越）",
       "episode_name": "",
       "genre": [],
       "area": "JP13"
@@ -2699,6 +3014,21 @@
       "area": "JP27"
     },
     {
+      "id": "JOCK-13902915",
+      "service": "radiko:JOCK",
+      "title": "[NHK AM（名古屋）] 交通情報（東海・北陸）",
+      "subtitle": "",
+      "content": "",
+      "start_time": "2026-09-12T07:58:00+09:00",
+      "end_time": "2026-09-12T08:00:00+09:00",
+      "duration_sec": 120,
+      "series_id": "rdk_ecd14189336f",
+      "series_name": "交通情報（東海・北陸）",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
+    },
+    {
       "id": "TOKAIRADIO-13792517",
       "service": "radiko:TOKAIRADIO",
       "title": "[TOKAI RADIO] Weekend Step (2)",
@@ -2739,6 +3069,21 @@
       "duration_sec": 1800,
       "series_id": "rdk_7fdc5f370b77",
       "series_name": "ダイドー おは・クラ・サタデー with セントラル愛知交響楽団",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
+    },
+    {
+      "id": "JOCK-13902916",
+      "service": "radiko:JOCK",
+      "title": "[NHK AM（名古屋）] ニュース",
+      "subtitle": "",
+      "content": "",
+      "start_time": "2026-09-12T08:00:00+09:00",
+      "end_time": "2026-09-12T08:05:00+09:00",
+      "duration_sec": 300,
+      "series_id": "rdk_0c1b71107178",
+      "series_name": "ニュース",
       "episode_name": "",
       "genre": [],
       "area": "JP23"
@@ -2844,6 +3189,21 @@
       "duration_sec": 1800,
       "series_id": "rdk_c6aca1d8aa7f",
       "series_name": "日産神奈川 presents Pick up my town",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP13"
+    },
+    {
+      "id": "JOAK-13902610",
+      "service": "radiko:JOAK",
+      "title": "[NHK AM（東京）] ニュース",
+      "subtitle": "",
+      "content": "",
+      "start_time": "2026-09-12T08:00:00+09:00",
+      "end_time": "2026-09-12T08:05:00+09:00",
+      "duration_sec": 300,
+      "series_id": "rdk_06b0df722680",
+      "series_name": "ニュース",
       "episode_name": "",
       "genre": [],
       "area": "JP13"
@@ -3033,6 +3393,21 @@
         "ドキュメンタリー/教養"
       ],
       "area": "NHK"
+    },
+    {
+      "id": "JOCK-13902917",
+      "service": "radiko:JOCK",
+      "title": "[NHK AM（名古屋）] 石丸謙二郎の山カフェ８時台",
+      "subtitle": "",
+      "content": "",
+      "start_time": "2026-09-12T08:05:00+09:00",
+      "end_time": "2026-09-12T08:55:00+09:00",
+      "duration_sec": 3000,
+      "series_id": "rdk_cd6a780cce42",
+      "series_name": "石丸謙二郎の山カフェ８時台",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
     },
     {
       "id": "JORF-13848684",
@@ -3410,6 +3785,21 @@
       "area": "JP23"
     },
     {
+      "id": "JOCK-13902918",
+      "service": "radiko:JOCK",
+      "title": "[NHK AM（名古屋）] 全国気象情報・全国交通情報",
+      "subtitle": "",
+      "content": "",
+      "start_time": "2026-09-12T08:55:00+09:00",
+      "end_time": "2026-09-12T09:00:00+09:00",
+      "duration_sec": 300,
+      "series_id": "rdk_5784381c61ef",
+      "series_name": "全国気象情報・全国交通情報",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
+    },
+    {
       "id": "FMT-13872074",
       "service": "radiko:FMT",
       "title": "[TOKYO FM] Cheer Up Station",
@@ -3435,6 +3825,21 @@
       "duration_sec": 300,
       "series_id": "rdk_ed0c44591424",
       "series_name": "鎌倉まめヴィアージュ",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP13"
+    },
+    {
+      "id": "JOAK-13902612",
+      "service": "radiko:JOAK",
+      "title": "[NHK AM（東京）] 全国気象情報・全国交通情報",
+      "subtitle": "",
+      "content": "",
+      "start_time": "2026-09-12T08:55:00+09:00",
+      "end_time": "2026-09-12T09:00:00+09:00",
+      "duration_sec": 300,
+      "series_id": "rdk_4fc0ea82c6e6",
+      "series_name": "全国気象情報・全国交通情報",
       "episode_name": "",
       "genre": [],
       "area": "JP13"
@@ -3605,6 +4010,36 @@
       "area": "JP23"
     },
     {
+      "id": "JOCK-13902919",
+      "service": "radiko:JOCK",
+      "title": "[NHK AM（名古屋）] ニュース",
+      "subtitle": "",
+      "content": "",
+      "start_time": "2026-09-12T09:00:00+09:00",
+      "end_time": "2026-09-12T09:05:00+09:00",
+      "duration_sec": 300,
+      "series_id": "rdk_0c1b71107178",
+      "series_name": "ニュース",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
+    },
+    {
+      "id": "JOAK-FM-13902872",
+      "service": "radiko:JOAK-FM",
+      "title": "[NHK FM（東京）] 世界の快適音楽セレクション",
+      "subtitle": "",
+      "content": "",
+      "start_time": "2026-09-12T09:00:00+09:00",
+      "end_time": "2026-09-12T10:55:00+09:00",
+      "duration_sec": 6900,
+      "series_id": "rdk_a1f268738db0",
+      "series_name": "世界の快適音楽セレクション",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
+    },
+    {
       "id": "TBS-13890150",
       "service": "radiko:TBS",
       "title": "[TBSラジオ] 土曜ワイドラジオTOKYO ナイツのちゃきちゃき大放送 (1)",
@@ -3720,6 +4155,21 @@
       "duration_sec": 7200,
       "series_id": "rdk_8f2ab8d6ff71",
       "series_name": "4Me",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP13"
+    },
+    {
+      "id": "JOAK-13902613",
+      "service": "radiko:JOAK",
+      "title": "[NHK AM（東京）] ニュース",
+      "subtitle": "",
+      "content": "",
+      "start_time": "2026-09-12T09:00:00+09:00",
+      "end_time": "2026-09-12T09:05:00+09:00",
+      "duration_sec": 300,
+      "series_id": "rdk_06b0df722680",
+      "series_name": "ニュース",
       "episode_name": "",
       "genre": [],
       "area": "JP13"
@@ -3928,6 +4378,21 @@
         "ドキュメンタリー/教養"
       ],
       "area": "NHK"
+    },
+    {
+      "id": "JOCK-13902920",
+      "service": "radiko:JOCK",
+      "title": "[NHK AM（名古屋）] 石丸謙二郎の山カフェ９時台",
+      "subtitle": "",
+      "content": "",
+      "start_time": "2026-09-12T09:05:00+09:00",
+      "end_time": "2026-09-12T09:55:00+09:00",
+      "duration_sec": 3000,
+      "series_id": "rdk_c33c79672ba1",
+      "series_name": "石丸謙二郎の山カフェ９時台",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
     },
     {
       "id": "OBC-13862021",
@@ -4140,6 +4605,21 @@
       "area": "JP23"
     },
     {
+      "id": "JOCK-13902921",
+      "service": "radiko:JOCK",
+      "title": "[NHK AM（名古屋）] 気象情報・おしらせ・交通情報（東海・北陸）",
+      "subtitle": "",
+      "content": "",
+      "start_time": "2026-09-12T09:55:00+09:00",
+      "end_time": "2026-09-12T10:00:00+09:00",
+      "duration_sec": 300,
+      "series_id": "rdk_bc36b5fa2a92",
+      "series_name": "気象情報・おしらせ・交通情報（東海・北陸）",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
+    },
+    {
       "id": "FMT-13872077",
       "service": "radiko:FMT",
       "title": "[TOKYO FM] DUNLOP WEATHER GUIDE",
@@ -4150,6 +4630,21 @@
       "duration_sec": 300,
       "series_id": "rdk_5f1815d79df4",
       "series_name": "DUNLOP WEATHER GUIDE",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP13"
+    },
+    {
+      "id": "JOAK-13902615",
+      "service": "radiko:JOAK",
+      "title": "[NHK AM（東京）] ニュース・交通情報（関東甲信越）",
+      "subtitle": "",
+      "content": "",
+      "start_time": "2026-09-12T09:55:00+09:00",
+      "end_time": "2026-09-12T10:00:00+09:00",
+      "duration_sec": 300,
+      "series_id": "rdk_e9d85d458609",
+      "series_name": "ニュース・交通情報（関東甲信越）",
       "episode_name": "",
       "genre": [],
       "area": "JP13"
@@ -4275,6 +4770,21 @@
       "area": "JP23"
     },
     {
+      "id": "JOCK-13902922",
+      "service": "radiko:JOCK",
+      "title": "[NHK AM（名古屋）] ニュース",
+      "subtitle": "",
+      "content": "",
+      "start_time": "2026-09-12T10:00:00+09:00",
+      "end_time": "2026-09-12T10:05:00+09:00",
+      "duration_sec": 300,
+      "series_id": "rdk_0c1b71107178",
+      "series_name": "ニュース",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
+    },
+    {
       "id": "QRR-13872735",
       "service": "radiko:QRR",
       "title": "[文化放送] 菊池桃子のミュージックサタデー",
@@ -4345,6 +4855,21 @@
       "duration_sec": 7200,
       "series_id": "rdk_e37aab6b5e17",
       "series_name": "Saturday Morning Radio おびハピ！ Part2",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP13"
+    },
+    {
+      "id": "JOAK-13902616",
+      "service": "radiko:JOAK",
+      "title": "[NHK AM（東京）] ニュース",
+      "subtitle": "",
+      "content": "",
+      "start_time": "2026-09-12T10:00:00+09:00",
+      "end_time": "2026-09-12T10:05:00+09:00",
+      "duration_sec": 300,
+      "series_id": "rdk_06b0df722680",
+      "series_name": "ニュース",
       "episode_name": "",
       "genre": [],
       "area": "JP13"
@@ -4534,6 +5059,21 @@
       "area": "NHK"
     },
     {
+      "id": "JOCK-13902923",
+      "service": "radiko:JOCK",
+      "title": "[NHK AM（名古屋）] さまよえるパパたちへ ９月１２日",
+      "subtitle": "ダイアモンド☆ユカイ/山本博/及川拓馬(ゲスト)",
+      "content": "ダイアモンド☆ユカイ，山本博，【ゲスト】及川拓馬",
+      "start_time": "2026-09-12T10:05:00+09:00",
+      "end_time": "2026-09-12T10:55:00+09:00",
+      "duration_sec": 3000,
+      "series_id": "rdk_e4a027a9a61e",
+      "series_name": "さまよえるパパたちへ ９月１２日",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
+    },
+    {
       "id": "FMAICHI-13874486",
       "service": "radiko:FMAICHI",
       "title": "[FM AICHI] コスモ アースコンシャス アクト 未来へのメッセージ",
@@ -4658,6 +5198,21 @@
       "area": "JP23"
     },
     {
+      "id": "JOCK-13902924",
+      "service": "radiko:JOCK",
+      "title": "[NHK AM（名古屋）] みんなのうた「マスク・ド・カメロ」",
+      "subtitle": "",
+      "content": "ＳＰアンコール／「マスク・ド・カメロ」作詞：新藤晴一、作曲：岡野昭仁、編曲：立崎優介・田中ユウスケ・ＰＯＲＮＯＧＲＡＦＦＩＴ、うた：ポルノグラフィティ\n\n２０２６年４月－５月に放送。子供から大人まで幅広い層に大きな反響を呼び、放送後もアンコールの声が多い『マスク・ド・カメロ』をＳＰアンコールとしてお届けします。ポルノグラフィティが歌うのは、メキシコを舞台に繰り広げられる悪役レスラーの重厚で熱い人間ドラマ。悪役レスラーの覆面に隠された挫折とプライド、そして父の期待に応えられなかった息子がリングで想うこととは？",
+      "start_time": "2026-09-12T10:55:00+09:00",
+      "end_time": "2026-09-12T11:00:00+09:00",
+      "duration_sec": 300,
+      "series_id": "rdk_f69f50e8eeed",
+      "series_name": "みんなのうた「マスク・ド・カメロ」",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
+    },
+    {
       "id": "QRR-13872736",
       "service": "radiko:QRR",
       "title": "[文化放送] ニュース・天気予報・交通情報",
@@ -4698,6 +5253,21 @@
       "duration_sec": 300,
       "series_id": "rdk_295012ac558a",
       "series_name": "Weekend Navi from TOKYO TOWER",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP13"
+    },
+    {
+      "id": "JOAK-13902618",
+      "service": "radiko:JOAK",
+      "title": "[NHK AM（東京）] みんなのうた「マスク・ド・カメロ」",
+      "subtitle": "",
+      "content": "ＳＰアンコール／「マスク・ド・カメロ」作詞：新藤晴一、作曲：岡野昭仁、編曲：立崎優介・田中ユウスケ・ＰＯＲＮＯＧＲＡＦＦＩＴ、うた：ポルノグラフィティ\n\n２０２６年４月－５月に放送。子供から大人まで幅広い層に大きな反響を呼び、放送後もアンコールの声が多い『マスク・ド・カメロ』をＳＰアンコールとしてお届けします。ポルノグラフィティが歌うのは、メキシコを舞台に繰り広げられる悪役レスラーの重厚で熱い人間ドラマ。悪役レスラーの覆面に隠された挫折とプライド、そして父の期待に応えられなかった息子がリングで想うこととは？",
+      "start_time": "2026-09-12T10:55:00+09:00",
+      "end_time": "2026-09-12T11:00:00+09:00",
+      "duration_sec": 300,
+      "series_id": "rdk_521050b7c845",
+      "series_name": "みんなのうた「マスク・ド・カメロ」",
       "episode_name": "",
       "genre": [],
       "area": "JP13"
@@ -4773,6 +5343,36 @@
       "duration_sec": 3600,
       "series_id": "rdk_2634705a39f3",
       "series_name": "TAKE ON presents 鎌田菜月のTAKE A RIDE",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
+    },
+    {
+      "id": "JOCK-13902925",
+      "service": "radiko:JOCK",
+      "title": "[NHK AM（名古屋）] ニュース",
+      "subtitle": "",
+      "content": "",
+      "start_time": "2026-09-12T11:00:00+09:00",
+      "end_time": "2026-09-12T11:05:00+09:00",
+      "duration_sec": 300,
+      "series_id": "rdk_0c1b71107178",
+      "series_name": "ニュース",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
+    },
+    {
+      "id": "JOAK-FM-13902874",
+      "service": "radiko:JOAK-FM",
+      "title": "[NHK FM（東京）] ライブジャポニズム！福之音（フクノート） 箏アーティスト・ＬＥＯ（２）",
+      "subtitle": "鈴木福(出演)/ＬＥＯ(ゲスト)",
+      "content": "パーソナリティーは俳優の鈴木福▽ゲストは箏アーティストのＬＥＯ（レオ）後編▽ホームページのメールフォームから質問、ご感想などをお待ちしています！\n\n先週に引き続き、ゲストは箏アーティスト・ＬＥＯさん！テーマは「音楽人生追体験」の後半戦です。大学卒業から現在まで、影響を受けた音楽やアーティストを、ご紹介いただきます。憧れのアーティストから、共演で刺激を受けた同世代の作曲家まで、エピソードも盛りだくさん。ＬＥＯさんが追及する『新しい音』とは！？そして、様々な活動を経て、伝統的な邦楽との向き合い方はどう変わってきたのか。とことん迫ります。\n\n「Ｓａｍａｎ」\nＡＲＮＡＬＤＳ ＯＬＡＦＵＲ:作曲\nＡＲＮＡＬＤＳ ＯＬＡＦＵＲ:作詞\nＯＬＡＦＵＲ ＡＲＮＡＬＤＳ\n０２分１１秒\n＜Ｄｅｃｃａ 6766005＞\n\n「Ｐｒｏｄｉｇａｌ Ｗｅｅｐ」\nＮＡＫＡＮＯ ＫＯＫＩ:作曲\n中野 公揮\n０１分２９秒\n＜Ｎｏ Ｆｏｒｍａｔ NOF64LP＞\n\n「Ｃｈｒｏｍｅ Ｃｏｕｎｔｒｙ」\nＯｎｅｏｈｔｒｉｘ Ｐｏｉｎｔ Ｎｅｖｅｒ:作曲\nＯｎｅｏｈｔｒｉｘ Ｐｏｉｎｔ Ｎｅｖｅｒ\n０４分３５秒\n＜Ｗａｒｐ Ｒｅｃｏｒｄｓ BRC-394＞\n\n「Ｐｅｒｐｅｔｕｕｍ Ｍｏｂｉｌｅ Ｐｈｕｎｋ」\n網守 将平:作曲\nＬＥＯ\n０１分５６秒\n＜Ｃｏｌｕｍｂｉａ COCQ-85603＞\n\n「落葉」\nＦＲＡＮＣＥＳＣＯ ＴＲＩＳＴＡＮＯ ＬＥＯ:作曲\nＬＥＯ\n０３分３９秒\n＜Ｃｏｌｕｍｂｉａ COCB-54380＞\n\n「Ｒａｙｓ ｏｆ Ｌｉｇｈｔ」\nＬＥＯ:作曲\n（箏）ＬＥＯ\n０３分３８秒\n～ＮＨＫＣＲ５０２スタジオ～",
+      "start_time": "2026-09-12T11:00:00+09:00",
+      "end_time": "2026-09-12T11:20:00+09:00",
+      "duration_sec": 1200,
+      "series_id": "rdk_59b76cdf6a7f",
+      "series_name": "ライブジャポニズム！福之音（フクノート） 箏アーティスト・ＬＥＯ",
       "episode_name": "",
       "genre": [],
       "area": "JP23"
@@ -4908,6 +5508,21 @@
       "duration_sec": 7200,
       "series_id": "rdk_8f2ab8d6ff71",
       "series_name": "4Me",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP13"
+    },
+    {
+      "id": "JOAK-13902619",
+      "service": "radiko:JOAK",
+      "title": "[NHK AM（東京）] ニュース",
+      "subtitle": "",
+      "content": "",
+      "start_time": "2026-09-12T11:00:00+09:00",
+      "end_time": "2026-09-12T11:05:00+09:00",
+      "duration_sec": 300,
+      "series_id": "rdk_06b0df722680",
+      "series_name": "ニュース",
       "episode_name": "",
       "genre": [],
       "area": "JP13"
@@ -5114,6 +5729,21 @@
         "バラエティ"
       ],
       "area": "NHK"
+    },
+    {
+      "id": "JOCK-13902926",
+      "service": "radiko:JOCK",
+      "title": "[NHK AM（名古屋）] 文芸選評 俳句 兼題「秋刀魚」",
+      "subtitle": "小澤實/石井かおる(司会)",
+      "content": "小澤實，【司会】石井かおる\n\n毎週土曜日にお送りしている『文芸選評』。今回は俳句で、兼題は「秋刀魚」。選者は俳人・小澤實さんです。司会は石井かおるアナウンサーです。",
+      "start_time": "2026-09-12T11:05:00+09:00",
+      "end_time": "2026-09-12T11:50:00+09:00",
+      "duration_sec": 2700,
+      "series_id": "rdk_c49cdb128e33",
+      "series_name": "文芸選評 俳句 兼題「秋刀魚」",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
     },
     {
       "id": "GBS-13856924",
@@ -5375,6 +6005,36 @@
       "area": "JP23"
     },
     {
+      "id": "JOCK-13902927",
+      "service": "radiko:JOCK",
+      "title": "[NHK AM（名古屋）] 気象情報・おしらせ（東海・北陸）",
+      "subtitle": "",
+      "content": "",
+      "start_time": "2026-09-12T11:50:00+09:00",
+      "end_time": "2026-09-12T12:00:00+09:00",
+      "duration_sec": 600,
+      "series_id": "rdk_74b209fc1443",
+      "series_name": "気象情報・おしらせ（東海・北陸）",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
+    },
+    {
+      "id": "JOAK-FM-13902876",
+      "service": "radiko:JOAK-FM",
+      "title": "[NHK FM（東京）] 気象情報・交通情報（関東甲信越）",
+      "subtitle": "",
+      "content": "",
+      "start_time": "2026-09-12T11:50:00+09:00",
+      "end_time": "2026-09-12T12:00:00+09:00",
+      "duration_sec": 600,
+      "series_id": "rdk_3da8e8f16e57",
+      "series_name": "気象情報・交通情報（関東甲信越）",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
+    },
+    {
       "id": "WBS-13890787",
       "service": "radiko:WBS",
       "title": "[wbs和歌山放送] ウインズ平阪の紀州和歌山へ！",
@@ -5550,6 +6210,36 @@
       "duration_sec": 1800,
       "series_id": "rdk_4e4827790dda",
       "series_name": "Happy Together",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
+    },
+    {
+      "id": "JOCK-13902928",
+      "service": "radiko:JOCK",
+      "title": "[NHK AM（名古屋）] ニュース 正午のＮＨＫニュース",
+      "subtitle": "",
+      "content": "▽最新のニュースは「らじる★らじる」やポッドキャスト「ＮＨＫラジオニュース」からもお聴きいただけます",
+      "start_time": "2026-09-12T12:00:00+09:00",
+      "end_time": "2026-09-12T12:10:00+09:00",
+      "duration_sec": 600,
+      "series_id": "rdk_e0fcde9b1591",
+      "series_name": "ニュース 正午のＮＨＫニュース",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
+    },
+    {
+      "id": "JOAK-FM-13902877",
+      "service": "radiko:JOAK-FM",
+      "title": "[NHK FM（東京）] ニュース 正午のＮＨＫニュース",
+      "subtitle": "",
+      "content": "▽最新のニュースは「らじる★らじる」やポッドキャスト「ＮＨＫラジオニュース」からもお聴きいただけます",
+      "start_time": "2026-09-12T12:00:00+09:00",
+      "end_time": "2026-09-12T12:10:00+09:00",
+      "duration_sec": 600,
+      "series_id": "rdk_954e6721d83a",
+      "series_name": "ニュース 正午のＮＨＫニュース",
       "episode_name": "",
       "genre": [],
       "area": "JP23"
@@ -5797,6 +6487,36 @@
       "area": "NHK"
     },
     {
+      "id": "JOCK-13902929",
+      "service": "radiko:JOCK",
+      "title": "[NHK AM（名古屋）] ニュース・気象情報（東海・北陸）",
+      "subtitle": "",
+      "content": "",
+      "start_time": "2026-09-12T12:10:00+09:00",
+      "end_time": "2026-09-12T12:15:00+09:00",
+      "duration_sec": 300,
+      "series_id": "rdk_3cbbd4f7adfe",
+      "series_name": "ニュース・気象情報（東海・北陸）",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
+    },
+    {
+      "id": "JOAK-FM-13902878",
+      "service": "radiko:JOAK-FM",
+      "title": "[NHK FM（東京）] ニュース（関東甲信越）",
+      "subtitle": "",
+      "content": "",
+      "start_time": "2026-09-12T12:10:00+09:00",
+      "end_time": "2026-09-12T12:15:00+09:00",
+      "duration_sec": 300,
+      "series_id": "rdk_93047434e8fb",
+      "series_name": "ニュース（関東甲信越）",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
+    },
+    {
       "id": "r1-270-2026091273268",
       "service": "r1",
       "title": "保阪正康が語る昭和人物史　作家　宇野千代、第２回",
@@ -5831,6 +6551,21 @@
         "音楽"
       ],
       "area": "NHK"
+    },
+    {
+      "id": "JOCK-13902930",
+      "service": "radiko:JOCK",
+      "title": "[NHK AM（名古屋）] 保阪正康が語る昭和人物史 作家 宇野千代、第２回",
+      "subtitle": "保阪正康(出演)/梯久美子(出演)",
+      "content": "「わが文学わが回想」１９８２年８月３日、ラジオ第２、聞き手；河路勝アナウンサー\n\n東京の西洋料理店で働き始めた宇野千代は、そこで当時の文学者と接し、自らも小説を書き始め、「ものを書くことで金が儲かる」ことを知ります。そして新聞の懸賞小説に応募し、一等に！しかも二等だった作家・尾崎士郎と出会い、一目惚れし、一緒に暮らし始めます。昭和５７年８月ラジオ第２放送の「わが文学わが回想」では、人に好かれる尾崎士郎の印象や思い出、その背景にある自らの父親の「酷薄な性格」を大胆に語っています。",
+      "start_time": "2026-09-12T12:15:00+09:00",
+      "end_time": "2026-09-12T12:45:00+09:00",
+      "duration_sec": 1800,
+      "series_id": "rdk_1da4c79ecd68",
+      "series_name": "保阪正康が語る昭和人物史 作家 宇野千代、",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
     },
     {
       "id": "OBC-13862029",
@@ -5960,6 +6695,21 @@
         "趣味/教育"
       ],
       "area": "NHK"
+    },
+    {
+      "id": "JOCK-13902931",
+      "service": "radiko:JOCK",
+      "title": "[NHK AM（名古屋）] 朗読 佐々木蔵之介が読む、夢枕獏『深山幻想譚』第２回",
+      "subtitle": "佐々木蔵之介(朗読)",
+      "content": "主人公は、会社の倒産で追い込まれた社長。逃げるようにやって来た山で、ひとりの男と出会います。朗読は、俳優の佐々木蔵之介さんです。４回シリーズの第２回。\n\n今月は、作家・夢枕獏さんの短編『深山幻想譚』をお聴きいただきます。夢枕獏さんは、安倍晴明を主人公とした『陰陽師』シリーズなど、多くのヒット作を生み出しています。『深山幻想譚』の主人公は、会社の倒産で追い込まれた、社長の「私」。逃げるようにやって来た、とある山で、ひとりの男と出会います。朗読は、俳優の佐々木蔵之介さんです。４回シリーズの第２回。",
+      "start_time": "2026-09-12T12:45:00+09:00",
+      "end_time": "2026-09-12T13:00:00+09:00",
+      "duration_sec": 900,
+      "series_id": "rdk_547603fa85eb",
+      "series_name": "朗読 佐々木蔵之介が読む、夢枕獏『深山幻想譚』",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
     },
     {
       "id": "TBS-13890151",
@@ -6157,6 +6907,21 @@
       "area": "JP23"
     },
     {
+      "id": "JOCK-13902932",
+      "service": "radiko:JOCK",
+      "title": "[NHK AM（名古屋）] ニュース",
+      "subtitle": "",
+      "content": "",
+      "start_time": "2026-09-12T13:00:00+09:00",
+      "end_time": "2026-09-12T13:05:00+09:00",
+      "duration_sec": 300,
+      "series_id": "rdk_0c1b71107178",
+      "series_name": "ニュース",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
+    },
+    {
       "id": "TBS-13890152",
       "service": "radiko:TBS",
       "title": "[TBSラジオ] プチ鹿島 赤坂タイムス (1)",
@@ -6287,6 +7052,21 @@
       "duration_sec": 10800,
       "series_id": "rdk_b78f94f8674c",
       "series_name": "土曜王国～サタデイキングダム～",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP13"
+    },
+    {
+      "id": "JOAK-13902626",
+      "service": "radiko:JOAK",
+      "title": "[NHK AM（東京）] ニュース",
+      "subtitle": "",
+      "content": "",
+      "start_time": "2026-09-12T13:00:00+09:00",
+      "end_time": "2026-09-12T13:05:00+09:00",
+      "duration_sec": 300,
+      "series_id": "rdk_06b0df722680",
+      "series_name": "ニュース",
       "episode_name": "",
       "genre": [],
       "area": "JP13"
@@ -6477,6 +7257,21 @@
       "area": "NHK"
     },
     {
+      "id": "JOCK-13902933",
+      "service": "radiko:JOCK",
+      "title": "[NHK AM（名古屋）] 真打ち競演 三拍子 桂小すみ 桃月庵白酒",
+      "subtitle": "三拍子(出演)/桂小すみ(出演)/桃月庵白酒(出演)/田中朋樹(司会)",
+      "content": "【出演】三拍子，桂小すみ，桃月庵白酒，【司会】田中朋樹\n\n出演は、三拍子、桂小すみ、桃月庵白酒【演目：短命】の３組。司会は田中朋樹ウンサー。～２０２６年９月５日 神奈川県大井町 大井町生涯学習センターにて収録～",
+      "start_time": "2026-09-12T13:05:00+09:00",
+      "end_time": "2026-09-12T13:55:00+09:00",
+      "duration_sec": 3000,
+      "series_id": "rdk_3bf368a30323",
+      "series_name": "真打ち競演 三拍子 桂小すみ 桃月庵白酒",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
+    },
+    {
       "id": "WBS-13890791",
       "service": "radiko:WBS",
       "title": "[wbs和歌山放送] オークワはっぴいアフタヌーン",
@@ -6627,6 +7422,21 @@
       "area": "JP23"
     },
     {
+      "id": "JOCK-13902934",
+      "service": "radiko:JOCK",
+      "title": "[NHK AM（名古屋）] 気象情報・おしらせ・交通情報（東海・北陸）",
+      "subtitle": "",
+      "content": "",
+      "start_time": "2026-09-12T13:55:00+09:00",
+      "end_time": "2026-09-12T14:00:00+09:00",
+      "duration_sec": 300,
+      "series_id": "rdk_bc36b5fa2a92",
+      "series_name": "気象情報・おしらせ・交通情報（東海・北陸）",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
+    },
+    {
       "id": "INT-13873419",
       "service": "radiko:INT",
       "title": "[interfm] Voyage",
@@ -6652,6 +7462,21 @@
       "duration_sec": 300,
       "series_id": "rdk_42c55bb9ce37",
       "series_name": "TOKYO FM Navi",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP13"
+    },
+    {
+      "id": "JOAK-13902628",
+      "service": "radiko:JOAK",
+      "title": "[NHK AM（東京）] ニュース・交通情報（関東甲信越）",
+      "subtitle": "",
+      "content": "",
+      "start_time": "2026-09-12T13:55:00+09:00",
+      "end_time": "2026-09-12T14:00:00+09:00",
+      "duration_sec": 300,
+      "series_id": "rdk_e9d85d458609",
+      "series_name": "ニュース・交通情報（関東甲信越）",
       "episode_name": "",
       "genre": [],
       "area": "JP13"
@@ -6762,6 +7587,36 @@
       "area": "JP23"
     },
     {
+      "id": "JOCK-13902935",
+      "service": "radiko:JOCK",
+      "title": "[NHK AM（名古屋）] ニュース",
+      "subtitle": "",
+      "content": "",
+      "start_time": "2026-09-12T14:00:00+09:00",
+      "end_time": "2026-09-12T14:05:00+09:00",
+      "duration_sec": 300,
+      "series_id": "rdk_0c1b71107178",
+      "series_name": "ニュース",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
+    },
+    {
+      "id": "JOAK-FM-13902882",
+      "service": "radiko:JOAK-FM",
+      "title": "[NHK FM（東京）] アニソン・アカデミー",
+      "subtitle": "",
+      "content": "",
+      "start_time": "2026-09-12T14:00:00+09:00",
+      "end_time": "2026-09-12T16:00:00+09:00",
+      "duration_sec": 7200,
+      "series_id": "rdk_2af6a1bc58c8",
+      "series_name": "アニソン・アカデミー",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
+    },
+    {
       "id": "TBS-13890152",
       "service": "radiko:TBS",
       "title": "[TBSラジオ] プチ鹿島 赤坂タイムス (2)",
@@ -6847,6 +7702,21 @@
       "duration_sec": 3600,
       "series_id": "rdk_bd40c268a8a5",
       "series_name": "HITS! THE TOWN Part2",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP13"
+    },
+    {
+      "id": "JOAK-13902629",
+      "service": "radiko:JOAK",
+      "title": "[NHK AM（東京）] ニュース",
+      "subtitle": "",
+      "content": "",
+      "start_time": "2026-09-12T14:00:00+09:00",
+      "end_time": "2026-09-12T14:05:00+09:00",
+      "duration_sec": 300,
+      "series_id": "rdk_06b0df722680",
+      "series_name": "ニュース",
       "episode_name": "",
       "genre": [],
       "area": "JP13"
@@ -7006,6 +7876,21 @@
         "スポーツ"
       ],
       "area": "NHK"
+    },
+    {
+      "id": "JOCK-13902936",
+      "service": "radiko:JOCK",
+      "title": "[NHK AM（名古屋）] プロ野球２０２６「巨人」対「阪神」",
+      "subtitle": "小早川毅彦(解説)/冨坂和男(アナウンサー)",
+      "content": "（試合開始 ２：００） 【解説】小早川毅彦，【アナウンサー】冨坂和男 〜東京ドームから中継〜\n\n＜中断＞（３：００）（４：００）ニュース［延伸のとき以降の番組に変更あり］",
+      "start_time": "2026-09-12T14:05:00+09:00",
+      "end_time": "2026-09-12T17:00:00+09:00",
+      "duration_sec": 10500,
+      "series_id": "rdk_2076c4ea8890",
+      "series_name": "プロ野球２０２６「巨人」対「阪神」",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
     },
     {
       "id": "RN1-13891085",
@@ -7833,6 +8718,21 @@
       "area": "JP23"
     },
     {
+      "id": "JOAK-FM-13902883",
+      "service": "radiko:JOAK-FM",
+      "title": "[NHK FM（東京）] ラジオマンジャック ９月１２日",
+      "subtitle": "赤坂泰彦(ＤＪ)/時東ぁみ(出演)/雨蘭咲木子(出演)",
+      "content": "２時間充実の生放送。番組ではメッセージやリクエストを募集しています。番組ホームページからどんどん送ってください！ 出演：赤坂泰彦、時東ぁみ、雨蘭咲木子",
+      "start_time": "2026-09-12T16:00:00+09:00",
+      "end_time": "2026-09-12T18:00:00+09:00",
+      "duration_sec": 7200,
+      "series_id": "rdk_68e0b52e5a7a",
+      "series_name": "ラジオマンジャック ９月１２日",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
+    },
+    {
       "id": "TBS-13890156",
       "service": "radiko:TBS",
       "title": "[TBSラジオ] …＆シノ！ from timelesz",
@@ -8601,6 +9501,21 @@
       "area": "JP23"
     },
     {
+      "id": "JOCK-13902937",
+      "service": "radiko:JOCK",
+      "title": "[NHK AM（名古屋）] ニュース",
+      "subtitle": "",
+      "content": "",
+      "start_time": "2026-09-12T17:00:00+09:00",
+      "end_time": "2026-09-12T17:05:00+09:00",
+      "duration_sec": 300,
+      "series_id": "rdk_0c1b71107178",
+      "series_name": "ニュース",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
+    },
+    {
       "id": "TBS-13890158",
       "service": "radiko:TBS",
       "title": "[TBSラジオ] room no.1007",
@@ -8716,6 +9631,21 @@
       "duration_sec": 3600,
       "series_id": "rdk_17ace2b4b44a",
       "series_name": "HITS! THE TOWN Part5",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP13"
+    },
+    {
+      "id": "JOAK-13902631",
+      "service": "radiko:JOAK",
+      "title": "[NHK AM（東京）] ニュース",
+      "subtitle": "",
+      "content": "",
+      "start_time": "2026-09-12T17:00:00+09:00",
+      "end_time": "2026-09-12T17:05:00+09:00",
+      "duration_sec": 300,
+      "series_id": "rdk_06b0df722680",
+      "series_name": "ニュース",
       "episode_name": "",
       "genre": [],
       "area": "JP13"
@@ -8905,6 +9835,21 @@
       "area": "NHK"
     },
     {
+      "id": "JOCK-13902938",
+      "service": "radiko:JOCK",
+      "title": "[NHK AM（名古屋）] 気象通報",
+      "subtitle": "",
+      "content": "",
+      "start_time": "2026-09-12T17:05:00+09:00",
+      "end_time": "2026-09-12T17:25:00+09:00",
+      "duration_sec": 1200,
+      "series_id": "rdk_73fe60c65d50",
+      "series_name": "気象通報",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
+    },
+    {
       "id": "JORF-13848693",
       "service": "radiko:JORF",
       "title": "[ラジオ日本] 今旬！インフォメーション",
@@ -8997,6 +9942,21 @@
         "趣味/教育"
       ],
       "area": "NHK"
+    },
+    {
+      "id": "JOCK-13902939",
+      "service": "radiko:JOCK",
+      "title": "[NHK AM（名古屋）] ちきゅうラジオ お別れ公衆電話",
+      "subtitle": "當間ローズ(出演)/中村慶子(アナウンサー)",
+      "content": "▽「ちきゅうメイト」はブラジルから。街から消える公衆電話についての話題。▽お便りテーマは「公衆電話の思い出」▽ＭＣは當間ローズさん！\n\n▽さようなら公衆電話。ブラジルでは、個性的な形をした公衆電話「オレリャン」が、ピーク時の１５０万台から今では３万台に。時代の移り変わりで街から消える公衆電話を紹介。▽お便りテーマは「公衆電話の思い出」海外の公衆電話での通話、実家への電話、大切なテレフォンカードなど公衆電話にまつわる思い出を大募集！▽ＳＮＳは、＃ちきゅうラジオ ▽ＭＣは當間ローズさん！",
+      "start_time": "2026-09-12T17:25:00+09:00",
+      "end_time": "2026-09-12T17:55:00+09:00",
+      "duration_sec": 1800,
+      "series_id": "rdk_4eb226b9322f",
+      "series_name": "ちきゅうラジオ お別れ公衆電話",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
     },
     {
       "id": "CBC-13889867",
@@ -9242,7 +10202,7 @@
       "id": "LFR-13874050",
       "service": "radiko:LFR",
       "title": "[ニッポン放送] ショウアップナイタープレイボール",
-      "subtitle": "真中満、宮田統樹",
+      "subtitle": "",
       "content": "メールアドレス：\n89@1242.com\n\n番組ホームページはこちら\n\ntwitterハッシュタグは「#ショウアップナイター」twitterアカウントは「@showup1242」",
       "start_time": "2026-09-12T17:50:00+09:00",
       "end_time": "2026-09-12T18:00:00+09:00",
@@ -9314,6 +10274,21 @@
       "area": "JP23"
     },
     {
+      "id": "JOCK-13902940",
+      "service": "radiko:JOCK",
+      "title": "[NHK AM（名古屋）] 気象情報・交通情報（東海３県）",
+      "subtitle": "",
+      "content": "",
+      "start_time": "2026-09-12T17:55:00+09:00",
+      "end_time": "2026-09-12T18:00:00+09:00",
+      "duration_sec": 300,
+      "series_id": "rdk_b67947f6a082",
+      "series_name": "気象情報・交通情報（東海３県）",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
+    },
+    {
       "id": "FMT-13872100",
       "service": "radiko:FMT",
       "title": "[TOKYO FM] 一建設 presents おうちのはなし",
@@ -9324,6 +10299,21 @@
       "duration_sec": 300,
       "series_id": "rdk_468e2841a555",
       "series_name": "一建設 presents おうちのはなし",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP13"
+    },
+    {
+      "id": "JOAK-13902634",
+      "service": "radiko:JOAK",
+      "title": "[NHK AM（東京）] 気象情報・交通情報（関東）",
+      "subtitle": "",
+      "content": "",
+      "start_time": "2026-09-12T17:55:00+09:00",
+      "end_time": "2026-09-12T18:00:00+09:00",
+      "duration_sec": 300,
+      "series_id": "rdk_1e8b10289a9b",
+      "series_name": "気象情報・交通情報（関東）",
       "episode_name": "",
       "genre": [],
       "area": "JP13"
@@ -9449,6 +10439,36 @@
       "area": "JP23"
     },
     {
+      "id": "JOCK-13902941",
+      "service": "radiko:JOCK",
+      "title": "[NHK AM（名古屋）] ニュース",
+      "subtitle": "",
+      "content": "",
+      "start_time": "2026-09-12T18:00:00+09:00",
+      "end_time": "2026-09-12T18:05:00+09:00",
+      "duration_sec": 300,
+      "series_id": "rdk_0c1b71107178",
+      "series_name": "ニュース",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
+    },
+    {
+      "id": "JOAK-FM-13902884",
+      "service": "radiko:JOAK-FM",
+      "title": "[NHK FM（東京）] ザ・ソウルミュージックⅡ",
+      "subtitle": "",
+      "content": "",
+      "start_time": "2026-09-12T18:00:00+09:00",
+      "end_time": "2026-09-12T18:50:00+09:00",
+      "duration_sec": 3000,
+      "series_id": "rdk_b57d6d7711a1",
+      "series_name": "ザ・ソウルミュージックⅡ",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
+    },
+    {
       "id": "TBS-13890160",
       "service": "radiko:TBS",
       "title": "[TBSラジオ] 杉本琢弥のVAVAVA",
@@ -9528,7 +10548,7 @@
       "service": "radiko:FMJ",
       "title": "[J-WAVE] SAPPORO BEER OTOAJITO",
       "subtitle": "クリス・ペプラー",
-      "content": "",
+      "content": "和久井沙良",
       "start_time": "2026-09-12T18:00:00+09:00",
       "end_time": "2026-09-12T19:00:00+09:00",
       "duration_sec": 3600,
@@ -9594,6 +10614,21 @@
       "duration_sec": 1800,
       "series_id": "rdk_ff7c9b0bec51",
       "series_name": "キムラカズキのCULTURE VANGUARD",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP13"
+    },
+    {
+      "id": "JOAK-13902635",
+      "service": "radiko:JOAK",
+      "title": "[NHK AM（東京）] ニュース",
+      "subtitle": "",
+      "content": "",
+      "start_time": "2026-09-12T18:00:00+09:00",
+      "end_time": "2026-09-12T18:05:00+09:00",
+      "duration_sec": 300,
+      "series_id": "rdk_06b0df722680",
+      "series_name": "ニュース",
       "episode_name": "",
       "genre": [],
       "area": "JP13"
@@ -9802,6 +10837,21 @@
         "趣味/教育"
       ],
       "area": "NHK"
+    },
+    {
+      "id": "JOCK-13902942",
+      "service": "radiko:JOCK",
+      "title": "[NHK AM（名古屋）] ちきゅうラジオ 世界最高齢の新聞配達員！",
+      "subtitle": "當間ローズ(出演)/中村慶子(アナウンサー)",
+      "content": "▽「ちきゅうナンバーワン！」今回は「最高齢の新聞配達員」を紹介します。世界記録に認されたのは日本の方！ ▽お便りテーマは「公衆電話の思い出」\n\n▽ユニーク世界記録と、その記録が生まれるまでのストーリーを伝える「ちきゅうナンバーワン！」。今回は「最高齢の新聞配達員」を紹介。世界記録は日本の方！ ▽お便りテーマは「公衆電話の思い出」海外の公衆電話、並んでかけた電話、テレフォンカードなど、公衆電話にまつわる思い出を大募集！",
+      "start_time": "2026-09-12T18:05:00+09:00",
+      "end_time": "2026-09-12T18:50:00+09:00",
+      "duration_sec": 2700,
+      "series_id": "rdk_3d36be991dbf",
+      "series_name": "ちきゅうラジオ 世界最高齢の新聞配達員！",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
     },
     {
       "id": "QRR-13872746",
@@ -10089,6 +11139,36 @@
       "area": "NHK"
     },
     {
+      "id": "JOCK-13902943",
+      "service": "radiko:JOCK",
+      "title": "[NHK AM（名古屋）] 気象情報・おしらせ（東海・北陸）",
+      "subtitle": "",
+      "content": "",
+      "start_time": "2026-09-12T18:50:00+09:00",
+      "end_time": "2026-09-12T19:00:00+09:00",
+      "duration_sec": 600,
+      "series_id": "rdk_74b209fc1443",
+      "series_name": "気象情報・おしらせ（東海・北陸）",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
+    },
+    {
+      "id": "JOAK-FM-13902885",
+      "service": "radiko:JOAK-FM",
+      "title": "[NHK FM（東京）] ニュース・気象情報・交通情報（関東甲信越）",
+      "subtitle": "",
+      "content": "",
+      "start_time": "2026-09-12T18:50:00+09:00",
+      "end_time": "2026-09-12T19:00:00+09:00",
+      "duration_sec": 600,
+      "series_id": "rdk_0c1ae24f3d2b",
+      "series_name": "ニュース・気象情報・交通情報（関東甲信越）",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
+    },
+    {
       "id": "FMT-13872103",
       "service": "radiko:FMT",
       "title": "[TOKYO FM] TOKYO FM Navi",
@@ -10204,6 +11284,36 @@
       "duration_sec": 1800,
       "series_id": "rdk_bc00ff4f4fb5",
       "series_name": "GLOBAL R-VISION",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
+    },
+    {
+      "id": "JOCK-13902944",
+      "service": "radiko:JOCK",
+      "title": "[NHK AM（名古屋）] ニュース ＮＨＫきょうのニュース",
+      "subtitle": "",
+      "content": "",
+      "start_time": "2026-09-12T19:00:00+09:00",
+      "end_time": "2026-09-12T19:20:00+09:00",
+      "duration_sec": 1200,
+      "series_id": "rdk_528493b07e24",
+      "series_name": "ニュース ＮＨＫきょうのニュース",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
+    },
+    {
+      "id": "JOAK-FM-13902886",
+      "service": "radiko:JOAK-FM",
+      "title": "[NHK FM（東京）] ニュース ＮＨＫきょうのニュース",
+      "subtitle": "",
+      "content": "",
+      "start_time": "2026-09-12T19:00:00+09:00",
+      "end_time": "2026-09-12T19:20:00+09:00",
+      "duration_sec": 1200,
+      "series_id": "rdk_c64cfb83ec7b",
+      "series_name": "ニュース ＮＨＫきょうのニュース",
       "episode_name": "",
       "genre": [],
       "area": "JP23"
@@ -10526,6 +11636,36 @@
       "area": "NHK"
     },
     {
+      "id": "JOCK-13902945",
+      "service": "radiko:JOCK",
+      "title": "[NHK AM（名古屋）] ニュース・気象情報（東海３県）",
+      "subtitle": "",
+      "content": "",
+      "start_time": "2026-09-12T19:20:00+09:00",
+      "end_time": "2026-09-12T19:25:00+09:00",
+      "duration_sec": 300,
+      "series_id": "rdk_b924ff932e35",
+      "series_name": "ニュース・気象情報（東海３県）",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
+    },
+    {
+      "id": "JOAK-FM-13902887",
+      "service": "radiko:JOAK-FM",
+      "title": "[NHK FM（東京）] ニュース・気象情報（関東・山梨）",
+      "subtitle": "",
+      "content": "",
+      "start_time": "2026-09-12T19:20:00+09:00",
+      "end_time": "2026-09-12T19:25:00+09:00",
+      "duration_sec": 300,
+      "series_id": "rdk_1358c044273c",
+      "series_name": "ニュース・気象情報（関東・山梨）",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
+    },
+    {
       "id": "r1-270-2026091273294",
       "service": "r1",
       "title": "上方演芸会　選　ラビットラ／大木こだまひびき",
@@ -10561,6 +11701,21 @@
         "その他"
       ],
       "area": "NHK"
+    },
+    {
+      "id": "JOCK-13902946",
+      "service": "radiko:JOCK",
+      "title": "[NHK AM（名古屋）] 上方演芸会 選 ラビットラ／大木こだまひびき",
+      "subtitle": "ラビットラ(出演)/大木こだまひびき(出演)/加藤向陽(司会)",
+      "content": "ラビットラ「親しき中にも礼儀あり」（作：小倉マサ志）／大木こだまひびき「おもしろい話あんねんけど聞く？」（作：村上太）▽兵庫県小野市で収録",
+      "start_time": "2026-09-12T19:25:00+09:00",
+      "end_time": "2026-09-12T19:50:00+09:00",
+      "duration_sec": 1500,
+      "series_id": "rdk_e010d89251ed",
+      "series_name": "上方演芸会 選 ラビットラ／大木こだまひびき",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
     },
     {
       "id": "CBC-13889869",
@@ -10820,6 +11975,21 @@
       "area": "JP23"
     },
     {
+      "id": "JOCK-13902947",
+      "service": "radiko:JOCK",
+      "title": "[NHK AM（名古屋）] 音の風景「桑名石取祭～三重～」",
+      "subtitle": "結城さとみ(語り)",
+      "content": "【初回放送】２０２６年９月７日【語り】結城さとみ ▽三重県・桑名の石取祭。『日本一やかましい祭り』とも言われる、華やかなお囃子と熱気を音でお楽しみください。\n\n【初回放送】２０２６年９月７日【語り】結城さとみ ▽三重県・桑名の石取祭。石を奉納する神事から始まったこのお祭りの特徴は『日本一やかましい祭り』とも言われる、華やかなお囃子。８月の第一土曜日・日曜日の昼夜に，市内各所で打ち鳴らされるお囃子の叩き出しは、なんと夜中の０時！老若男女が地元総出で参加します。城下町としての歴史を持ち、宿場町としても名高い桑名の、夏ならではの熱気を音でお楽しみください。",
+      "start_time": "2026-09-12T19:50:00+09:00",
+      "end_time": "2026-09-12T19:55:00+09:00",
+      "duration_sec": 300,
+      "series_id": "rdk_94169a3a82e3",
+      "series_name": "音の風景「桑名石取祭～三重～」",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
+    },
+    {
       "id": "r1-270-2026091281439",
       "service": "r1",
       "title": "気象情報・おしらせ・交通情報（関西）",
@@ -10835,6 +12005,21 @@
       "area": "NHK"
     },
     {
+      "id": "JOCK-13902948",
+      "service": "radiko:JOCK",
+      "title": "[NHK AM（名古屋）] 気象情報・海上予報・交通情報（東海・北陸）",
+      "subtitle": "",
+      "content": "",
+      "start_time": "2026-09-12T19:55:00+09:00",
+      "end_time": "2026-09-12T20:00:00+09:00",
+      "duration_sec": 300,
+      "series_id": "rdk_767548d3aa6b",
+      "series_name": "気象情報・海上予報・交通情報（東海・北陸）",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
+    },
+    {
       "id": "FMT-13872106",
       "service": "radiko:FMT",
       "title": "[TOKYO FM] TOKYO FM Navi",
@@ -10845,6 +12030,21 @@
       "duration_sec": 300,
       "series_id": "rdk_42c55bb9ce37",
       "series_name": "TOKYO FM Navi",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP13"
+    },
+    {
+      "id": "JOAK-13902642",
+      "service": "radiko:JOAK",
+      "title": "[NHK AM（東京）] 気象情報・交通情報（関東甲信越）",
+      "subtitle": "",
+      "content": "",
+      "start_time": "2026-09-12T19:55:00+09:00",
+      "end_time": "2026-09-12T20:00:00+09:00",
+      "duration_sec": 300,
+      "series_id": "rdk_ee377370e4ee",
+      "series_name": "気象情報・交通情報（関東甲信越）",
       "episode_name": "",
       "genre": [],
       "area": "JP13"
@@ -10935,6 +12135,21 @@
       "duration_sec": 1800,
       "series_id": "rdk_ea08ec0f160a",
       "series_name": "ATSUMI MOTORS Do You Know RADIO？",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
+    },
+    {
+      "id": "JOCK-13902949",
+      "service": "radiko:JOCK",
+      "title": "[NHK AM（名古屋）] ニュース",
+      "subtitle": "",
+      "content": "",
+      "start_time": "2026-09-12T20:00:00+09:00",
+      "end_time": "2026-09-12T20:05:00+09:00",
+      "duration_sec": 300,
+      "series_id": "rdk_0c1b71107178",
+      "series_name": "ニュース",
       "episode_name": "",
       "genre": [],
       "area": "JP23"
@@ -11085,6 +12300,21 @@
       "duration_sec": 1800,
       "series_id": "rdk_29f74f4c56e3",
       "series_name": "Jazz＆J",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP13"
+    },
+    {
+      "id": "JOAK-13902643",
+      "service": "radiko:JOAK",
+      "title": "[NHK AM（東京）] ニュース",
+      "subtitle": "",
+      "content": "",
+      "start_time": "2026-09-12T20:00:00+09:00",
+      "end_time": "2026-09-12T20:05:00+09:00",
+      "duration_sec": 300,
+      "series_id": "rdk_06b0df722680",
+      "series_name": "ニュース",
       "episode_name": "",
       "genre": [],
       "area": "JP13"
@@ -11291,6 +12521,21 @@
       "area": "NHK"
     },
     {
+      "id": "JOCK-13902950",
+      "service": "radiko:JOCK",
+      "title": "[NHK AM（名古屋）] ミルクボーイのそれオカンに言うといて！「日本史の話」",
+      "subtitle": "ミルクボーイ(出演)/一柳亜矢子(出演)/河合敦(ゲスト)",
+      "content": "ミルクボーイが狭くて深い世界を掘り下げるトーク番組。ゲストは歴史作家の河合敦さん。日本史の教科書の記述は昔と今でずいぶん異なるという。一体どこが？なぜか？伺う。\n\n漫才コンビ・ミルクボーイが“狭くて深～い”世界を掘り下げるトーク番組。今回のゲストは「歴史探偵」でもおなじみの歴史作家・河合敦さん。実は「日本史」の教科書の記述は、昔と今とでずいぶん変わっていることをご存じでしょうか。「●●は覚えなくてもよくなった？」「●●は人名でなく地名で呼ぶようになった？」など、アップデートされた教科書の記述についてたっぷりと伺います。投稿コーナーではおたよりを募集中です。",
+      "start_time": "2026-09-12T20:05:00+09:00",
+      "end_time": "2026-09-12T20:55:00+09:00",
+      "duration_sec": 3000,
+      "series_id": "rdk_39ebbac1ad1d",
+      "series_name": "ミルクボーイのそれオカンに言うといて！「日本史の話」",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
+    },
+    {
       "id": "CBC-13889873",
       "service": "radiko:CBC",
       "title": "[CBCラジオ] Take on presents 山浦・平野・今田のうまから!",
@@ -11488,6 +12733,21 @@
       "area": "NHK"
     },
     {
+      "id": "JOCK-13902951",
+      "service": "radiko:JOCK",
+      "title": "[NHK AM（名古屋）] 全国気象情報・全国交通情報",
+      "subtitle": "",
+      "content": "",
+      "start_time": "2026-09-12T20:55:00+09:00",
+      "end_time": "2026-09-12T21:00:00+09:00",
+      "duration_sec": 300,
+      "series_id": "rdk_5784381c61ef",
+      "series_name": "全国気象情報・全国交通情報",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
+    },
+    {
       "id": "KISSFMKOBE-13873017",
       "service": "radiko:KISSFMKOBE",
       "title": "[Kiss FM KOBE] K-BREAK",
@@ -11573,6 +12833,36 @@
       "duration_sec": 1800,
       "series_id": "rdk_551f8ae290a6",
       "series_name": "RADIO．INAZUMA",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
+    },
+    {
+      "id": "JOCK-13902952",
+      "service": "radiko:JOCK",
+      "title": "[NHK AM（名古屋）] ニュース",
+      "subtitle": "",
+      "content": "",
+      "start_time": "2026-09-12T21:00:00+09:00",
+      "end_time": "2026-09-12T21:05:00+09:00",
+      "duration_sec": 300,
+      "series_id": "rdk_0c1b71107178",
+      "series_name": "ニュース",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
+    },
+    {
+      "id": "JOAK-FM-13902889",
+      "service": "radiko:JOAK-FM",
+      "title": "[NHK FM（東京）] ＦＭシネマサウンズ 無償の愛",
+      "subtitle": "藤丸千",
+      "content": "藤丸千\n\n映画作品を俳優が語り、その音楽が響きます。いつか観た、観たかった映画のシーンを思い浮かべてください。",
+      "start_time": "2026-09-12T21:00:00+09:00",
+      "end_time": "2026-09-12T21:50:00+09:00",
+      "duration_sec": 3000,
+      "series_id": "rdk_47f0698ab48c",
+      "series_name": "ＦＭシネマサウンズ 無償の愛",
       "episode_name": "",
       "genre": [],
       "area": "JP23"
@@ -11738,6 +13028,21 @@
       "duration_sec": 1800,
       "series_id": "rdk_46b1e876ac34",
       "series_name": "LuckyFes×BARKS Radio",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP13"
+    },
+    {
+      "id": "JOAK-13902646",
+      "service": "radiko:JOAK",
+      "title": "[NHK AM（東京）] ニュース",
+      "subtitle": "",
+      "content": "",
+      "start_time": "2026-09-12T21:00:00+09:00",
+      "end_time": "2026-09-12T21:05:00+09:00",
+      "duration_sec": 300,
+      "series_id": "rdk_06b0df722680",
+      "series_name": "ニュース",
       "episode_name": "",
       "genre": [],
       "area": "JP13"
@@ -11957,6 +13262,21 @@
         "音楽"
       ],
       "area": "NHK"
+    },
+    {
+      "id": "JOCK-13902953",
+      "service": "radiko:JOCK",
+      "title": "[NHK AM（名古屋）] ぶいあーる！〜ＶＴｕｂｅｒの音楽Ｒａｄｉｏ〜",
+      "subtitle": "",
+      "content": "",
+      "start_time": "2026-09-12T21:05:00+09:00",
+      "end_time": "2026-09-12T21:55:00+09:00",
+      "duration_sec": 3000,
+      "series_id": "rdk_10785b15a7dc",
+      "series_name": "ぶいあーる！〜ＶＴｕｂｅｒの音楽Ｒａｄｉｏ〜",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
     },
     {
       "id": "LFR-13874054",
@@ -12276,6 +13596,21 @@
       "area": "NHK"
     },
     {
+      "id": "JOCK-13902954",
+      "service": "radiko:JOCK",
+      "title": "[NHK AM（名古屋）] ニュース・気象情報（東海・北陸）",
+      "subtitle": "",
+      "content": "",
+      "start_time": "2026-09-12T21:55:00+09:00",
+      "end_time": "2026-09-12T22:00:00+09:00",
+      "duration_sec": 300,
+      "series_id": "rdk_3cbbd4f7adfe",
+      "series_name": "ニュース・気象情報（東海・北陸）",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
+    },
+    {
       "id": "INT-13873433",
       "service": "radiko:INT",
       "title": "[interfm] interfm Headline News",
@@ -12301,6 +13636,21 @@
       "duration_sec": 300,
       "series_id": "rdk_864dfb934c21",
       "series_name": "TOKYO FM NEWS～きょうのSHO TIME!",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP13"
+    },
+    {
+      "id": "JOAK-13902648",
+      "service": "radiko:JOAK",
+      "title": "[NHK AM（東京）] ニュース・海上気象情報・交通情報（関東甲信越）",
+      "subtitle": "",
+      "content": "",
+      "start_time": "2026-09-12T21:55:00+09:00",
+      "end_time": "2026-09-12T22:00:00+09:00",
+      "duration_sec": 300,
+      "series_id": "rdk_2ed5c018a52d",
+      "series_name": "ニュース・海上気象情報・交通情報（関東甲信越）",
       "episode_name": "",
       "genre": [],
       "area": "JP13"
@@ -12406,6 +13756,36 @@
       "duration_sec": 3300,
       "series_id": "rdk_9220c60a2a0d",
       "series_name": "SPITZ 草野マサムネのロック大陸漫遊記",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
+    },
+    {
+      "id": "JOCK-13902955",
+      "service": "radiko:JOCK",
+      "title": "[NHK AM（名古屋）] ニュース",
+      "subtitle": "",
+      "content": "",
+      "start_time": "2026-09-12T22:00:00+09:00",
+      "end_time": "2026-09-12T22:05:00+09:00",
+      "duration_sec": 300,
+      "series_id": "rdk_0c1b71107178",
+      "series_name": "ニュース",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
+    },
+    {
+      "id": "JOAK-FM-13902891",
+      "service": "radiko:JOAK-FM",
+      "title": "[NHK FM（東京）] ＦＭシアター「階段」",
+      "subtitle": "津田純子(作)/苅谷俊介(出演)/橘明架里(出演)/雛川水暉(出演)/堀口純香(音楽)/佐古井隆之(出演)/若林久弥(出演)/澁谷凜音(出演)/白土直子(出演)/佐藤譲(演出)",
+      "content": "【作】津田純子【演出】佐藤譲【出演】苅谷俊介，橘明架里，雛川水暉，佐古井隆之，若林久弥，澁谷凜音，白土直子【音楽】堀口純香",
+      "start_time": "2026-09-12T22:00:00+09:00",
+      "end_time": "2026-09-12T22:50:00+09:00",
+      "duration_sec": 3000,
+      "series_id": "rdk_5c4f5bfc8f85",
+      "series_name": "ＦＭシアター「階段」",
       "episode_name": "",
       "genre": [],
       "area": "JP23"
@@ -12571,6 +13951,21 @@
       "duration_sec": 3600,
       "series_id": "rdk_966d28137a0d",
       "series_name": "ミッドナイトクレイジーラジオ",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP13"
+    },
+    {
+      "id": "JOAK-13902649",
+      "service": "radiko:JOAK",
+      "title": "[NHK AM（東京）] ニュース",
+      "subtitle": "",
+      "content": "",
+      "start_time": "2026-09-12T22:00:00+09:00",
+      "end_time": "2026-09-12T22:05:00+09:00",
+      "duration_sec": 300,
+      "series_id": "rdk_06b0df722680",
+      "series_name": "ニュース",
       "episode_name": "",
       "genre": [],
       "area": "JP13"
@@ -12761,6 +14156,21 @@
         "その他"
       ],
       "area": "NHK"
+    },
+    {
+      "id": "JOCK-13902956",
+      "service": "radiko:JOCK",
+      "title": "[NHK AM（名古屋）] 山下健二郎のトーク・ライク・フィッシング 野々村真が登場！後編",
+      "subtitle": "山下健二郎(出演)/野々村真(出演)/藤原陸遊(アナウンサー)",
+      "content": "釣り好き大集合！今こそ釣りの素晴らしさを語ろう！釣りを愛してやまない三代目ＪＳＢ・山下健二郎が釣り好きゲストと釣りトーク全開！釣り好きでない方もぜひ！",
+      "start_time": "2026-09-12T22:05:00+09:00",
+      "end_time": "2026-09-12T22:55:00+09:00",
+      "duration_sec": 3000,
+      "series_id": "rdk_509a2e6753cf",
+      "series_name": "山下健二郎のトーク・ライク・フィッシング 野々村真が登場！後編",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
     },
     {
       "id": "ABC-13880974",
@@ -13069,6 +14479,21 @@
       "area": "JP23"
     },
     {
+      "id": "JOCK-13902957",
+      "service": "radiko:JOCK",
+      "title": "[NHK AM（名古屋）] ニュース・気象情報（東海・北陸）",
+      "subtitle": "",
+      "content": "",
+      "start_time": "2026-09-12T22:55:00+09:00",
+      "end_time": "2026-09-12T23:00:00+09:00",
+      "duration_sec": 300,
+      "series_id": "rdk_3cbbd4f7adfe",
+      "series_name": "ニュース・気象情報（東海・北陸）",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
+    },
+    {
       "id": "FMT-13872113",
       "service": "radiko:FMT",
       "title": "[TOKYO FM] フラガリアメモリーズ Knight Link",
@@ -13079,6 +14504,21 @@
       "duration_sec": 300,
       "series_id": "rdk_3cb95dc04556",
       "series_name": "フラガリアメモリーズ Knight Link",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP13"
+    },
+    {
+      "id": "JOAK-13902651",
+      "service": "radiko:JOAK",
+      "title": "[NHK AM（東京）] ニュース・気象情報（関東甲信越）",
+      "subtitle": "",
+      "content": "",
+      "start_time": "2026-09-12T22:55:00+09:00",
+      "end_time": "2026-09-12T23:00:00+09:00",
+      "duration_sec": 300,
+      "series_id": "rdk_b591278fb288",
+      "series_name": "ニュース・気象情報（関東甲信越）",
       "episode_name": "",
       "genre": [],
       "area": "JP13"
@@ -13169,6 +14609,36 @@
       "duration_sec": 3300,
       "series_id": "rdk_ffc0d5a6e1f3",
       "series_name": "桑田佳祐のやさしい夜遊び",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
+    },
+    {
+      "id": "JOCK-13902958",
+      "service": "radiko:JOCK",
+      "title": "[NHK AM（名古屋）] ニュース",
+      "subtitle": "",
+      "content": "",
+      "start_time": "2026-09-12T23:00:00+09:00",
+      "end_time": "2026-09-12T23:05:00+09:00",
+      "duration_sec": 300,
+      "series_id": "rdk_0c1b71107178",
+      "series_name": "ニュース",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
+    },
+    {
+      "id": "JOAK-FM-13902894",
+      "service": "radiko:JOAK-FM",
+      "title": "[NHK FM（東京）] ジャズ・トゥナイト",
+      "subtitle": "",
+      "content": "",
+      "start_time": "2026-09-12T23:00:00+09:00",
+      "end_time": "2026-09-13T01:00:00+09:00",
+      "duration_sec": 7200,
+      "series_id": "rdk_fe466f155ff3",
+      "series_name": "ジャズ・トゥナイト",
       "episode_name": "",
       "genre": [],
       "area": "JP23"
@@ -13304,6 +14774,21 @@
       "duration_sec": 1800,
       "series_id": "rdk_90a81f5ee0a9",
       "series_name": "Rock’N’ Roll Journey",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP13"
+    },
+    {
+      "id": "JOAK-13902652",
+      "service": "radiko:JOAK",
+      "title": "[NHK AM（東京）] ニュース",
+      "subtitle": "",
+      "content": "",
+      "start_time": "2026-09-12T23:00:00+09:00",
+      "end_time": "2026-09-12T23:05:00+09:00",
+      "duration_sec": 300,
+      "series_id": "rdk_06b0df722680",
+      "series_name": "ニュース",
       "episode_name": "",
       "genre": [],
       "area": "JP13"
@@ -13510,6 +14995,21 @@
         "ドキュメンタリー/教養"
       ],
       "area": "NHK"
+    },
+    {
+      "id": "JOCK-13902959",
+      "service": "radiko:JOCK",
+      "title": "[NHK AM（名古屋）] ラジオ深夜便▽深夜便ＮＥＸＴ・前半",
+      "subtitle": "森田美由紀(アンカー)/藤井隆(出演)",
+      "content": "▽深夜便ＮＥＸＴ・前半 「おじいちゃん、おばあちゃんと言えば」 ▽天気概況・明日の日の出",
+      "start_time": "2026-09-12T23:05:00+09:00",
+      "end_time": "2026-09-13T00:00:00+09:00",
+      "duration_sec": 3300,
+      "series_id": "rdk_9e16e7331879",
+      "series_name": "ラジオ深夜便▽深夜便ＮＥＸＴ",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
     },
     {
       "id": "CBC-13889881",
@@ -13872,6 +15372,21 @@
       "area": "JP23"
     },
     {
+      "id": "JOCK-13902960",
+      "service": "radiko:JOCK",
+      "title": "[NHK AM（名古屋）] ニュース",
+      "subtitle": "",
+      "content": "",
+      "start_time": "2026-09-13T00:00:00+09:00",
+      "end_time": "2026-09-13T00:10:00+09:00",
+      "duration_sec": 600,
+      "series_id": "rdk_0c1b71107178",
+      "series_name": "ニュース",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
+    },
+    {
       "id": "TBS-13890170",
       "service": "radiko:TBS",
       "title": "[TBSラジオ] 俺達には土曜日しかない",
@@ -14002,6 +15517,21 @@
       "duration_sec": 1800,
       "series_id": "rdk_d6c98ffb2094",
       "series_name": "Adult Nostalgic Radioshow ～ANR大人の秘密基地～",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP13"
+    },
+    {
+      "id": "JOAK-13902654",
+      "service": "radiko:JOAK",
+      "title": "[NHK AM（東京）] ニュース",
+      "subtitle": "",
+      "content": "",
+      "start_time": "2026-09-13T00:00:00+09:00",
+      "end_time": "2026-09-13T00:10:00+09:00",
+      "duration_sec": 600,
+      "series_id": "rdk_06b0df722680",
+      "series_name": "ニュース",
       "episode_name": "",
       "genre": [],
       "area": "JP13"
@@ -14191,6 +15721,21 @@
         "ドキュメンタリー/教養"
       ],
       "area": "NHK"
+    },
+    {
+      "id": "JOCK-13902961",
+      "service": "radiko:JOCK",
+      "title": "[NHK AM（名古屋）] ラジオ深夜便▽深夜便ＮＥＸＴ・後半",
+      "subtitle": "森田美由紀(アンカー)/藤井隆(出演)",
+      "content": "▽深夜便ＮＥＸＴ・後半 「おじいちゃん、おばあちゃんと言えば」 ▽天気概況・世界の天気と予想気温",
+      "start_time": "2026-09-13T00:10:00+09:00",
+      "end_time": "2026-09-13T01:00:00+09:00",
+      "duration_sec": 3000,
+      "series_id": "rdk_9e16e7331879",
+      "series_name": "ラジオ深夜便▽深夜便ＮＥＸＴ",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
     },
     {
       "id": "FMO-13872329",
@@ -14523,6 +16068,36 @@
       "area": "JP23"
     },
     {
+      "id": "JOCK-13902962",
+      "service": "radiko:JOCK",
+      "title": "[NHK AM（名古屋）] ニュース",
+      "subtitle": "",
+      "content": "",
+      "start_time": "2026-09-13T01:00:00+09:00",
+      "end_time": "2026-09-13T01:05:00+09:00",
+      "duration_sec": 300,
+      "series_id": "rdk_0c1b71107178",
+      "series_name": "ニュース",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
+    },
+    {
+      "id": "JOAK-FM-13902895",
+      "service": "radiko:JOAK-FM",
+      "title": "[NHK FM（東京）] ポルトガル語講座 入門 聴いて・覚えて・話してみよう！（２２）",
+      "subtitle": "中川ソニア(講師)/宮入亮(講師)",
+      "content": "声に出す練習をたくさんして、ポルトガル語の基礎的な文法や表現を身につけます。",
+      "start_time": "2026-09-13T01:00:00+09:00",
+      "end_time": "2026-09-13T01:15:00+09:00",
+      "duration_sec": 900,
+      "series_id": "rdk_4efb97774b3f",
+      "series_name": "ポルトガル語講座 入門 聴いて・覚えて・話してみよう！",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
+    },
+    {
       "id": "TBS-13890171",
       "service": "radiko:TBS",
       "title": "[TBSラジオ] 東京ポッド許可局",
@@ -14647,7 +16222,7 @@
       "service": "radiko:NACK5",
       "title": "[NACK5] 海老車の「ばくばく」 Part1",
       "subtitle": "海老車",
-      "content": "【メッセージフォーム】\n\nメッセージテーマ\n\nゲスト：My Hair is Badの椎木 知仁さんへの質問やメッセージ\n\n単語ガチャ大喜利\n\nサエキの胸キュン百人組手\n\n探偵事務所 海老車\n\nお出かけ推進部\n\nふつうのおたより",
+      "content": "???【海老車の「ばくばく」】\nサエキ、大根勇樹、中村シュンスケのお笑いトリオ・海老車が\n「トレンド情報」「流行の音楽」「リアルな悩み」「日常でのちょっとした話題・出来事」など\n土曜深夜に持ち寄ってリスナーのみんなと一緒に深夜1時から3時間45分生放送でおとどけ！\n\n9月12日（土）のメッセージテーマは…\n?気づいちゃった！?\n\n久々の同窓会の中で「俺って本当に仲良い友達いなかったのかも…」と気づいちゃったサエキ。\nそこで、あなたが「気づいちゃったこと」を送ってきてください。\n\nぜひXでの実況は「＃ばくばく795」をつけて投稿してください。\n\n【メッセージフォーム】\n\nメッセージテーマ\n\n単語ガチャ大喜利\n\nサエキの胸キュン百人組手\n\n探偵事務所 海老車\n\nお出かけ推進部\n\nふつうのおたより",
       "start_time": "2026-09-13T01:00:00+09:00",
       "end_time": "2026-09-13T02:00:00+09:00",
       "duration_sec": 3600,
@@ -14683,6 +16258,21 @@
       "duration_sec": 7200,
       "series_id": "rdk_3e490f32838e",
       "series_name": "ニチレイプレゼンツ オードリーのオールナイトニッポン",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP13"
+    },
+    {
+      "id": "JOAK-13902656",
+      "service": "radiko:JOAK",
+      "title": "[NHK AM（東京）] ニュース",
+      "subtitle": "",
+      "content": "",
+      "start_time": "2026-09-13T01:00:00+09:00",
+      "end_time": "2026-09-13T01:05:00+09:00",
+      "duration_sec": 300,
+      "series_id": "rdk_06b0df722680",
+      "series_name": "ニュース",
       "episode_name": "",
       "genre": [],
       "area": "JP13"
@@ -14891,6 +16481,21 @@
         "ドキュメンタリー/教養"
       ],
       "area": "NHK"
+    },
+    {
+      "id": "JOCK-13902963",
+      "service": "radiko:JOCK",
+      "title": "[NHK AM（名古屋）] ラジオ深夜便▽話芸１００選",
+      "subtitle": "森田美由紀(アンカー)/柳亭こみち(出演)/金子拓(ご案内)",
+      "content": "▽話芸１００選 落語「小間物屋政談」 ▽深夜便のうた・天気概況",
+      "start_time": "2026-09-13T01:05:00+09:00",
+      "end_time": "2026-09-13T02:00:00+09:00",
+      "duration_sec": 3300,
+      "series_id": "rdk_eb902124a1ab",
+      "series_name": "ラジオ深夜便▽話芸１００選",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
     },
     {
       "id": "r3-270-2026091373485",
@@ -15152,6 +16757,36 @@
       "area": "JP23"
     },
     {
+      "id": "JOCK-13902964",
+      "service": "radiko:JOCK",
+      "title": "[NHK AM（名古屋）] ニュース",
+      "subtitle": "",
+      "content": "",
+      "start_time": "2026-09-13T02:00:00+09:00",
+      "end_time": "2026-09-13T02:05:00+09:00",
+      "duration_sec": 300,
+      "series_id": "rdk_0c1b71107178",
+      "series_name": "ニュース",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
+    },
+    {
+      "id": "JOAK-FM-13902897",
+      "service": "radiko:JOAK-FM",
+      "title": "[NHK FM（東京）] 日曜カルチャー「秀吉の天下一統の軌跡をたどる（２）小牧・長久手合戦ほか」",
+      "subtitle": "黒田基樹(講師)",
+      "content": "大河ドラマ「豊臣兄弟！」時代考証担当の黒田基樹さんが最新研究成果をもとに秀吉の天下一統の過程を概観する。またそのなかで弟・秀長が果たした役割についても注目する。\n\n秀吉は織田家当主の織田信雄と対立し「小牧・長久手」合戦で勝利。天下人の地位を確立し羽柴（豊臣）政権を築き上げました。その後四国・北国を相次いで平定し全く新しい武家政権のあり方を成立させます。最新研究では、江戸時代、合戦の名称が徳川家康の活躍にスポットが当たるよう作り上げられたとの説も出されイメージが塗り替えられています。「豊臣兄弟！」の時代考証担当・黒田基樹さんが秀吉天下一統の実像に迫ります。",
+      "start_time": "2026-09-13T02:00:00+09:00",
+      "end_time": "2026-09-13T03:00:00+09:00",
+      "duration_sec": 3600,
+      "series_id": "rdk_501865339e3e",
+      "series_name": "日曜カルチャー「秀吉の天下一統の軌跡をたどる（２）小牧・長久手合戦ほか」",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
+    },
+    {
       "id": "TBS-13890172",
       "service": "radiko:TBS",
       "title": "[TBSラジオ] 脳盗",
@@ -15231,7 +16866,7 @@
       "service": "radiko:NACK5",
       "title": "[NACK5] 海老車の「ばくばく」 Part2",
       "subtitle": "海老車",
-      "content": "【メッセージフォーム】\n\nメッセージテーマ\n\nゲスト：My Hair is Badの椎木 知仁さんへの質問やメッセージ\n\n単語ガチャ大喜利\n\nサエキの胸キュン百人組手\n\n探偵事務所 海老車\n\nお出かけ推進部\n\nふつうのおたより",
+      "content": "???【海老車の「ばくばく」】\nサエキ、大根勇樹、中村シュンスケのお笑いトリオ・海老車が\n「トレンド情報」「流行の音楽」「リアルな悩み」「日常でのちょっとした話題・出来事」など\n土曜深夜に持ち寄ってリスナーのみんなと一緒に深夜1時から3時間45分生放送でおとどけ！\n\n9月12日（土）のメッセージテーマは…\n?気づいちゃった！?\n\n久々の同窓会の中で「俺って本当に仲良い友達いなかったのかも…」と気づいちゃったサエキ。\nそこで、あなたが「気づいちゃったこと」を送ってきてください。\n\nぜひXでの実況は「＃ばくばく795」をつけて投稿してください。\n\n【メッセージフォーム】\n\nメッセージテーマ\n\n単語ガチャ大喜利\n\nサエキの胸キュン百人組手\n\n探偵事務所 海老車\n\nお出かけ推進部\n\nふつうのおたより",
       "start_time": "2026-09-13T02:00:00+09:00",
       "end_time": "2026-09-13T03:00:00+09:00",
       "duration_sec": 3600,
@@ -15252,6 +16887,21 @@
       "duration_sec": 9000,
       "series_id": "rdk_939f10cf4b27",
       "series_name": "Radio HITS Radio",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP13"
+    },
+    {
+      "id": "JOAK-13902658",
+      "service": "radiko:JOAK",
+      "title": "[NHK AM（東京）] ニュース",
+      "subtitle": "",
+      "content": "",
+      "start_time": "2026-09-13T02:00:00+09:00",
+      "end_time": "2026-09-13T02:05:00+09:00",
+      "duration_sec": 300,
+      "series_id": "rdk_06b0df722680",
+      "series_name": "ニュース",
       "episode_name": "",
       "genre": [],
       "area": "JP13"
@@ -15385,6 +17035,21 @@
         "ドキュメンタリー/教養"
       ],
       "area": "NHK"
+    },
+    {
+      "id": "JOCK-13902965",
+      "service": "radiko:JOCK",
+      "title": "[NHK AM（名古屋）] ラジオ深夜便▽ロマンチックコンサート",
+      "subtitle": "森田美由紀(アンカー)",
+      "content": "▽ロマンチックコンサート 「月（Ｍｏｏｎ）のうたアラカルト Ｐａｒｔ１」 ▽天気概況",
+      "start_time": "2026-09-13T02:05:00+09:00",
+      "end_time": "2026-09-13T03:00:00+09:00",
+      "duration_sec": 3300,
+      "series_id": "rdk_999d246a673c",
+      "series_name": "ラジオ深夜便▽ロマンチックコンサート",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
     },
     {
       "id": "FMAICHI-13874520",
@@ -15582,6 +17247,36 @@
       "area": "JP23"
     },
     {
+      "id": "JOCK-13902966",
+      "service": "radiko:JOCK",
+      "title": "[NHK AM（名古屋）] ニュース",
+      "subtitle": "",
+      "content": "",
+      "start_time": "2026-09-13T03:00:00+09:00",
+      "end_time": "2026-09-13T03:05:00+09:00",
+      "duration_sec": 300,
+      "series_id": "rdk_0c1b71107178",
+      "series_name": "ニュース",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
+    },
+    {
+      "id": "JOAK-FM-13902898",
+      "service": "radiko:JOAK-FM",
+      "title": "[NHK FM（東京）] ＮＨＫ高校講座 仕事の現場ｒｅａｌ 歯科衛生士",
+      "subtitle": "松根三枝子(ゲスト)/吉岡由梨菜(きき手)",
+      "content": "今回は歯科衛生士の松根三枝子さんにお話しを伺います。\n\n松根さんはお姉さんが看護師だったこと、理系科目が得意だったことから歯科衛生士を目指したといいます。患者さんひとり一人に寄り添いながら、口の健康を守り、健康な人生が送れるように見守る歯科衛生士が目標です。今の仕事に就くまでに松根さんがどのように資格取得の道を選んだのか、現場に出てどんな壁に出会いそれを乗り越えたのか、詳しくお話を伺います。",
+      "start_time": "2026-09-13T03:00:00+09:00",
+      "end_time": "2026-09-13T03:20:00+09:00",
+      "duration_sec": 1200,
+      "series_id": "rdk_52067066addc",
+      "series_name": "ＮＨＫ高校講座 仕事の現場ｒｅａｌ 歯科衛生士",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
+    },
+    {
       "id": "TBS-13890173",
       "service": "radiko:TBS",
       "title": "[TBSラジオ] さらば青春の光がTaダ、Baカ、Saワギ",
@@ -15691,7 +17386,7 @@
       "service": "radiko:NACK5",
       "title": "[NACK5] 海老車の「ばくばく」 Part3",
       "subtitle": "海老車",
-      "content": "【メッセージフォーム】\n\nメッセージテーマ\n\nゲスト：My Hair is Badの椎木 知仁さんへの質問やメッセージ\n\n単語ガチャ大喜利\n\nサエキの胸キュン百人組手\n\n探偵事務所 海老車\n\nお出かけ推進部\n\nふつうのおたより",
+      "content": "???【海老車の「ばくばく」】\nサエキ、大根勇樹、中村シュンスケのお笑いトリオ・海老車が\n「トレンド情報」「流行の音楽」「リアルな悩み」「日常でのちょっとした話題・出来事」など\n土曜深夜に持ち寄ってリスナーのみんなと一緒に深夜1時から3時間45分生放送でおとどけ！\n\n9月12日（土）のメッセージテーマは…\n?気づいちゃった！?\n\n久々の同窓会の中で「俺って本当に仲良い友達いなかったのかも…」と気づいちゃったサエキ。\nそこで、あなたが「気づいちゃったこと」を送ってきてください。\n\nぜひXでの実況は「＃ばくばく795」をつけて投稿してください。\n\n【メッセージフォーム】\n\nメッセージテーマ\n\n単語ガチャ大喜利\n\nサエキの胸キュン百人組手\n\n探偵事務所 海老車\n\nお出かけ推進部\n\nふつうのおたより",
       "start_time": "2026-09-13T03:00:00+09:00",
       "end_time": "2026-09-13T04:45:00+09:00",
       "duration_sec": 6300,
@@ -15712,6 +17407,21 @@
       "duration_sec": 7200,
       "series_id": "rdk_d0154dd858ef",
       "series_name": "オールナイトニッポンＺＥＲＯ",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP13"
+    },
+    {
+      "id": "JOAK-13902660",
+      "service": "radiko:JOAK",
+      "title": "[NHK AM（東京）] ニュース",
+      "subtitle": "",
+      "content": "",
+      "start_time": "2026-09-13T03:00:00+09:00",
+      "end_time": "2026-09-13T03:05:00+09:00",
+      "duration_sec": 300,
+      "series_id": "rdk_06b0df722680",
+      "series_name": "ニュース",
       "episode_name": "",
       "genre": [],
       "area": "JP13"
@@ -15920,6 +17630,21 @@
         "ドキュメンタリー/教養"
       ],
       "area": "NHK"
+    },
+    {
+      "id": "JOCK-13902967",
+      "service": "radiko:JOCK",
+      "title": "[NHK AM（名古屋）] ラジオ深夜便▽にっぽんの歌こころの歌",
+      "subtitle": "森田美由紀(アンカー)",
+      "content": "▽にっぽんの歌こころの歌 「月（Ｍｏｏｎ）のうたアラカルト Ｐａｒｔ２」 ▽天気概況・各地の天気と予想気温",
+      "start_time": "2026-09-13T03:05:00+09:00",
+      "end_time": "2026-09-13T04:00:00+09:00",
+      "duration_sec": 3300,
+      "series_id": "rdk_45740598e58f",
+      "series_name": "ラジオ深夜便▽にっぽんの歌こころの歌",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
     },
     {
       "id": "CBC-13889886",
@@ -16155,6 +17880,36 @@
       "area": "JP23"
     },
     {
+      "id": "JOCK-13902968",
+      "service": "radiko:JOCK",
+      "title": "[NHK AM（名古屋）] ニュース",
+      "subtitle": "",
+      "content": "",
+      "start_time": "2026-09-13T04:00:00+09:00",
+      "end_time": "2026-09-13T04:05:00+09:00",
+      "duration_sec": 300,
+      "series_id": "rdk_0c1b71107178",
+      "series_name": "ニュース",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
+    },
+    {
+      "id": "JOAK-FM-13902901",
+      "service": "radiko:JOAK-FM",
+      "title": "[NHK FM（東京）] 宗教の時間 タオ「道」を旅する―老子・荘子のことば第６回「道」を歩むその先に",
+      "subtitle": "舘野正美(出演)/上田早苗(朗読)",
+      "content": "戦乱の時代に、本来の世界のありようや何事にもとらわれない生き方を説いた老子・荘子の教えを現代的によみとくシリーズ。第６回は医学や易の哲学との関係について考える。\n\n戦乱の時代に、本来の世界のありようや何事にもとらわれない生き方を説いた老子・荘子。そのことばを哲学者で医学博士の舘野正美さんが現代的視点から読み解くシリーズ。最終回は「道」の思想が医学や易の哲学とどのような繋がりを持つのか、その広がりを見る。物事が小さなうちに対処しバランスをとる生き方は医学の「未病」に通じ、「道」を体得し本来の自分を知る者は、運命を受け入れその道を積極的に歩むことができるという。",
+      "start_time": "2026-09-13T04:00:00+09:00",
+      "end_time": "2026-09-13T04:30:00+09:00",
+      "duration_sec": 1800,
+      "series_id": "rdk_379dd1f96da9",
+      "series_name": "宗教の時間 タオ「道」を旅する―老子・荘子のことば第６回「道」を歩むその先に",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
+    },
+    {
       "id": "TBS-13890175",
       "service": "radiko:TBS",
       "title": "[TBSラジオ] Music Palette♪",
@@ -16240,6 +17995,21 @@
       "duration_sec": 3600,
       "series_id": "rdk_5d9455cb72ed",
       "series_name": "POWER ROCK TODAY Hour.4",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP13"
+    },
+    {
+      "id": "JOAK-13902662",
+      "service": "radiko:JOAK",
+      "title": "[NHK AM（東京）] ニュース",
+      "subtitle": "",
+      "content": "",
+      "start_time": "2026-09-13T04:00:00+09:00",
+      "end_time": "2026-09-13T04:05:00+09:00",
+      "duration_sec": 300,
+      "series_id": "rdk_06b0df722680",
+      "series_name": "ニュース",
       "episode_name": "",
       "genre": [],
       "area": "JP13"
@@ -16387,6 +18157,21 @@
         "ドキュメンタリー/教養"
       ],
       "area": "NHK"
+    },
+    {
+      "id": "JOCK-13902969",
+      "service": "radiko:JOCK",
+      "title": "[NHK AM（名古屋）] ラジオ深夜便▽インタビュー",
+      "subtitle": "森田美由紀(アンカー)/岡部雅弥(出演)/遠藤ふき子(きき手)",
+      "content": "▽インタビュー 「アーティストマネージャーという仕事」 音楽マネージメント会社 プロデューサー 岡部雅弥 ▽誕生日の花・番組予告",
+      "start_time": "2026-09-13T04:05:00+09:00",
+      "end_time": "2026-09-13T05:00:00+09:00",
+      "duration_sec": 3300,
+      "series_id": "rdk_fb7e112ef214",
+      "series_name": "ラジオ深夜便▽インタビュー",
+      "episode_name": "",
+      "genre": [],
+      "area": "JP23"
     },
     {
       "id": "MBS-13875914",
