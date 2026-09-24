@@ -88,8 +88,20 @@ def test_fetch_series_episodes_network_error():
     def boom(*a, **kw):
         raise httpx.RequestError("boom")
     with patch.object(httpx, "get", side_effect=boom):
-        eps = radiru.fetch_series_episodes("X")
-    assert eps == []
+        with pytest.raises(httpx.RequestError):
+            radiru.fetch_series_episodes("X")
+
+
+def test_find_episode_propagates_transport_error_without_brute_force():
+    """DNS 断を空結果に潰すと corner 01-30 を叩き、未収録として捨ててしまう。"""
+    def boom(*a, **kw):
+        raise httpx.ConnectError("dns")
+    with patch.object(httpx, "get", side_effect=boom) as get:
+        with pytest.raises(httpx.ConnectError):
+            radiru.find_episode(
+                "X", datetime(2026, 4, 14, 23, 20, tzinfo=JST),
+            )
+    assert get.call_count == 1
 
 
 def test_find_episode_exact_match():

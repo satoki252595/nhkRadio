@@ -54,6 +54,83 @@ def test_report_exits_124_when_runtime_deadline_is_exhausted():
     assert exc.value.code == 124
 
 
+def test_report_exits_4_when_no_vpn_reaches_the_data_plane():
+    counters = {
+        "success": 0,
+        "failed": 0,
+        "skipped": 0,
+        "mismatch": 0,
+        "via_radiru": 0,
+        "already_uploaded": 0,
+        "radiru_missing": 0,
+    }
+
+    with pytest.raises(SystemExit) as exc:
+        _report_and_exit(
+            counters, 2, logging.getLogger(__name__),
+            vpn_data_plane_ok=False,
+        )
+
+    assert exc.value.code == 4
+
+
+def test_report_exits_0_when_data_plane_worked_and_items_remain_uncovered():
+    counters = {
+        "success": 0,
+        "failed": 0,
+        "skipped": 0,
+        "mismatch": 0,
+        "via_radiru": 0,
+        "already_uploaded": 0,
+        "radiru_missing": 0,
+    }
+
+    _report_and_exit(
+        counters, 2, logging.getLogger(__name__),
+        vpn_data_plane_ok=True,
+    )
+
+
+def test_main_exits_4_without_downloads_when_data_plane_probe_fails(tmp_path):
+    server = Mock(hostname="vpn.example", ip="192.0.2.1", score=1)
+    server.write_ovpn = Mock()
+    cfg = _config(tmp_path)
+    with (
+        patch.object(sys, "argv", [
+            "nhk-rec",
+            "--subscriptions", "subscriptions.json",
+            "--target-date", "2026-08-01",
+            "--days", "1",
+            "--max-vpn-attempts", "1",
+        ]),
+        patch("nhk_recorder.main.signal.signal"),
+        patch("nhk_recorder.main.load_config", return_value=cfg),
+        patch(
+            "nhk_recorder.main._load_subscriptions",
+            return_value=(["series-1"], []),
+        ),
+        patch(
+            "nhk_recorder.main._load_programs_from_json",
+            return_value=[_program()],
+        ),
+        patch("nhk_recorder.main.fetch_jp_servers", return_value=[server]),
+        patch("nhk_recorder.main.vpn_manager.connect", return_value=True),
+        patch(
+            "nhk_recorder.main.vpn_manager.probe_data_plane",
+            return_value=False,
+        ),
+        patch("nhk_recorder.main.vpn_manager.disconnect") as disconnect,
+        patch("nhk_recorder.main._download_nhk_via_radiru") as download,
+    ):
+        with pytest.raises(SystemExit) as exc:
+            main()
+
+    assert exc.value.code == 4
+    download.assert_not_called()
+    disconnect.assert_called_once_with()
+    server.write_ovpn.assert_called_once()
+
+
 def test_sigterm_becomes_system_exit_143():
     with pytest.raises(SystemExit) as exc:
         _handle_sigterm(signal.SIGTERM, None)

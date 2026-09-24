@@ -126,7 +126,7 @@ sequenceDiagram
   participant FF as ffmpeg / yt-dlp
   participant N as Notion API
 
-  Cron->>Main: 06:00 JST 起動 (前日分対象)
+  Cron->>Main: 06:00 JST 起動 (直近7日。既録音はスキップ)
   Main->>Sub: series_ids / keywords 読込
   Main->>Cache: 番組メタを全件ロード
   Main->>Main: filter_by_series + filter_programs<br/>+ dedupe (NHK本家 vs radiko:JOBK)
@@ -331,7 +331,7 @@ keywords: ["落語", "らくご", "英語"]
 
 3. **動作確認**: Actionsタブ → "NHK Radio Recorder" → "Run workflow" で手動実行
 
-これで毎日 06:00 JST に起動し、前日分（失敗時は翌日のフォールバック対象）を録音します。
+これで毎日 06:00 JST に起動し、直近7日分を対象に録音します。Notion に既にある回はダウンロード前にスキップします。
 
 録音対象は必須入力の `data/subscriptions.json`（シリーズ購読・キーワード方式）から
 読みます。WebUI の「☁ GitHubへプッシュ」でこのファイルを更新できます。

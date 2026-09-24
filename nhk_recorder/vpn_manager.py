@@ -9,6 +9,7 @@ openvpn を Popen でフォアグラウンド実行し、stderr を threading �
 import logging
 import os
 import shutil
+import socket
 import subprocess
 import threading
 import time
@@ -120,6 +121,42 @@ def connect(
         logger.warning("  openvpn> %s", line)
     disconnect()
     return False
+
+
+def probe_data_plane(
+    hosts: tuple[str, ...] = ("radiko.jp", "www.nhk.or.jp"),
+    timeout_sec: float = 10,
+    deadline: float | None = None,
+) -> bool:
+    """VPN 接続後に録音先へ TCP 443 が届くか確認する。
+
+    OpenVPN の redirect-gateway は runner のリゾルバをトンネルへ送り込む。
+    --script-security 1 では pushed DNS が resolv.conf に書かれないため、
+    コンテナの公開 DNS が死んでいると Initialization Sequence Completed の
+    あとで名前解決が全滅する。ここで失敗させ、番組を未収録扱いにせず
+    次の VPN へ回す。
+    """
+    for host in hosts:
+        if deadline is not None and time.monotonic() >= deadline:
+            logger.warning("データプレーン確認前に全体期限へ到達")
+            return False
+        remaining = timeout_sec
+        if deadline is not None:
+            remaining = min(remaining, max(0.0, deadline - time.monotonic()))
+            if remaining <= 0:
+                logger.warning("データプレーン確認前に全体期限へ到達")
+                return False
+        try:
+            conn = socket.create_connection((host, 443), timeout=remaining)
+        except OSError as e:
+            logger.warning("VPN データプレーン確認失敗 (%s:443): %s", host, e)
+            return False
+        try:
+            conn.close()
+        except OSError:
+            pass
+    logger.info("VPN データプレーン確認成功: %s", ", ".join(hosts))
+    return True
 
 
 def disconnect() -> None:

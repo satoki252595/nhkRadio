@@ -11,9 +11,9 @@ on:
         type: string
         required: false
       days:
-        description: '過去何日分を対象にするか'
+        description: '過去何日分を対象にするか (Radiko タイムフリーは7日。既に Notion へ上がった回はスキップ)'
         type: string
-        default: '1'
+        default: '7'
       max_vpn_attempts:
         description: '最大 VPN 試行回数 (area カバーのため複数回接続試行)'
         type: string
@@ -130,7 +130,9 @@ jobs:
         timeout-minutes: 220
         shell: bash
         env:
-          DAYS: ${{ inputs.days || '2' }}
+          # Radiko タイムフリーは7日。既アップロードは DL 前に除外されるので、
+          # 障害が数日続いても次の cron で窓内の未録音分を取り直せる。
+          DAYS: ${{ inputs.days || '7' }}
           MAX_VPN_ATTEMPTS: ${{ inputs.max_vpn_attempts || '15' }}
           NHK_API_KEY: ${{ secrets.NHK_API_KEY }}
           NOTION_DATABASE_ID: ${{ secrets.NOTION_DATABASE_ID }}
@@ -153,6 +155,10 @@ jobs:
 
           # OpenVPN and Python intentionally share this one network namespace.
           # The host checkout and Git credentials are never mounted here.
+          # redirect-gateway sends the runner resolver (Azure 168.63.129.16 /
+          # Docker 127.0.0.11) into the tunnel, and --script-security 1 never
+          # installs pushed DNS. Pin public resolvers or name lookup dies
+          # after the tunnel comes up (2026-09 recorder outage).
           timeout --signal=TERM --kill-after=20s 215m docker run \
             --name "$RECORDER_CONTAINER" \
             --init \
@@ -162,6 +168,8 @@ jobs:
             --tmpfs /run:rw,nosuid,nodev,noexec,size=32m \
             --cap-drop ALL \
             --cap-add NET_ADMIN \
+            --dns 8.8.8.8 \
+            --dns 1.1.1.1 \
             --device /dev/net/tun \
             --security-opt no-new-privileges \
             --mount "type=bind,source=${GITHUB_WORKSPACE}/data,target=/app/data,readonly" \

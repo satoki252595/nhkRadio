@@ -151,6 +151,7 @@ ffmpeg -headers "X-Radiko-AuthToken: {authtoken}" \
 | VPN接続後のRadiko認証失敗 | area_idが `JP` プレフィックスか確認 |
 | 録音中のVPN切断 | タイムアウト設定、リトライロジック |
 | VPN が runner の制御通信を切断 | VPN を専用 network namespace に隔離し、host route の不変性を smoke test |
+| redirect-gateway 後に runner DNS へ届かない | コンテナへ公開 DNS (`8.8.8.8` / `1.1.1.1`) を固定し、接続後に `radiko.jp` と `www.nhk.or.jp` へ TCP 443 を確認する。失敗した VPN では録音せず、一度も到達できなければワークフローを失敗させる |
 | 外部 `.ovpn` の危険な directive | allowlist 検証、`--script-security 1`、secret 非継承、最小 capability |
 | Radiko側でVPN IPを検出・ブロック | 検出されたら別サーバーに切り替え |
 | Radiko規約変更 | 定期的に規約確認 |
