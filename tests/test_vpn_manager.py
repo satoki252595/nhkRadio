@@ -60,3 +60,36 @@ def test_connect_limits_environment_and_disconnects_owned_group_only(euid, prefi
     assert popen.call_args.kwargs["start_new_session"] is True
     terminate.assert_called_once_with(proc)
     assert vpn_manager._current_proc is None
+
+
+def test_probe_data_plane_connects_to_recorder_hosts():
+    sockets = []
+
+    def create(addr, timeout):
+        sock = Mock()
+        sockets.append((addr, timeout, sock))
+        return sock
+
+    with patch(
+        "nhk_recorder.vpn_manager.socket.create_connection",
+        side_effect=create,
+    ):
+        assert vpn_manager.probe_data_plane(
+            timeout_sec=3, deadline=time.monotonic() + 30,
+        )
+
+    assert [item[0] for item in sockets] == [
+        ("radiko.jp", 443),
+        ("www.nhk.or.jp", 443),
+    ]
+    assert all(item[1] <= 3 for item in sockets)
+    for _addr, _timeout, sock in sockets:
+        sock.close.assert_called_once_with()
+
+
+def test_probe_data_plane_fails_closed_on_oserror():
+    with patch(
+        "nhk_recorder.vpn_manager.socket.create_connection",
+        side_effect=OSError("Temporary failure in name resolution"),
+    ):
+        assert vpn_manager.probe_data_plane() is False

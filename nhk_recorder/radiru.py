@@ -121,9 +121,10 @@ def fetch_series_episodes(
 ) -> list[RadiruEpisode]:
     """指定シリーズの聴き逃しエピソード一覧を取得する。
 
-    JSON 以外の応答 (HTML エラー等) が返った場合は空リストを返す
-    (例外を握りつぶして処理を続行する。NHK 側の一時的な不調でも
-    他シリーズの取得は止めない方針)。
+    JSON 以外の応答 (HTML エラー等) は空リストを返す。通信エラー
+    (httpx.RequestError) は再送出する。空リストに潰すと find_episode が
+    corner を最大 30 件ブルートフォースし、DNS 断を未収録として
+    永久スキップしてしまう。
     """
     try:
         r = httpx.get(
@@ -136,7 +137,13 @@ def fetch_series_episodes(
         )
         r.raise_for_status()
         data = r.json()
-    except (httpx.RequestError, httpx.HTTPStatusError, ValueError) as e:
+    except httpx.RequestError as e:
+        logger.warning(
+            "radiru series fetch 失敗 (%s/%s): %s",
+            series_site_id, corner_site_id, e,
+        )
+        raise
+    except (httpx.HTTPStatusError, ValueError) as e:
         logger.warning(
             "radiru series fetch 失敗 (%s/%s): %s",
             series_site_id, corner_site_id, e,
@@ -187,7 +194,10 @@ def _discover_corners(series_site_id: str, timeout: float = 30.0) -> list[str]:
         r = httpx.get(NEW_ARRIVALS_URL, timeout=timeout)
         r.raise_for_status()
         data = r.json()
-    except (httpx.RequestError, httpx.HTTPStatusError) as e:
+    except httpx.RequestError as e:
+        logger.debug("radiru new_arrivals fetch 失敗: %s", e)
+        raise
+    except httpx.HTTPStatusError as e:
         logger.debug("radiru new_arrivals fetch 失敗: %s", e)
         return []
 

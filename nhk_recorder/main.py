@@ -795,6 +795,7 @@ def main() -> None:
     )
 
     attempted_radiko_areas: set[str] = set()
+    vpn_data_plane_ok = False
     vpn_config_path = Path(args.vpn_config)
     radiru_deadline = time.monotonic() + RADIRU_TIME_BUDGET_SEC
     if run_deadline is not None:
@@ -846,6 +847,16 @@ def main() -> None:
                 logger.warning("VPN 接続失敗、次へ")
                 continue
 
+            # トンネル確立だけでは録音できない。runner DNS がトンネル内で
+            # 名前解決できないと、Radiko 認証も radiru 取得も失敗し、
+            # 未収録扱いで番組が消える (2026-09 障害)。
+            if not vpn_manager.probe_data_plane(deadline=run_deadline):
+                logger.warning(
+                    "VPN データプレーンが使えないためこのサーバーでは録音せず次へ",
+                )
+                continue
+            vpn_data_plane_ok = True
+
             # 1) 民放 Radiko を先に処理する (2026-07 障害対応で順序を反転)。
             #    radiru は 1 件あたり最大 timeout_sec 秒 (現状 600s) を
             #    3 並列で溶かし得るのに対し、Radiko 認証・番組表取得は
@@ -882,8 +893,8 @@ def main() -> None:
             #    Radiko の結果に関わらず試す。ただし累計処理時間が
             #    RADIRU_TIME_BUDGET_SEC を超えたら、同じ理由 (VPN 回線の
             #    帯域不足) で今後も失敗し続ける可能性が高いと判断し、
-            #    残り試行は Radiko 専用にする (未取得分は翌日 cron の
-            #    2 日分フォールバックに委ねる)。
+            #    残り試行は Radiko 専用にする (未取得分は次回 cron の
+            #    7 日分フォールバックに委ねる)。
             if nhk_pending:
                 if not radiru_budget_exhausted and (
                     time.monotonic() < radiru_deadline
@@ -914,6 +925,7 @@ def main() -> None:
     _report_and_exit(
         counters, len(pending), logger, pending,
         deadline_exhausted=deadline_exhausted,
+        vpn_data_plane_ok=vpn_data_plane_ok,
     )
 
 
@@ -924,8 +936,13 @@ def _report_and_exit(
     pending: list[Program] | None = None,
     *,
     deadline_exhausted: bool = False,
+    vpn_data_plane_ok: bool = True,
 ) -> None:
-    """最終レポートを出して、全滅していれば非ゼロで終了する。"""
+    """最終レポートを出して、全滅していれば非ゼロで終了する。
+
+    使える VPN が一度もなく未取得が残っている場合は exit 4。
+    データプレーンは生きていて radiru 未収録だけのときは 0 のまま。
+    """
     if pending:
         logger.warning("取得できなかった番組 (%d 件):", len(pending))
         for p in pending:
@@ -954,6 +971,16 @@ def _report_and_exit(
 
     if deadline_exhausted:
         sys.exit(124)
+    if (
+        not vpn_data_plane_ok
+        and remaining_count > 0
+        and counters["success"] == 0
+    ):
+        logger.error(
+            "使える VPN データプレーンが無く %d 件未取得のため終了",
+            remaining_count,
+        )
+        sys.exit(4)
     if (
         counters["success"] == 0
         and counters["failed"] > 0
