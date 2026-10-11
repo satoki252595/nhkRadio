@@ -218,6 +218,45 @@ def geolocate_region(ip: str) -> str:
         return ""
 
 
+def candidate_fetch_limit(rank: int, count: int) -> int:
+    """How many top-scoring servers to fetch for a ranked write.
+
+    A single server keeps the historical ``rank + 1`` window. Multiple
+    candidates are always the top ``count`` servers; ``rank`` only rotates
+    which of those is written first.
+    """
+    if count == 1:
+        return rank + 1
+    return count
+
+
+def select_candidates(
+    servers: list[VpnGateServer],
+    rank: int,
+    count: int,
+) -> list[VpnGateServer]:
+    """Pick up to ``count`` servers, starting at ``rank``.
+
+    ``count == 1`` is the historical data-update behavior: exactly
+    ``servers[rank]``, or an empty list when that index does not exist.
+    Larger counts walk forward and wrap, and never repeat a server.
+    """
+    if count < 1 or rank < 0 or not servers:
+        return []
+    if count == 1:
+        if rank >= len(servers):
+            return []
+        return [servers[rank]]
+
+    start = rank % len(servers)
+    chosen: list[VpnGateServer] = []
+    for offset in range(count):
+        chosen.append(servers[(start + offset) % len(servers)])
+        if len(chosen) == len(servers):
+            break
+    return chosen
+
+
 def find_server_for_region(region: str, limit: int = 5) -> VpnGateServer | None:
     """指定リージョン(kanto/kansai)のVPNサーバーを探す。
 
@@ -232,6 +271,33 @@ def find_server_for_region(region: str, limit: int = 5) -> VpnGateServer | None:
     return None
 
 
+def _print_server(chosen: VpnGateServer, *, index: int | None = None) -> None:
+    prefix = f"  [{index}] " if index is not None else "  "
+    print(f"{prefix}HostName: {chosen.hostname}")
+    print(f"  IP: {chosen.ip}")
+    print(f"  Score: {chosen.score:,}")
+    print(f"  Ping: {chosen.ping}ms / Speed: {chosen.speed:,}bps")
+    print(f"  Sessions: {chosen.num_sessions}")
+
+
+def _write_manifest(directory: Path, rows: list[tuple[str, VpnGateServer]]) -> None:
+    lines = [
+        f"{filename}\t{server.hostname}\t{server.ip}\t{server.score}\n"
+        for filename, server in rows
+    ]
+    path = directory / "manifest.tsv"
+    flags = os.O_WRONLY | os.O_CREAT | os.O_TRUNC | getattr(os, "O_NOFOLLOW", 0)
+    fd = os.open(path, flags, 0o600)
+    try:
+        os.fchmod(fd, 0o600)
+        with os.fdopen(fd, "w", encoding="utf-8") as handle:
+            fd = -1
+            handle.writelines(lines)
+    finally:
+        if fd >= 0:
+            os.close(fd)
+
+
 def main():
     """CLI: JP VPN サーバーの .ovpn を書き出す。
 
@@ -239,18 +305,31 @@ def main():
         python -m nhk_recorder.vpngate vpn.ovpn              # 最良の日本サーバー
         python -m nhk_recorder.vpngate vpn.ovpn --region kanto  # 関東(東京等)
         python -m nhk_recorder.vpngate vpn.ovpn --region kansai # 関西(大阪等)
+        python -m nhk_recorder.vpngate /vpn/candidates --count 4 --rank 1
+            # rank から最大4台。output はディレクトリ
     """
     import argparse
     import sys
 
     parser = argparse.ArgumentParser(description="VPN Gate から日本のVPN .ovpn 取得")
-    parser.add_argument("output", nargs="?", default="vpn.ovpn", help="出力先パス")
-    parser.add_argument("--rank", type=int, default=0, help="何番目を使うか (0=最良)")
+    parser.add_argument(
+        "output", nargs="?", default="vpn.ovpn",
+        help="出力先 (.ovpn ファイル、または --count>1 のときディレクトリ)",
+    )
+    parser.add_argument("--rank", type=int, default=0, help="何番目から使うか (0=最良)")
+    parser.add_argument(
+        "--count", type=int, default=1,
+        help="書き出す候補数 (1-4, 既定 1)。2以上なら output はディレクトリ",
+    )
     parser.add_argument(
         "--region", choices=["kanto", "kansai", "any"], default="any",
         help="対象リージョン (kanto=関東/kansai=関西)",
     )
     args = parser.parse_args()
+    if args.rank < 0 or not 1 <= args.count <= 4:
+        parser.error("--rank は 0 以上、--count は 1 から 4 を指定してください")
+    if args.region in ("kanto", "kansai") and args.count != 1:
+        parser.error("--region 指定時は --count 1 のみ対応です")
 
     logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 
@@ -259,23 +338,36 @@ def main():
         if not chosen:
             print(f"{args.region} エリアのVPNサーバーが見つかりません", file=sys.stderr)
             sys.exit(1)
+        chosen_list = [chosen]
     else:
-        servers = fetch_jp_servers(limit=args.rank + 1)
-        if not servers or args.rank >= len(servers):
+        servers = fetch_jp_servers(limit=candidate_fetch_limit(args.rank, args.count))
+        chosen_list = select_candidates(servers, args.rank, args.count)
+        if not chosen_list:
             print("適切なVPN Gateサーバーが見つかりません", file=sys.stderr)
             sys.exit(1)
-        chosen = servers[args.rank]
 
-    out = Path(args.output)
-    chosen.write_ovpn(out)
-    print(f"✓ OVPN書き出し: {out}")
-    print(f"  HostName: {chosen.hostname}")
-    print(f"  IP: {chosen.ip}")
-    print(f"  Score: {chosen.score:,}")
-    print(f"  Ping: {chosen.ping}ms / Speed: {chosen.speed:,}bps")
-    print(f"  Sessions: {chosen.num_sessions}")
-    if args.region in ("kanto", "kansai"):
-        print(f"  Region: {args.region}")
+    if args.count == 1:
+        chosen = chosen_list[0]
+        out = Path(args.output)
+        chosen.write_ovpn(out)
+        print(f"✓ OVPN書き出し: {out}")
+        _print_server(chosen)
+        if args.region in ("kanto", "kansai"):
+            print(f"  Region: {args.region}")
+        return
+
+    out_dir = Path(args.output)
+    out_dir.mkdir(parents=True, exist_ok=True)
+    written: list[tuple[str, VpnGateServer]] = []
+    for index, chosen in enumerate(chosen_list, start=1):
+        filename = f"candidate-{index:02d}.ovpn"
+        chosen.write_ovpn(out_dir / filename)
+        written.append((filename, chosen))
+    _write_manifest(out_dir, written)
+    print(f"✓ OVPN候補 {len(written)}件: {out_dir}")
+    for index, (filename, chosen) in enumerate(written, start=1):
+        _print_server(chosen, index=index)
+        print(f"  File: {filename}")
 
 
 if __name__ == "__main__":
