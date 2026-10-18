@@ -1,0 +1,26 @@
+{
+  "argv": [
+    "/Applications/Xcode.app/Contents/Developer/usr/bin/xcodebuild",
+    "-project",
+    "Playback.xcodeproj",
+    "-scheme",
+    "Playback",
+    "-configuration",
+    "Debug",
+    "-destination",
+    "platform=iOS Simulator,name=iPhone 17 Pro Max,OS=26.5",
+    "-destination-timeout",
+    "15",
+    "-derivedDataPath",
+    "/Users/satoki252595/orca/nhkRadio/ios/build/codex-prep-2026-10-18/TestDerivedData",
+    "-resultBundlePath",
+    "/Users/satoki252595/orca/nhkRadio/ios/build/codex-prep-2026-10-18/PlaybackTests.xcresult",
+    "-only-testing:PlaybackTests",
+    "CODE_SIGNING_ALLOWED=NO",
+    "test"
+  ],
+  "cwd": "/Users/satoki252595/orca/nhkRadio/ios",
+  "started": "2026-10-18T23:27:43.525684+09:00",
+  "finished": "2026-10-18T23:27:59.417019+09:00",
+  "exit_code": 70
+}

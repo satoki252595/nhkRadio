@@ -1,0 +1,23 @@
+{
+  "argv": [
+    "/Applications/Xcode.app/Contents/Developer/usr/bin/xcodebuild",
+    "-project",
+    "Playback.xcodeproj",
+    "-scheme",
+    "Playback",
+    "-configuration",
+    "Debug",
+    "-sdk",
+    "iphonesimulator",
+    "-destination",
+    "generic/platform=iOS Simulator",
+    "-derivedDataPath",
+    "/Users/satoki252595/orca/nhkRadio/ios/build/codex-prep-2026-10-18/DerivedData",
+    "CODE_SIGNING_ALLOWED=NO",
+    "build"
+  ],
+  "cwd": "/Users/satoki252595/orca/nhkRadio/ios",
+  "started": "2026-10-18T23:27:13.611773+09:00",
+  "finished": "2026-10-18T23:27:20.762414+09:00",
+  "exit_code": 65
+}

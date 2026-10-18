@@ -1,0 +1,22 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "playback-auth",
+  // Personal account (Satoki252595@gmail.com's Account). Pinned so deploys
+  // never land on another account visible to the same login.
+  "account_id": "5880d85c320ca5fee8baf9efddd005ed",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-10-18",
+  "observability": {
+    "enabled": true,
+    "redact_query_string": true,
+    "traces": {
+      "enabled": true
+    }
+  },
+  // NOTION_CLIENT_SECRET is set with `wrangler secret put` (never in source).
+  "vars": {
+    "NOTION_CLIENT_ID": "3fdd872b-594c-81c5-a259-0037b004178a",
+    "NOTION_REDIRECT_URI": "https://playback-auth.satoki252595.workers.dev/oauth/callback",
+    "APP_SCHEME": "playbacknotion"
+  }
+}

@@ -1,0 +1,55 @@
+[
+  {
+    "name": "git-status-before",
+    "cwd": "/Users/satoki252595/orca/nhkRadio",
+    "argv": [
+      "git",
+      "status",
+      "--short",
+      "--branch"
+    ],
+    "exit_code": 0
+  },
+  {
+    "name": "git-head",
+    "cwd": "/Users/satoki252595/orca/nhkRadio",
+    "argv": [
+      "git",
+      "rev-parse",
+      "HEAD"
+    ],
+    "exit_code": 0
+  },
+  {
+    "name": "toolchain",
+    "cwd": "/Users/satoki252595/orca/nhkRadio",
+    "argv": [
+      "xcodebuild",
+      "-version"
+    ],
+    "exit_code": 0
+  },
+  {
+    "name": "simulator-devices",
+    "cwd": "/Users/satoki252595/orca/nhkRadio",
+    "argv": [
+      "xcrun",
+      "simctl",
+      "list",
+      "devices",
+      "available"
+    ],
+    "exit_code": 1
+  },
+  {
+    "name": "simulator-runtimes",
+    "cwd": "/Users/satoki252595/orca/nhkRadio",
+    "argv": [
+      "xcrun",
+      "simctl",
+      "list",
+      "runtimes"
+    ],
+    "exit_code": 1
+  }
+]

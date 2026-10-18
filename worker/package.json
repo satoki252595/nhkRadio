@@ -1,0 +1,19 @@
+{
+  "name": "playback-auth",
+  "version": "1.0.0",
+  "private": true,
+  "description": "OAuth token-exchange relay for Playback for Notion (iOS). Holds the Notion client secret so the app never ships it.",
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "dry-run": "wrangler deploy --dry-run",
+    "types": "wrangler types",
+    "check": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^5.20261006.1",
+    "typescript": "^5.9.0",
+    "wrangler": "^4.40.0"
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "argv": [
+    "xcrun",
+    "xcresulttool",
+    "get",
+    "test-results",
+    "summary",
+    "--path",
+    "/Users/satoki252595/orca/nhkRadio/ios/build/codex-prep-2026-10-18/PlaybackTests.xcresult"
+  ],
+  "cwd": "/Users/satoki252595/orca/nhkRadio",
+  "started": "2026-10-18T23:29:05.150141+09:00",
+  "finished": "2026-10-18T23:29:05.743841+09:00",
+  "exit_code": 64
+}

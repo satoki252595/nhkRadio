@@ -1,0 +1,23 @@
+{
+  "argv": [
+    "/Applications/Xcode.app/Contents/Developer/usr/bin/xcodebuild",
+    "-project",
+    "Playback.xcodeproj",
+    "-scheme",
+    "Playback",
+    "-configuration",
+    "Release",
+    "-destination",
+    "generic/platform=iOS",
+    "-derivedDataPath",
+    "/Users/satoki252595/orca/nhkRadio/ios/build/codex-prep-2026-10-18/ArchiveDerivedData",
+    "-archivePath",
+    "/Users/satoki252595/orca/nhkRadio/ios/build/codex-prep-2026-10-18/Playback-probe.xcarchive",
+    "BUILD_SOURCE_COMMIT=UNSET",
+    "archive"
+  ],
+  "cwd": "/Users/satoki252595/orca/nhkRadio/ios",
+  "started": "2026-10-18T23:28:24.702055+09:00",
+  "finished": "2026-10-18T23:28:27.071041+09:00",
+  "exit_code": 65
+}

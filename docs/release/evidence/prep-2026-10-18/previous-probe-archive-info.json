@@ -1,0 +1,29 @@
+{
+  "archive": {
+    "CreationDate": "2026-10-18 13:55:56",
+    "ApplicationProperties": {
+      "ApplicationPath": "Applications/Playback.app",
+      "Architectures": [
+        "arm64"
+      ],
+      "CFBundleIdentifier": "dev.satoki.playback",
+      "CFBundleShortVersionString": "1.0.0",
+      "CFBundleVersion": "1",
+      "SigningIdentity": "Apple Development: satoki okamoto (VC5Q6V99Y9)",
+      "Team": "QVUR5T7J46"
+    }
+  },
+  "app": {
+    "CFBundleIdentifier": "dev.satoki.playback",
+    "CFBundleShortVersionString": "1.0.0",
+    "CFBundleVersion": "1",
+    "BuildSourceCommit": "903b6674e35fb1ebb30248f845e0f457b14664e8",
+    "UIDeviceFamily": [
+      1,
+      2
+    ],
+    "DTXcode": "2710",
+    "DTSDKName": "iphoneos27.1",
+    "MinimumOSVersion": "17.0"
+  }
+}

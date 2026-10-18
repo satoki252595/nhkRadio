@@ -1,0 +1,383 @@
+{
+  "id": "a2918aa8-22b0-4343-bfcd-8b6f6d83380d",
+  "ok": true,
+  "result": [
+    {
+      "role": "アプリケーション",
+      "type": "Application",
+      "label": "Playback",
+      "value": "",
+      "enabled": true,
+      "frame": {
+        "x": 0,
+        "y": 0,
+        "width": 1,
+        "height": 1
+      },
+      "children": [
+        {
+          "role": "ボタン",
+          "type": "Button",
+          "label": "Sheet Grabber",
+          "value": "Expanded",
+          "enabled": true,
+          "frame": {
+            "x": 0.4136,
+            "y": 0.0596,
+            "width": 0.1727,
+            "height": 0.0262
+          },
+          "children": []
+        },
+        {
+          "role": "ボタン",
+          "type": "Button",
+          "label": "閉じる",
+          "value": "",
+          "enabled": true,
+          "frame": {
+            "x": 0.0545,
+            "y": 0.09,
+            "width": 0.1636,
+            "height": 0.0377
+          },
+          "children": []
+        },
+        {
+          "role": "ボタン",
+          "type": "Button",
+          "label": "キュー",
+          "value": "",
+          "enabled": true,
+          "frame": {
+            "x": 0.8636,
+            "y": 0.09,
+            "width": 0.0818,
+            "height": 0.0377
+          },
+          "children": [],
+          "id": "list.bullet"
+        },
+        {
+          "role": "イメージ",
+          "type": "Image",
+          "label": "",
+          "value": "",
+          "enabled": true,
+          "frame": {
+            "x": 0.1591,
+            "y": 0.1548,
+            "width": 0.6818,
+            "height": 0.3138
+          },
+          "children": []
+        },
+        {
+          "role": "テキスト",
+          "type": "StaticText",
+          "label": "落語特選: 古典の味わい",
+          "value": "",
+          "enabled": true,
+          "frame": {
+            "x": 0.2758,
+            "y": 0.4916,
+            "width": 0.4485,
+            "height": 0.0251
+          },
+          "children": []
+        },
+        {
+          "role": "テキスト",
+          "type": "StaticText",
+          "label": "demo-speech-2.m4a",
+          "value": "",
+          "enabled": true,
+          "frame": {
+            "x": 0.364,
+            "y": 0.523,
+            "width": 0.272,
+            "height": 0.015
+          },
+          "children": []
+        },
+        {
+          "role": "ボタン",
+          "type": "Button",
+          "label": "お気に入り",
+          "value": "",
+          "enabled": true,
+          "frame": {
+            "x": 0.4258,
+            "y": 0.5474,
+            "width": 0.0553,
+            "height": 0.0216
+          },
+          "children": [],
+          "id": "heart"
+        },
+        {
+          "role": "ボタン",
+          "type": "Button",
+          "label": "ダウンロード",
+          "value": "",
+          "enabled": true,
+          "frame": {
+            "x": 0.522,
+            "y": 0.5464,
+            "width": 0.053,
+            "height": 0.0237
+          },
+          "children": [],
+          "id": "arrow.down.circle"
+        },
+        {
+          "role": "スライダ",
+          "type": "Slider",
+          "label": "",
+          "value": "0.8633143",
+          "enabled": true,
+          "frame": {
+            "x": 0.0545,
+            "y": 0.5931,
+            "width": 0.8909,
+            "height": 0.0324
+          },
+          "children": []
+        },
+        {
+          "role": "テキスト",
+          "type": "StaticText",
+          "label": "0:13",
+          "value": "",
+          "enabled": true,
+          "frame": {
+            "x": 0.0545,
+            "y": 0.6318,
+            "width": 0.0598,
+            "height": 0.015
+          },
+          "children": []
+        },
+        {
+          "role": "テキスト",
+          "type": "StaticText",
+          "label": "-0:02",
+          "value": "",
+          "enabled": true,
+          "frame": {
+            "x": 0.8727,
+            "y": 0.6318,
+            "width": 0.0727,
+            "height": 0.015
+          },
+          "children": []
+        },
+        {
+          "role": "ボタン",
+          "type": "Button",
+          "label": "前へ",
+          "value": "",
+          "enabled": true,
+          "frame": {
+            "x": 0.1644,
+            "y": 0.6974,
+            "width": 0.0576,
+            "height": 0.0209
+          },
+          "children": [],
+          "id": "backward.end.fill"
+        },
+        {
+          "role": "ボタン",
+          "type": "Button",
+          "label": "15秒戻る",
+          "value": "",
+          "enabled": true,
+          "frame": {
+            "x": 0.2811,
+            "y": 0.6893,
+            "width": 0.0742,
+            "height": 0.0366
+          },
+          "children": [],
+          "id": "gobackward.15"
+        },
+        {
+          "role": "ボタン",
+          "type": "Button",
+          "label": "一時停止",
+          "value": "",
+          "enabled": true,
+          "frame": {
+            "x": 0.4144,
+            "y": 0.6698,
+            "width": 0.1712,
+            "height": 0.076
+          },
+          "children": [],
+          "id": "pause.circle.fill"
+        },
+        {
+          "role": "ボタン",
+          "type": "Button",
+          "label": "15秒進む",
+          "value": "",
+          "enabled": true,
+          "frame": {
+            "x": 0.6447,
+            "y": 0.6893,
+            "width": 0.0742,
+            "height": 0.0366
+          },
+          "children": [],
+          "id": "goforward.15"
+        },
+        {
+          "role": "ボタン",
+          "type": "Button",
+          "label": "次へ",
+          "value": "",
+          "enabled": true,
+          "frame": {
+            "x": 0.778,
+            "y": 0.6974,
+            "width": 0.0576,
+            "height": 0.0209
+          },
+          "children": [],
+          "id": "forward.end.fill"
+        },
+        {
+          "role": "ポップアップボタン",
+          "type": "PopUpButton",
+          "label": "1倍速",
+          "value": "",
+          "enabled": true,
+          "frame": {
+            "x": 0.0545,
+            "y": 0.7716,
+            "width": 0.1977,
+            "height": 0.0408
+          },
+          "children": []
+        },
+        {
+          "role": "ポップアップボタン",
+          "type": "PopUpButton",
+          "label": "スリープ",
+          "value": "",
+          "enabled": true,
+          "frame": {
+            "x": 0.2523,
+            "y": 0.7702,
+            "width": 0.1977,
+            "height": 0.0432
+          },
+          "children": []
+        },
+        {
+          "role": "ボタン",
+          "type": "Button",
+          "label": "リピート",
+          "value": "",
+          "enabled": true,
+          "frame": {
+            "x": 0.45,
+            "y": 0.7727,
+            "width": 0.1977,
+            "height": 0.0384
+          },
+          "children": []
+        },
+        {
+          "role": "ボタン",
+          "type": "Button",
+          "label": "シャッフル",
+          "value": "",
+          "enabled": true,
+          "frame": {
+            "x": 0.6477,
+            "y": 0.7727,
+            "width": 0.1977,
+            "height": 0.0387
+          },
+          "children": []
+        },
+        {
+          "role": "ボタン",
+          "type": "Button",
+          "label": "AirPlay",
+          "value": "",
+          "enabled": true,
+          "frame": {
+            "x": 0.8455,
+            "y": 0.7688,
+            "width": 0.1,
+            "height": 0.046
+          },
+          "children": [],
+          "id": "AirPlay"
+        },
+        {
+          "role": "テキスト",
+          "type": "StaticText",
+          "label": "23:40",
+          "value": "",
+          "enabled": true,
+          "frame": {
+            "x": 0.1477,
+            "y": 0.023,
+            "width": 0.0841,
+            "height": 0.0227
+          },
+          "children": []
+        },
+        {
+          "role": "",
+          "type": "GenericElement",
+          "label": "Dynamic Island、何もなし",
+          "value": "",
+          "enabled": true,
+          "frame": {
+            "x": 0.3576,
+            "y": 0.0146,
+            "width": 0.2848,
+            "height": 0.0384
+          },
+          "children": []
+        },
+        {
+          "role": "",
+          "type": "GenericElement",
+          "label": "モバイル通信",
+          "value": "4本中4本、信号強度",
+          "enabled": true,
+          "frame": {
+            "x": 0.7098,
+            "y": 0.0265,
+            "width": 0.0492,
+            "height": 0.0143
+          },
+          "children": []
+        },
+        {
+          "role": "",
+          "type": "GenericElement",
+          "label": "バッテリー電源100%",
+          "value": "",
+          "enabled": true,
+          "frame": {
+            "x": 0.8371,
+            "y": 0.0262,
+            "width": 0.0712,
+            "height": 0.015
+          },
+          "children": []
+        }
+      ]
+    }
+  ],
+  "_meta": {
+    "runtimeId": "a2e60b1e-dd9b-4df3-9063-c439eada2177"
+  }
+}

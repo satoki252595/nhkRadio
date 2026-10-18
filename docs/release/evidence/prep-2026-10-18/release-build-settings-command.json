@@ -1,0 +1,17 @@
+{
+  "argv": [
+    "/Applications/Xcode.app/Contents/Developer/usr/bin/xcodebuild",
+    "-project",
+    "Playback.xcodeproj",
+    "-target",
+    "Playback",
+    "-configuration",
+    "Release",
+    "-showBuildSettings",
+    "-json"
+  ],
+  "cwd": "/Users/satoki252595/orca/nhkRadio/ios",
+  "started": "2026-10-18T23:29:04.363986+09:00",
+  "finished": "2026-10-18T23:29:05.149536+09:00",
+  "exit_code": 0
+}

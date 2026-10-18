@@ -1,0 +1,681 @@
+{
+  "id": "456c8306-cf48-4557-b3dc-2b89c55e71b9",
+  "ok": true,
+  "result": [
+    {
+      "role": "アプリケーション",
+      "type": "Application",
+      "label": "Playback",
+      "value": "",
+      "enabled": true,
+      "frame": {
+        "x": 0,
+        "y": 0,
+        "width": 1,
+        "height": 1
+      },
+      "children": [
+        {
+          "role": "back button",
+          "type": "Button",
+          "label": "サンプル: ラジオ録音",
+          "value": "",
+          "enabled": true,
+          "frame": {
+            "x": 0.0455,
+            "y": 0.0649,
+            "width": 0.1,
+            "height": 0.046
+          },
+          "children": [],
+          "id": "BackButton"
+        },
+        {
+          "role": "ボタン",
+          "type": "Button",
+          "label": "すべて",
+          "value": "",
+          "enabled": true,
+          "frame": {
+            "x": -0.2636,
+            "y": 0.2448,
+            "width": 0.1417,
+            "height": 0.0293
+          },
+          "children": []
+        },
+        {
+          "role": "ボタン",
+          "type": "Button",
+          "label": "未再生",
+          "value": "",
+          "enabled": true,
+          "frame": {
+            "x": -0.1038,
+            "y": 0.2448,
+            "width": 0.1417,
+            "height": 0.0293
+          },
+          "children": []
+        },
+        {
+          "role": "ボタン",
+          "type": "Button",
+          "label": "再生中",
+          "value": "",
+          "enabled": true,
+          "frame": {
+            "x": 0.0561,
+            "y": 0.2448,
+            "width": 0.1417,
+            "height": 0.0293
+          },
+          "children": []
+        },
+        {
+          "role": "ボタン",
+          "type": "Button",
+          "label": "保存済み",
+          "value": "",
+          "enabled": true,
+          "frame": {
+            "x": 0.2159,
+            "y": 0.2448,
+            "width": 0.1735,
+            "height": 0.0293
+          },
+          "children": []
+        },
+        {
+          "role": "ボタン",
+          "type": "Button",
+          "label": "お気に入り",
+          "value": "",
+          "enabled": true,
+          "frame": {
+            "x": 0.4076,
+            "y": 0.2448,
+            "width": 0.2053,
+            "height": 0.0293
+          },
+          "children": []
+        },
+        {
+          "role": "Group",
+          "type": "Group",
+          "label": "",
+          "value": "",
+          "enabled": true,
+          "frame": {
+            "x": -0.3,
+            "y": 0,
+            "width": 1,
+            "height": 1
+          },
+          "children": [
+            {
+              "role": "ボタン",
+              "type": "Button",
+              "label": "朝の朗読: 宮沢賢治セレクション, R1 · 2026年10月17日 · 05:10-05:40",
+              "value": "",
+              "enabled": true,
+              "frame": {
+                "x": -0.3,
+                "y": 0.2887,
+                "width": 1,
+                "height": 0.09
+              },
+              "children": []
+            },
+            {
+              "role": "ボタン",
+              "type": "Button",
+              "label": "落語特選: 古典の味わい, R1 · 2026年10月16日 · 21:05-21:55",
+              "value": "",
+              "enabled": true,
+              "frame": {
+                "x": -0.3,
+                "y": 0.3787,
+                "width": 1,
+                "height": 0.09
+              },
+              "children": []
+            },
+            {
+              "role": "ボタン",
+              "type": "Button",
+              "label": "英語ニュース シャドーイング練習, R3 · 2026年10月15日 · 07:15-07:30",
+              "value": "",
+              "enabled": true,
+              "frame": {
+                "x": -0.3,
+                "y": 0.4686,
+                "width": 1,
+                "height": 0.09
+              },
+              "children": []
+            },
+            {
+              "role": "ボタン",
+              "type": "Button",
+              "label": "クラシック名曲アーカイブ（映像つき）, FM · 2026年10月14日 · 19:30-20:00",
+              "value": "",
+              "enabled": true,
+              "frame": {
+                "x": -0.3,
+                "y": 0.5586,
+                "width": 1,
+                "height": 0.09
+              },
+              "children": []
+            },
+            {
+              "role": "ボタン",
+              "type": "Button",
+              "label": "深夜のジャズ便り, FM · 2026年10月13日 · 23:00-23:50",
+              "value": "",
+              "enabled": true,
+              "frame": {
+                "x": -0.3,
+                "y": 0.6485,
+                "width": 1,
+                "height": 0.09
+              },
+              "children": []
+            }
+          ]
+        },
+        {
+          "role": "Group",
+          "type": "Group",
+          "label": "",
+          "value": "",
+          "enabled": true,
+          "frame": {
+            "x": 0,
+            "y": 0,
+            "width": 1,
+            "height": 1
+          },
+          "children": [
+            {
+              "role": "イメージ",
+              "type": "Image",
+              "label": "waveform",
+              "value": "",
+              "enabled": true,
+              "frame": {
+                "x": 0.4462,
+                "y": 0.2099,
+                "width": 0.1068,
+                "height": 0.0551
+              },
+              "children": [],
+              "id": "waveform"
+            },
+            {
+              "role": "テキスト",
+              "type": "StaticText",
+              "label": "朝の朗読: 宮沢賢治セレクション",
+              "value": "",
+              "enabled": true,
+              "frame": {
+                "x": 0.1905,
+                "y": 0.3149,
+                "width": 0.6189,
+                "height": 0.0251
+              },
+              "children": []
+            },
+            {
+              "role": "ボタン",
+              "type": "Button",
+              "label": "再生",
+              "value": "",
+              "enabled": true,
+              "frame": {
+                "x": 0.2689,
+                "y": 0.3546,
+                "width": 0.3,
+                "height": 0.061
+              },
+              "children": []
+            },
+            {
+              "role": "ボタン",
+              "type": "Button",
+              "label": "お気に入り",
+              "value": "",
+              "enabled": true,
+              "frame": {
+                "x": 0.6015,
+                "y": 0.3759,
+                "width": 0.0447,
+                "height": 0.0188
+              },
+              "children": [],
+              "id": "heart"
+            },
+            {
+              "role": "ボタン",
+              "type": "Button",
+              "label": "ダウンロード",
+              "value": "",
+              "enabled": true,
+              "frame": {
+                "x": 0.6788,
+                "y": 0.3734,
+                "width": 0.053,
+                "height": 0.0237
+              },
+              "children": [],
+              "id": "arrow.down.circle"
+            },
+            {
+              "role": "見出し",
+              "type": "Heading",
+              "label": "メディアファイル",
+              "value": "",
+              "enabled": true,
+              "frame": {
+                "x": 0.0455,
+                "y": 0.4508,
+                "width": 0.9091,
+                "height": 0.0422
+              },
+              "children": []
+            },
+            {
+              "role": "ボタン",
+              "type": "Button",
+              "label": "Play",
+              "value": "",
+              "enabled": true,
+              "frame": {
+                "x": 0.0909,
+                "y": 0.5087,
+                "width": 0.0803,
+                "height": 0.0359
+              },
+              "children": [],
+              "id": "play.circle.fill"
+            },
+            {
+              "role": "テキスト",
+              "type": "StaticText",
+              "label": "demo-speech-1.m4a",
+              "value": "",
+              "enabled": true,
+              "frame": {
+                "x": 0.1985,
+                "y": 0.5087,
+                "width": 0.3341,
+                "height": 0.0188
+              },
+              "children": []
+            },
+            {
+              "role": "イメージ",
+              "type": "Image",
+              "label": "waveform",
+              "value": "",
+              "enabled": true,
+              "frame": {
+                "x": 0.2015,
+                "y": 0.5317,
+                "width": 0.0227,
+                "height": 0.0119
+              },
+              "children": [],
+              "id": "waveform"
+            },
+            {
+              "role": "テキスト",
+              "type": "StaticText",
+              "label": "音声",
+              "value": "",
+              "enabled": true,
+              "frame": {
+                "x": 0.2409,
+                "y": 0.5307,
+                "width": 0.047,
+                "height": 0.0139
+              },
+              "children": []
+            },
+            {
+              "role": "ボタン",
+              "type": "Button",
+              "label": "ダウンロード",
+              "value": "",
+              "enabled": true,
+              "frame": {
+                "x": 0.8561,
+                "y": 0.515,
+                "width": 0.053,
+                "height": 0.0237
+              },
+              "children": [],
+              "id": "arrow.down.circle"
+            },
+            {
+              "role": "見出し",
+              "type": "Heading",
+              "label": "プロパティ",
+              "value": "",
+              "enabled": true,
+              "frame": {
+                "x": 0.0455,
+                "y": 0.5785,
+                "width": 0.9091,
+                "height": 0.0422
+              },
+              "children": []
+            },
+            {
+              "role": "テキスト",
+              "type": "StaticText",
+              "label": "番組名",
+              "value": "",
+              "enabled": true,
+              "frame": {
+                "x": 0.0909,
+                "y": 0.6384,
+                "width": 0.0773,
+                "height": 0.015
+              },
+              "children": []
+            },
+            {
+              "role": "テキスト",
+              "type": "StaticText",
+              "label": "朝の朗読: 宮沢賢治セレクション",
+              "value": "",
+              "enabled": true,
+              "frame": {
+                "x": 0.0909,
+                "y": 0.6566,
+                "width": 0.4652,
+                "height": 0.0188
+              },
+              "children": []
+            },
+            {
+              "role": "テキスト",
+              "type": "StaticText",
+              "label": "音声ファイル",
+              "value": "",
+              "enabled": true,
+              "frame": {
+                "x": 0.0909,
+                "y": 0.7109,
+                "width": 0.1538,
+                "height": 0.015
+              },
+              "children": []
+            },
+            {
+              "role": "テキスト",
+              "type": "StaticText",
+              "label": "demo-speech-1.m4a",
+              "value": "",
+              "enabled": true,
+              "frame": {
+                "x": 0.0909,
+                "y": 0.7291,
+                "width": 0.3258,
+                "height": 0.0188
+              },
+              "children": []
+            },
+            {
+              "role": "テキスト",
+              "type": "StaticText",
+              "label": "チャンネル",
+              "value": "",
+              "enabled": true,
+              "frame": {
+                "x": 0.0909,
+                "y": 0.7835,
+                "width": 0.128,
+                "height": 0.015
+              },
+              "children": []
+            },
+            {
+              "role": "テキスト",
+              "type": "StaticText",
+              "label": "R1",
+              "value": "",
+              "enabled": true,
+              "frame": {
+                "x": 0.0909,
+                "y": 0.8016,
+                "width": 0.0371,
+                "height": 0.0188
+              },
+              "children": []
+            },
+            {
+              "role": "テキスト",
+              "type": "StaticText",
+              "label": "放送日",
+              "value": "",
+              "enabled": true,
+              "frame": {
+                "x": 0.0909,
+                "y": 0.856,
+                "width": 0.0773,
+                "height": 0.015
+              },
+              "children": []
+            },
+            {
+              "role": "テキスト",
+              "type": "StaticText",
+              "label": "2026年10月17日",
+              "value": "",
+              "enabled": true,
+              "frame": {
+                "x": 0.0909,
+                "y": 0.8741,
+                "width": 0.2614,
+                "height": 0.0188
+              },
+              "children": []
+            },
+            {
+              "role": "テキスト",
+              "type": "StaticText",
+              "label": "時間帯",
+              "value": "",
+              "enabled": true,
+              "frame": {
+                "x": 0.0909,
+                "y": 0.9285,
+                "width": 0.0773,
+                "height": 0.015
+              },
+              "children": []
+            },
+            {
+              "role": "テキスト",
+              "type": "StaticText",
+              "label": "05:10-05:40",
+              "value": "",
+              "enabled": true,
+              "frame": {
+                "x": 0.0909,
+                "y": 0.9467,
+                "width": 0.197,
+                "height": 0.0188
+              },
+              "children": []
+            },
+            {
+              "role": "テキスト",
+              "type": "StaticText",
+              "label": "録音時間(分)",
+              "value": "",
+              "enabled": true,
+              "frame": {
+                "x": 0.0909,
+                "y": 1.001,
+                "width": 0.1538,
+                "height": 0.015
+              },
+              "children": []
+            },
+            {
+              "role": "テキスト",
+              "type": "StaticText",
+              "label": "30",
+              "value": "",
+              "enabled": true,
+              "frame": {
+                "x": 0.0909,
+                "y": 1.0192,
+                "width": 0.0424,
+                "height": 0.0188
+              },
+              "children": []
+            }
+          ]
+        },
+        {
+          "role": "group",
+          "type": "Group",
+          "label": "Tab Bar",
+          "value": "",
+          "enabled": true,
+          "frame": {
+            "x": 0,
+            "y": 0.9132,
+            "width": 1,
+            "height": 0.0868
+          },
+          "children": []
+        },
+        {
+          "role": "テキスト",
+          "type": "StaticText",
+          "label": "23:39",
+          "value": "",
+          "enabled": true,
+          "frame": {
+            "x": 0.1477,
+            "y": 0.023,
+            "width": 0.0841,
+            "height": 0.0227
+          },
+          "children": []
+        },
+        {
+          "role": "",
+          "type": "GenericElement",
+          "label": "Dynamic Island、何もなし",
+          "value": "",
+          "enabled": true,
+          "frame": {
+            "x": 0.3576,
+            "y": 0.0146,
+            "width": 0.2848,
+            "height": 0.0384
+          },
+          "children": []
+        },
+        {
+          "role": "",
+          "type": "GenericElement",
+          "label": "モバイル通信",
+          "value": "",
+          "enabled": true,
+          "frame": {
+            "x": 0.7098,
+            "y": 0.0265,
+            "width": 0.0492,
+            "height": 0.0143
+          },
+          "children": []
+        },
+        {
+          "role": "",
+          "type": "GenericElement",
+          "label": "バッテリー電源100%",
+          "value": "",
+          "enabled": true,
+          "frame": {
+            "x": 0.8371,
+            "y": 0.0262,
+            "width": 0.0712,
+            "height": 0.015
+          },
+          "children": []
+        },
+        {
+          "role": "タブ",
+          "type": "RadioButton",
+          "label": "ライブラリ",
+          "value": "1",
+          "enabled": true,
+          "frame": {
+            "x": 0.0568,
+            "y": 0.9174,
+            "width": 0.2375,
+            "height": 0.0565
+          },
+          "children": [],
+          "id": "music.note.list"
+        },
+        {
+          "role": "タブ",
+          "type": "RadioButton",
+          "label": "ダウンロード",
+          "value": "0",
+          "enabled": true,
+          "frame": {
+            "x": 0.2731,
+            "y": 0.9174,
+            "width": 0.2375,
+            "height": 0.0565
+          },
+          "children": [],
+          "id": "arrow.down.circle"
+        },
+        {
+          "role": "タブ",
+          "type": "RadioButton",
+          "label": "履歴",
+          "value": "0",
+          "enabled": true,
+          "frame": {
+            "x": 0.4894,
+            "y": 0.9174,
+            "width": 0.2375,
+            "height": 0.0565
+          },
+          "children": [],
+          "id": "clock.arrow.circlepath"
+        },
+        {
+          "role": "タブ",
+          "type": "RadioButton",
+          "label": "設定",
+          "value": "0",
+          "enabled": true,
+          "frame": {
+            "x": 0.7057,
+            "y": 0.9174,
+            "width": 0.2375,
+            "height": 0.0565
+          },
+          "children": [],
+          "id": "gearshape"
+        }
+      ]
+    }
+  ],
+  "_meta": {
+    "runtimeId": "a2e60b1e-dd9b-4df3-9063-c439eada2177"
+  }
+}

@@ -146,12 +146,17 @@
       devShells = forAllSystems (system:
         let pkgs = mkPkgs system;
         in {
-          default = pkgs.mkShell {
+          default = pkgs.mkShellNoCC {
+            shellHook = nixpkgs.lib.optionalString pkgs.stdenv.isDarwin ''
+              export DEVELOPER_DIR="$(/usr/bin/env -u DEVELOPER_DIR /usr/bin/xcode-select -p)"
+              unset SDKROOT
+            '';
             packages = [
               (mkCheckPython pkgs)
               pkgs.actionlint
               pkgs.ffmpeg-headless
               pkgs.openvpn
+              pkgs.nodejs
               pkgs.shellcheck
             ];
           };

@@ -1,0 +1,53 @@
+{
+  "schema_version": 2,
+  "release": {
+    "version": "1.0.0",
+    "build": "1",
+    "bundle_id": "dev.satoki.playback",
+    "team_id": "QVUR5T7J46",
+    "operation": "first_release",
+    "branch": "main",
+    "sku": "未確定（ユーザー作業）",
+    "release_method": "未確定（ユーザー作業）",
+    "primary_language": "ja",
+    "localizations": [
+      "ja"
+    ],
+    "commerce_mode": "none",
+    "app_store_connect_id": "未確定（ユーザー作業）"
+  },
+  "source": {
+    "xcode_project": "ios/Playback.xcodeproj",
+    "release_targets": [
+      "Playback"
+    ],
+    "release_configuration": "Release",
+    "privacy_manifest": "ios/Playback/Resources/PrivacyInfo.xcprivacy",
+    "required_usage_descriptions": []
+  },
+  "bundles": [
+    {
+      "kind": "app",
+      "bundle_id": "dev.satoki.playback",
+      "app_id_prefix": "未確定（ユーザー作業）",
+      "required_entitlements": {},
+      "unchecked_entitlements": {},
+      "required_info_values": {
+        "ITSAppUsesNonExemptEncryption": false
+      },
+      "unchecked_info_keys": {},
+      "policy_reason": "署名後の実物と照合する前のドラフト。App ID prefix は Team ID から推測しない。"
+    }
+  ],
+  "provenance": {
+    "source_commit": "未確定（ユーザー作業）",
+    "info_plist_key": "BuildSourceCommit"
+  },
+  "artifacts": {
+    "archive": "/Users/satoki252595/orca/nhkRadio/ios/build/codex-prep-2026-10-18/Playback-probe.xcarchive",
+    "ipa": "/Users/satoki252595/orca/nhkRadio/ios/build/codex-prep-2026-10-18/export/Playback.ipa",
+    "export_options": "/Users/satoki252595/orca/nhkRadio/ios/build/codex-prep-2026-10-18/ExportOptions.plist",
+    "distribution_summary": "/Users/satoki252595/orca/nhkRadio/ios/build/codex-prep-2026-10-18/export/DistributionSummary.plist"
+  },
+  "repo": "/Users/satoki252595/orca/nhkRadio"
+}

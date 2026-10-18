@@ -1,0 +1,365 @@
+{
+  "id": "ac485183-1a98-4903-95df-6a7d8e14faeb",
+  "ok": true,
+  "result": [
+    {
+      "role": "アプリケーション",
+      "type": "Application",
+      "label": "Playback",
+      "value": "",
+      "enabled": true,
+      "frame": {
+        "x": 0,
+        "y": 0,
+        "width": 1,
+        "height": 1
+      },
+      "children": [
+        {
+          "role": "イメージ",
+          "type": "Image",
+          "label": "waveform.circle.fill",
+          "value": "",
+          "enabled": true,
+          "frame": {
+            "x": 0.0659,
+            "y": 0.0938,
+            "width": 0.1273,
+            "height": 0.0586
+          },
+          "children": [],
+          "id": "waveform.circle.fill"
+        },
+        {
+          "role": "テキスト",
+          "type": "StaticText",
+          "label": "Playback for Notion",
+          "value": "",
+          "enabled": true,
+          "frame": {
+            "x": 0.0545,
+            "y": 0.1688,
+            "width": 0.7008,
+            "height": 0.0425
+          },
+          "children": []
+        },
+        {
+          "role": "テキスト",
+          "type": "StaticText",
+          "label": "Notionのデータベースにある音声・動画を、iPhoneでそのまま再生。ダウンロードすればオフラインでも聴けます。",
+          "value": "",
+          "enabled": true,
+          "frame": {
+            "x": 0.0545,
+            "y": 0.2238,
+            "width": 0.8841,
+            "height": 0.0673
+          },
+          "children": []
+        },
+        {
+          "role": "イメージ",
+          "type": "Image",
+          "label": "Play",
+          "value": "",
+          "enabled": true,
+          "frame": {
+            "x": 0.0659,
+            "y": 0.3218,
+            "width": 0.0455,
+            "height": 0.0209
+          },
+          "children": [],
+          "id": "play.circle.fill"
+        },
+        {
+          "role": "テキスト",
+          "type": "StaticText",
+          "label": "タップで再生",
+          "value": "",
+          "enabled": true,
+          "frame": {
+            "x": 0.1545,
+            "y": 0.3204,
+            "width": 0.2174,
+            "height": 0.0213
+          },
+          "children": []
+        },
+        {
+          "role": "テキスト",
+          "type": "StaticText",
+          "label": "バックグラウンド再生・ロック画面操作・倍速・スリープタイマー対応",
+          "value": "",
+          "enabled": true,
+          "frame": {
+            "x": 0.1545,
+            "y": 0.3438,
+            "width": 0.7023,
+            "height": 0.0397
+          },
+          "children": []
+        },
+        {
+          "role": "イメージ",
+          "type": "Image",
+          "label": "Arrow Down Circle",
+          "value": "",
+          "enabled": true,
+          "frame": {
+            "x": 0.0659,
+            "y": 0.3996,
+            "width": 0.0455,
+            "height": 0.0209
+          },
+          "children": [],
+          "id": "arrow.down.circle.fill"
+        },
+        {
+          "role": "テキスト",
+          "type": "StaticText",
+          "label": "オフライン再生",
+          "value": "",
+          "enabled": true,
+          "frame": {
+            "x": 0.1545,
+            "y": 0.3982,
+            "width": 0.253,
+            "height": 0.0213
+          },
+          "children": []
+        },
+        {
+          "role": "テキスト",
+          "type": "StaticText",
+          "label": "必要な回だけ選んでダウンロード。容量管理もできます",
+          "value": "",
+          "enabled": true,
+          "frame": {
+            "x": 0.1545,
+            "y": 0.4215,
+            "width": 0.6712,
+            "height": 0.0397
+          },
+          "children": []
+        },
+        {
+          "role": "イメージ",
+          "type": "Image",
+          "label": "Table",
+          "value": "",
+          "enabled": true,
+          "frame": {
+            "x": 0.0621,
+            "y": 0.4773,
+            "width": 0.053,
+            "height": 0.0188
+          },
+          "children": [],
+          "id": "tablecells.fill"
+        },
+        {
+          "role": "テキスト",
+          "type": "StaticText",
+          "label": "どんなデータベースでも",
+          "value": "",
+          "enabled": true,
+          "frame": {
+            "x": 0.1545,
+            "y": 0.4759,
+            "width": 0.3977,
+            "height": 0.0213
+          },
+          "children": []
+        },
+        {
+          "role": "テキスト",
+          "type": "StaticText",
+          "label": "音声ファイル列を選ぶだけ。その他の列も一覧・詳細で確認できます",
+          "value": "",
+          "enabled": true,
+          "frame": {
+            "x": 0.1545,
+            "y": 0.4993,
+            "width": 0.703,
+            "height": 0.0397
+          },
+          "children": []
+        },
+        {
+          "role": "イメージ",
+          "type": "Image",
+          "label": "lock.shield.fill",
+          "value": "",
+          "enabled": true,
+          "frame": {
+            "x": 0.0705,
+            "y": 0.5551,
+            "width": 0.0364,
+            "height": 0.0206
+          },
+          "children": [],
+          "id": "lock.shield.fill"
+        },
+        {
+          "role": "テキスト",
+          "type": "StaticText",
+          "label": "トークンは端末内だけ",
+          "value": "",
+          "enabled": true,
+          "frame": {
+            "x": 0.1545,
+            "y": 0.5537,
+            "width": 0.3621,
+            "height": 0.0213
+          },
+          "children": []
+        },
+        {
+          "role": "テキスト",
+          "type": "StaticText",
+          "label": "認証情報はKeychainに保存され、開発者のサーバーには送られません",
+          "value": "",
+          "enabled": true,
+          "frame": {
+            "x": 0.1545,
+            "y": 0.5771,
+            "width": 0.7561,
+            "height": 0.0397
+          },
+          "children": []
+        },
+        {
+          "role": "ボタン",
+          "type": "Button",
+          "label": "Notionでサインイン",
+          "value": "",
+          "enabled": true,
+          "frame": {
+            "x": 0.0545,
+            "y": 0.6461,
+            "width": 0.8909,
+            "height": 0.0652
+          },
+          "children": []
+        },
+        {
+          "role": "テキスト",
+          "type": "StaticText",
+          "label": "OAuth接続は準備中です。下のトークン接続、またはデモをご利用ください。",
+          "value": "",
+          "enabled": true,
+          "frame": {
+            "x": 0.0545,
+            "y": 0.7238,
+            "width": 0.8197,
+            "height": 0.0317
+          },
+          "children": []
+        },
+        {
+          "role": "ボタン",
+          "type": "Button",
+          "label": "自分のトークンで接続",
+          "value": "",
+          "enabled": true,
+          "frame": {
+            "x": 0.0545,
+            "y": 0.7681,
+            "width": 0.8909,
+            "height": 0.0687
+          },
+          "children": []
+        },
+        {
+          "role": "ボタン",
+          "type": "Button",
+          "label": "デモライブラリで試す（アカウント不要）",
+          "value": "",
+          "enabled": true,
+          "frame": {
+            "x": 0.1667,
+            "y": 0.8539,
+            "width": 0.6716,
+            "height": 0.0188
+          },
+          "children": []
+        },
+        {
+          "role": "テキスト",
+          "type": "StaticText",
+          "label": "Playback for Notion は独立したサードパーティアプリであり、Notion Labs, Inc. とは提携していません。",
+          "value": "",
+          "enabled": true,
+          "frame": {
+            "x": 0.0545,
+            "y": 0.9104,
+            "width": 0.8371,
+            "height": 0.0317
+          },
+          "children": []
+        },
+        {
+          "role": "テキスト",
+          "type": "StaticText",
+          "label": "9:41",
+          "value": "",
+          "enabled": true,
+          "frame": {
+            "x": 0.1477,
+            "y": 0.023,
+            "width": 0.0841,
+            "height": 0.0227
+          },
+          "children": []
+        },
+        {
+          "role": "",
+          "type": "GenericElement",
+          "label": "Dynamic Island、何もなし",
+          "value": "",
+          "enabled": true,
+          "frame": {
+            "x": 0.3576,
+            "y": 0.0146,
+            "width": 0.2848,
+            "height": 0.0384
+          },
+          "children": []
+        },
+        {
+          "role": "",
+          "type": "GenericElement",
+          "label": "モバイル通信",
+          "value": "",
+          "enabled": true,
+          "frame": {
+            "x": 0.7098,
+            "y": 0.0265,
+            "width": 0.0492,
+            "height": 0.0143
+          },
+          "children": []
+        },
+        {
+          "role": "",
+          "type": "GenericElement",
+          "label": "バッテリー電源100%",
+          "value": "",
+          "enabled": true,
+          "frame": {
+            "x": 0.8371,
+            "y": 0.0262,
+            "width": 0.0712,
+            "height": 0.015
+          },
+          "children": []
+        }
+      ]
+    }
+  ],
+  "_meta": {
+    "runtimeId": "a2e60b1e-dd9b-4df3-9063-c439eada2177"
+  }
+}
