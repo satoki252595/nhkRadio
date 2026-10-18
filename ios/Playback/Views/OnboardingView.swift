@@ -60,8 +60,8 @@ struct OnboardingView: View {
                        "必要な回だけ選んでダウンロード。容量管理もできます")
             featureRow("tablecells.fill", "どんなデータベースでも",
                        "音声ファイル列を選ぶだけ。その他の列も一覧・詳細で確認できます")
-            featureRow("lock.shield.fill", "トークンは端末内だけ",
-                       "認証情報はKeychainに保存され、開発者のサーバーには送られません")
+            featureRow("lock.shield.fill", "トークンを安全に保存",
+                       "端末のKeychainに保存。OAuthの認証更新は中継サーバーを経由し、永続保存しません")
         }
     }
 
@@ -95,6 +95,11 @@ struct OnboardingView: View {
             .buttonStyle(.borderedProminent)
             .controlSize(.large)
             .disabled(isSigningIn)
+
+            Text("Notion画面で「ページを選択する」から使いたいDBを許可してください。すでに接続済みでも同じ手順で再接続できます。")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .frame(maxWidth: .infinity, alignment: .leading)
 
             if !Config.oauthIsConfigured {
                 Text("OAuth接続は準備中です。下のトークン接続、またはデモをご利用ください。")

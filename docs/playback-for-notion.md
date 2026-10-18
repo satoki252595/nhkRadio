@@ -152,3 +152,9 @@ formula, rollup, relation件数, files件数）。詳細画面では全列を表
 - iOSテスト14/14、既存Pythonテスト82/82、Worker型チェック・dry-run、本番ルート7件のHTTP応答を確認。実ユーザーOAuthと実機再生はまだ未検証。
 
 上の旧ユーザー作業チェックリストは着手前の記録。現在の提出可否は `docs/release/release-manifest.md` とGit外の候補別preflight証跡を参照する。
+
+## OAuth再接続時の案内（2026-10-19）
+
+Notionの「権限がすでに付与されています」は認証失敗ではない。「ページを選択する」→使用DBを選択→許可で再接続する。実際の認可画面でこの導線を確認した。ユーザー情報取得は不要のため無効化し、認可画面からユーザー／メールアドレスの表示権限が消えたことを再読込で確認した。
+
+アプリ初回画面にこの案内を追加し、OAuth中継を経由する認証更新についても正確な保存説明へ揃えた。変更後のiOSテスト14件合格。根拠: https://developers.notion.com/guides/get-started/authorization
