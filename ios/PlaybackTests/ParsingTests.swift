@@ -264,6 +264,57 @@ final class DownloadDeletionTests: XCTestCase {
 
 final class PlaybackFeedbackTests: XCTestCase {
     @MainActor
+    func testRestoredDownloadCompletionAndStaleCallbacks() async throws {
+        let savedPending = DownloadManager.loadPending()
+        defer { DownloadManager.savePending(savedPending) }
+        let manager = DownloadManager()
+        var completions = 0
+        manager.onDownloaded = { _, _, _ in completions += 1 }
+        let item = try XCTUnwrap(DemoData.items.first)
+        let file = try XCTUnwrap(item.mediaFiles.first)
+        let source = try XCTUnwrap(DemoData.bundleURL(forFileName: file.name))
+        for legacy in [false, true] {
+            var pending = PendingDownload(
+                pageID: "relaunch-test-\(UUID())", databaseID: item.databaseID,
+                itemTitle: item.title, fileName: file.name, kindRaw: file.kind.rawValue)
+            if legacy { pending.requestID = nil }
+            let encoded = try JSONEncoder().encode(pending)
+            XCTAssertEqual(try JSONDecoder().decode(PendingDownload.self, from: encoded).requestID, pending.requestID)
+            var all = savedPending
+            all[pending.key] = pending
+            DownloadManager.savePending(all)
+            let task = URLSession.shared.downloadTask(with: source)
+            task.taskDescription = legacy ? pending.key : String(data: encoded, encoding: .utf8)
+            let temporary = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+            try FileManager.default.copyItem(at: source, to: temporary)
+            let destination = try XCTUnwrap(DownloadStorage.fileURL(relativePath:
+                DownloadStorage.relativePath(pageID: pending.pageID, fileName: file.name)))
+            defer { try? FileManager.default.removeItem(at: destination.deletingLastPathComponent()) }
+            let before = completions
+            // No in-memory task is registered: emulate completion before the
+            // background session's getAllTasks restoration has returned.
+            manager.urlSession(URLSession.shared, downloadTask: task, didFinishDownloadingTo: temporary)
+            for _ in 0..<100 where completions == before { try await Task.sleep(for: .milliseconds(10)) }
+            XCTAssertEqual(completions, before + 1)
+            XCTAssertTrue(FileManager.default.fileExists(atPath: destination.path))
+            XCTAssertNil(DownloadManager.loadPending()[pending.key])
+
+            // The same file is retried; the old attempt must not mutate it.
+            pending.requestID = UUID()
+            all[pending.key] = pending
+            DownloadManager.savePending(all)
+            XCTAssertNil(DownloadManager.pending(for: task))
+            manager.urlSession(URLSession.shared, downloadTask: task,
+                               didWriteData: 10, totalBytesWritten: 10, totalBytesExpectedToWrite: 20)
+            manager.urlSession(URLSession.shared, task: task, didCompleteWithError: URLError(.timedOut))
+            try await Task.sleep(for: .milliseconds(20))
+            XCTAssertFalse(manager.isDownloading(pending.key))
+            XCTAssertNil(manager.lastError)
+            XCTAssertEqual(DownloadManager.loadPending()[pending.key]?.requestID, pending.requestID)
+        }
+    }
+
+    @MainActor
     func testDownloadWaitMessageAndCancellationBeforeURLResolution() async throws {
         let state = AppState()
         defer { state.player.stop() }

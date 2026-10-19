@@ -9,7 +9,7 @@ struct PendingDownload: Codable {
     var itemTitle: String
     var fileName: String
     var kindRaw: String
-    var taskIdentifier: Int?
+    var requestID: UUID? = UUID()
     var key: String { "\(pageID)|\(fileName)" }
 }
 
@@ -110,10 +110,7 @@ final class DownloadManager: NSObject {
                     return
                 }
                 let task = self.session.downloadTask(with: url)
-                task.taskDescription = pending.key
-                var running = pending
-                running.taskIdentifier = task.taskIdentifier
-                self.storePending(running)
+                task.taskDescription = String(data: try JSONEncoder().encode(pending), encoding: .utf8)
                 task.countOfBytesClientExpectsToSend = 0
                 self.tasks[pending.key] = task
                 task.resume()
@@ -176,6 +173,20 @@ final class DownloadManager: NSObject {
         }
     }
 
+    /// Persisted identity works before getAllTasks completes after relaunch,
+    /// and rejects late callbacks from a cancelled attempt.
+    nonisolated static func pending(for task: URLSessionTask) -> PendingDownload? {
+        guard let description = task.taskDescription else { return nil }
+        if let encoded = description.data(using: .utf8),
+           let tagged = try? JSONDecoder().decode(PendingDownload.self, from: encoded),
+           let current = loadPending()[tagged.key], current.requestID == tagged.requestID {
+            return current
+        }
+        // Downloads created by earlier versions used just the key.
+        guard let legacy = loadPending()[description], legacy.requestID == nil else { return nil }
+        return legacy
+    }
+
     private func storePending(_ pending: PendingDownload) {
         var all = Self.loadPending()
         all[pending.key] = pending
@@ -193,9 +204,8 @@ final class DownloadManager: NSObject {
             Task { @MainActor in
                 guard let self else { return }
                 for case let task as URLSessionDownloadTask in tasks {
-                    if let key = task.taskDescription, !key.isEmpty,
-                       task.state != .canceling, task.state != .completed,
-                       Self.loadPending()[key] != nil {
+                    if task.state != .canceling, task.state != .completed,
+                       let key = Self.pending(for: task)?.key {
                         self.tasks[key] = task
                         if self.progress[key] == nil { self.progress[key] = -1 }
                     }
@@ -209,9 +219,8 @@ extension DownloadManager: URLSessionDownloadDelegate {
     nonisolated func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask,
                                 didFinishDownloadingTo location: URL) {
         // The system deletes `location` when this method returns: move now.
-        guard let key = downloadTask.taskDescription,
-              let pending = DownloadManager.loadPending()[key],
-              pending.taskIdentifier == nil || pending.taskIdentifier == downloadTask.taskIdentifier else { return }
+        guard let pending = DownloadManager.pending(for: downloadTask) else { return }
+        let key = pending.key
         let relative = DownloadStorage.relativePath(pageID: pending.pageID, fileName: pending.fileName)
         do {
             if let response = downloadTask.response as? HTTPURLResponse,
@@ -229,7 +238,7 @@ extension DownloadManager: URLSessionDownloadDelegate {
             try FileManager.default.moveItem(at: location, to: destination)
             let size = (try? destination.resourceValues(forKeys: [.fileSizeKey]).fileSize) ?? 0
             Task { @MainActor in
-                guard self.tasks[key] === downloadTask else { return }
+                guard Self.pending(for: downloadTask) != nil else { return }
                 self.progress[key] = nil
                 self.tasks[key] = nil
                 self.removePending(key: key)
@@ -237,7 +246,7 @@ extension DownloadManager: URLSessionDownloadDelegate {
             }
         } catch {
             Task { @MainActor in
-                guard self.tasks[key] === downloadTask else { return }
+                guard Self.pending(for: downloadTask) != nil else { return }
                 self.fail(pending: pending, message: error.localizedDescription)
             }
         }
@@ -246,30 +255,23 @@ extension DownloadManager: URLSessionDownloadDelegate {
     nonisolated func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask,
                                 didWriteData bytesWritten: Int64, totalBytesWritten: Int64,
                                 totalBytesExpectedToWrite: Int64) {
-        guard let key = downloadTask.taskDescription else { return }
         let fraction = totalBytesExpectedToWrite > 0
             ? Double(totalBytesWritten) / Double(totalBytesExpectedToWrite)
             : -1
         Task { @MainActor in
-            guard self.tasks[key] === downloadTask else { return }
-            self.progress[key] = fraction
+            guard let pending = Self.pending(for: downloadTask) else { return }
+            self.progress[pending.key] = fraction
         }
     }
 
     nonisolated func urlSession(_ session: URLSession, task: URLSessionTask,
                                 didCompleteWithError error: Error?) {
-        guard let error, let key = task.taskDescription else { return }
+        guard let error else { return }
         let nsError = error as NSError
         if nsError.domain == NSURLErrorDomain, nsError.code == NSURLErrorCancelled { return }
         Task { @MainActor in
-            guard self.tasks[key] === task else { return }
-            let pending = DownloadManager.loadPending()[key]
-            if let pending {
-                self.fail(pending: pending, message: error.localizedDescription)
-            } else {
-                self.progress[key] = nil
-                self.tasks[key] = nil
-            }
+            guard let pending = Self.pending(for: task) else { return }
+            self.fail(pending: pending, message: error.localizedDescription)
         }
     }
 
