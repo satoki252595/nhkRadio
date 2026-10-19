@@ -98,6 +98,11 @@ struct LibraryView: View {
                         appState.selectedDatabaseID = connection.databaseID
                     }
                 }
+                .onChange(of: showConnect) { _, isPresented in
+                    if !isPresented, !appState.isDemo, let connection = selectedConnection {
+                        Task { await appState.loadLibrary(connection: connection) }
+                    }
+                }
         }
     }
 

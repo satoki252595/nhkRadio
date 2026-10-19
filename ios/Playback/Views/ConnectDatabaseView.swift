@@ -1,3 +1,4 @@
+import AuthenticationServices
 import SwiftData
 import SwiftUI
 
@@ -7,39 +8,81 @@ struct ConnectDatabaseView: View {
     @Environment(AppState.self) private var appState
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.webAuthenticationSession) private var webAuthenticationSession
 
     @State private var searchResults: [DatabaseRef] = []
     @State private var isSearching = false
     @State private var searchError: String?
     @State private var pasteText = ""
     @State private var pasteError: String?
-    @State private var isResolvingPaste = false
+    @State private var resolvingInput: String?
+    @State private var resolvedDatabase: DatabaseRef?
+    @State private var needsDatabaseAccess = false
+    @State private var isAuthorizing = false
+
+    private var isResolvingPaste: Bool { resolvingInput != nil }
 
     var body: some View {
         NavigationStack {
             Form {
                 Section {
-                    TextField("https://www.notion.so/… または ID", text: $pasteText)
+                    TextField("NotionのデータベースURL または ID", text: $pasteText)
                         .textInputAutocapitalization(.never)
                         .autocorrectionDisabled()
+                        .keyboardType(.URL)
+                        .submitLabel(.search)
+                        .disabled(isAuthorizing)
+                        .onSubmit { Task { await resolvePaste() } }
+                        .onChange(of: pasteText) { _, _ in
+                            resolvedDatabase = nil
+                            pasteError = nil
+                            needsDatabaseAccess = false
+                        }
+                        .task(id: pasteText) {
+                            guard NotionID.extract(from: pasteText) != nil else { return }
+                            do { try await Task.sleep(for: .milliseconds(350)) }
+                            catch { return }
+                            await resolvePaste()
+                        }
                     if let pasteError {
                         Label(pasteError, systemImage: "xmark.octagon.fill")
                             .foregroundStyle(.red)
                             .font(.caption)
                     }
+                    if needsDatabaseAccess {
+                        Text("URLは読み取れました。NotionでこのDBをPlaybackに共有し、再検索してください。すでに許可したDBも引き続き使う場合は、認可画面で一緒に選択してください。")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                        if case .notion(_, "oauth") = appState.authState {
+                            Button("Notionでアクセスを許可して再検索") {
+                                Task { await authorizeAndResolve() }
+                            }
+                            .disabled(isAuthorizing || isResolvingPaste)
+                        } else {
+                            Text("Notionの対象DBで「…」→「接続を追加」から、お使いの接続を追加してください。")
+                                .font(.caption)
+                        }
+                    }
                     Button {
                         Task { await resolvePaste() }
                     } label: {
                         HStack {
-                            if isResolvingPaste { ProgressView().controlSize(.small) }
-                            Text("このURL / IDで接続")
+                            if isResolvingPaste || isAuthorizing { ProgressView().controlSize(.small) }
+                            Text("このURL / IDで検索")
                         }
                     }
-                    .disabled(pasteText.trimmingCharacters(in: .whitespaces).isEmpty || isResolvingPaste)
+                    .disabled(pasteText.trimmingCharacters(in: .whitespaces).isEmpty || isResolvingPaste || isAuthorizing)
+                    if let database = resolvedDatabase {
+                        NavigationLink {
+                            MappingEditorView(database: database) { dismiss() }
+                        } label: {
+                            Label(database.title, systemImage: "tablecells")
+                        }
+                    }
                 } header: {
                     Text("URLまたはIDを貼る")
                 } footer: {
-                    Text("Notionでデータベースを開き、ブラウザのURLをコピーして貼ってください。")
+                    Text("Notionの「リンクをコピー」で取得したURLをそのまま貼ると自動検索します。app.notion.com・notion.soの共有リンク（ビュー指定付き）に対応しています。")
                 }
 
                 Section("アクセス可能なデータベース") {
@@ -95,21 +138,50 @@ struct ConnectDatabaseView: View {
     }
 
     private func resolvePaste() async {
+        let input = pasteText
+        guard !isAuthorizing, resolvingInput != input else { return }
         pasteError = nil
-        guard let id = NotionID.extract(from: pasteText) else {
+        resolvedDatabase = nil
+        needsDatabaseAccess = false
+        guard let id = NotionID.extract(from: input) else {
             pasteError = "URL / IDからデータベースIDを判別できませんでした。"
             return
         }
-        isResolvingPaste = true
-        defer { isResolvingPaste = false }
+        resolvingInput = input
+        defer { if resolvingInput == input { resolvingInput = nil } }
         do {
             let info = try await appState.client.database(id: id)
-            // Insert at the top so the user can continue with a normal tap.
-            let ref = DatabaseRef(id: id, title: info.title, iconEmoji: info.iconEmoji)
-            searchResults.removeAll { $0.id == id }
-            searchResults.insert(ref, at: 0)
-            pasteText = ""
+            guard pasteText == input, !Task.isCancelled else { return }
+            resolvedDatabase = DatabaseRef(id: id, title: info.title, iconEmoji: info.iconEmoji)
         } catch {
+            guard pasteText == input, !Task.isCancelled else { return }
+            pasteError = (error as? LocalizedError)?.errorDescription ?? error.localizedDescription
+            if let error = error as? NotionError {
+                switch error {
+                case .databaseNotFoundOrNotShared, .http(403, _), .http(404, _):
+                    needsDatabaseAccess = true
+                default: break
+                }
+            }
+        }
+    }
+
+    private func authorizeAndResolve() async {
+        isAuthorizing = true
+        do {
+            let (url, state) = try appState.auth.makeAuthorizeURL()
+            let callbackURL = try await webAuthenticationSession.authenticate(
+                using: url, callbackURLScheme: Config.oauthCallbackScheme)
+            let success = try await appState.auth.completeOAuth(
+                callbackURL: callbackURL, expectedState: state)
+            appState.completeSignIn(success)
+            await search()
+            isAuthorizing = false
+            await resolvePaste()
+        } catch let error as ASWebAuthenticationSessionError where error.code == .canceledLogin {
+            isAuthorizing = false
+        } catch {
+            isAuthorizing = false
             pasteError = (error as? LocalizedError)?.errorDescription ?? error.localizedDescription
         }
     }

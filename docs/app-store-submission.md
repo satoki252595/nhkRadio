@@ -1,4 +1,4 @@
-# Playback for Notion — App Store 提出ドラフト（v1.0.0 / build 2）
+# Playback for Notion — App Store 提出ドラフト（v1.0.0 / build 3）
 
 状態: Notion OAuth登録・Worker設定・Xcodeログイン・ASCアプリ作成は完了。公開候補のarchive/export/preflightとTestFlight実機検証を進行中。審査未提出。
 
@@ -10,7 +10,7 @@
 | アプリ名 | Playback for Notion |
 | Bundle ID | `dev.satoki.playback` |
 | Team | `QVUR5T7J46` |
-| バージョン / ビルド | 1.0.0 / 2 |
+| バージョン / ビルド | 1.0.0 / 3 |
 | 主言語 | 日本語 |
 | カテゴリ | ミュージック（副: ユーティリティ） |
 | 価格 | 無料（IAPなし） |

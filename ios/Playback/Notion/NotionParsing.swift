@@ -4,18 +4,24 @@ import Foundation
 enum NotionID {
     static func extract(from text: String) -> String? {
         let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
-        // Dashed UUID anywhere in the string.
-        if let range = trimmed.range(
-            of: "[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}",
-            options: .regularExpression
-        ) {
-            return String(trimmed[range]).lowercased()
+        let candidate: String
+        if let url = URLComponents(string: trimmed), url.scheme != nil {
+            guard ["https", "http", "notion"].contains(url.scheme?.lowercased() ?? ""),
+                  let host = url.host?.lowercased(),
+                  ["notion.com", "notion.so", "notion.site"].contains(where: {
+                      host == $0 || host.hasSuffix("." + $0)
+                  }) else { return nil }
+            // A view ID in ?v= or an ID in the workspace slug is not the database ID.
+            candidate = (url.path as NSString).lastPathComponent
+        } else {
+            candidate = trimmed
         }
-        // 32 hex chars (Notion URLs embed this form, often after a title slug).
-        if let range = trimmed.range(of: "[0-9a-fA-F]{32}", options: .regularExpression) {
-            return dashed(String(trimmed[range]))
-        }
-        return nil
+        guard let range = candidate.range(
+            of: "(?<![0-9a-f])(?:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|[0-9a-f]{32})$",
+            options: [.regularExpression, .caseInsensitive]
+        ) else { return nil }
+        let id = String(candidate[range]).lowercased()
+        return id.contains("-") ? id : dashed(id)
     }
 
     static func dashed(_ hex32: String) -> String {

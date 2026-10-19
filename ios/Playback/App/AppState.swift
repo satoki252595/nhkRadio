@@ -242,6 +242,7 @@ final class AppState {
 
     func deleteDownload(_ record: DownloadRecord) {
         if let url = DownloadStorage.fileURL(relativePath: record.relativePath) {
+            player.invalidateLocalFile(url, progressKey: record.key)
             try? FileManager.default.removeItem(at: url)
         }
         modelContext?.delete(record)
@@ -251,6 +252,7 @@ final class AppState {
     func deleteAllDownloads(records: [DownloadRecord]) {
         for record in records {
             if let url = DownloadStorage.fileURL(relativePath: record.relativePath) {
+                player.invalidateLocalFile(url, progressKey: record.key)
                 try? FileManager.default.removeItem(at: url)
             }
             modelContext?.delete(record)

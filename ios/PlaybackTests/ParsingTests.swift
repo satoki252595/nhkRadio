@@ -1,10 +1,31 @@
 import XCTest
+import AVFoundation
+import SwiftData
 @testable import Playback
 
 final class NotionIDTests: XCTestCase {
     func testExtractFromNotionURL() {
-        let url = "https://app.notion.com/p/kabu-labo2/6dc536e3d4404708a92ef5554353fa0d?v=0620491a6d394af38dcd60a3be23904e"
+        let url = "https://app.notion.com/p/kabu-labo2/6dc536e3d4404708a92ef5554353fa0d?v=0620491a6d394af38dcd60a3be23904e&source=copy_link"
         XCTAssertEqual(NotionID.extract(from: url), "6dc536e3-d440-4708-a92e-f5554353fa0d")
+    }
+
+    func testDatabasePathWinsOverWorkspaceAndViewIDs() {
+        let url = "https://app.notion.com/p/11111111-2222-3333-4444-555555555555/6dc536e3d4404708a92ef5554353fa0d?v=0620491a-6d39-4af3-8dcd-60a3be23904e"
+        XCTAssertEqual(NotionID.extract(from: url), "6dc536e3-d440-4708-a92e-f5554353fa0d")
+    }
+
+    func testExtractFromTitleAndPublicNotionLinks() {
+        for host in ["www.notion.so", "example.notion.site"] {
+            let url = "https://\(host)/Radio-6dc536e3d4404708a92ef5554353fa0d?source=copy_link"
+            XCTAssertEqual(NotionID.extract(from: url), "6dc536e3-d440-4708-a92e-f5554353fa0d")
+        }
+    }
+
+    func testRejectsViewOnlyAndUnrelatedURLs() {
+        XCTAssertNil(NotionID.extract(from: "https://app.notion.com/p/kabu-labo2?v=0620491a6d394af38dcd60a3be23904e"))
+        XCTAssertNil(NotionID.extract(from: "https://example.com/6dc536e3d4404708a92ef5554353fa0d"))
+        XCTAssertNil(NotionID.extract(from: "https://notion.so.evil.example/6dc536e3d4404708a92ef5554353fa0d"))
+        XCTAssertNil(NotionID.extract(from: "16dc536e3d4404708a92ef5554353fa0d"))
     }
 
     func testExtractDashedUUID() {
@@ -153,5 +174,90 @@ final class FormatHelpersTests: XCTestCase {
         XCTAssertEqual(DownloadStorage.sanitized("a/b:c.m4a"), "a_b_c.m4a")
         XCTAssertEqual(DownloadStorage.sanitized(""), "download")
         XCTAssertEqual(DownloadStorage.relativePath(pageID: "p1", fileName: "x y.m4a"), "p1/x y.m4a")
+    }
+}
+
+final class DownloadDeletionTests: XCTestCase {
+    @MainActor
+    func testDeletingCurrentDownloadReleasesPlayerAndResolvesOriginalAgain() async throws {
+        for deleteAll in [false, true] {
+            let container = try ModelContainer(
+                for: ConnectionRecord.self, DownloadRecord.self, ProgressRecord.self,
+                configurations: ModelConfiguration(isStoredInMemoryOnly: true))
+            let state = AppState()
+            defer { state.player.stop() }
+            state.modelContext = ModelContext(container)
+            let item = try XCTUnwrap(DemoData.items.first)
+            let file = try XCTUnwrap(item.mediaFiles.first)
+            let entry = QueueEntry(item: item, file: file)
+            let original = try XCTUnwrap(DemoData.bundleURL(forFileName: file.name))
+            let relative = "deletion-test-\(UUID().uuidString)/\(file.name)"
+            let local = try XCTUnwrap(DownloadStorage.fileURL(relativePath: relative))
+            try FileManager.default.createDirectory(
+                at: local.deletingLastPathComponent(), withIntermediateDirectories: true)
+            defer { try? FileManager.default.removeItem(at: local.deletingLastPathComponent()) }
+            try FileManager.default.copyItem(at: original, to: local)
+            let record = DownloadRecord(
+                key: entry.progressKey, pageID: item.pageID, databaseID: item.databaseID,
+                itemTitle: item.title, fileName: file.name, relativePath: relative,
+                byteCount: 1, kind: file.kind)
+            state.modelContext?.insert(record)
+            try state.modelContext?.save()
+
+            let before = try await state.resolveURL(for: entry)
+            XCTAssertEqual(before, local)
+            state.player.playQueue([entry])
+            for _ in 0..<100 where state.player.isLoading {
+                try await Task.sleep(for: .milliseconds(10))
+            }
+            XCTAssertEqual((state.player.player.currentItem?.asset as? AVURLAsset)?.url, local)
+            state.player.pause()
+
+            if deleteAll { state.deleteAllDownloads(records: [record]) }
+            else { state.deleteDownload(record) }
+
+            XCTAssertNil(state.downloadRecord(forKey: entry.progressKey))
+            XCTAssertFalse(FileManager.default.fileExists(atPath: local.path))
+            XCTAssertNil(state.player.currentEntry)
+            XCTAssertNil(state.player.player.currentItem)
+            let after = try await state.resolveURL(for: entry)
+            XCTAssertEqual(after, original)
+            state.player.playQueue([entry])
+            for _ in 0..<100 where state.player.isLoading {
+                try await Task.sleep(for: .milliseconds(10))
+            }
+            XCTAssertEqual((state.player.player.currentItem?.asset as? AVURLAsset)?.url, original)
+        }
+    }
+
+    @MainActor
+    func testDeletionWhileResolvingCannotRestoreTheDeletedFileAfterReplay() async throws {
+        let item = try XCTUnwrap(DemoData.items.first)
+        let file = try XCTUnwrap(item.mediaFiles.first)
+        let entry = QueueEntry(item: item, file: file)
+        let original = try XCTUnwrap(DemoData.bundleURL(forFileName: file.name))
+        let deleted = FileManager.default.temporaryDirectory.appendingPathComponent("deleted.m4a")
+        let player = PlayerEngine()
+        defer { player.stop() }
+        var pending: CheckedContinuation<URL, Error>?
+        player.resolveURL = { _ in
+            try await withCheckedThrowingContinuation { pending = $0 }
+        }
+        player.playQueue([entry])
+        for _ in 0..<100 where pending == nil {
+            try await Task.sleep(for: .milliseconds(10))
+        }
+        let delayed = try XCTUnwrap(pending)
+        player.invalidateLocalFile(deleted, progressKey: entry.progressKey)
+        XCTAssertNil(player.currentEntry)
+        XCTAssertFalse(player.isLoading)
+        player.resolveURL = { _ in original }
+        player.playQueue([entry])
+        for _ in 0..<100 where player.isLoading {
+            try await Task.sleep(for: .milliseconds(10))
+        }
+        delayed.resume(returning: deleted)
+        try await Task.sleep(for: .milliseconds(20))
+        XCTAssertEqual((player.player.currentItem?.asset as? AVURLAsset)?.url, original)
     }
 }

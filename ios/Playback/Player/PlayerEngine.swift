@@ -69,6 +69,7 @@ final class PlayerEngine {
     private var shuffledOrder: [Int] = []
     private var wasPlayingBeforeInterruption = false
     private var lastProgressSave = Date.distantPast
+    private var playbackGeneration = UUID()
 
     static let availableRates: [Float] = [0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0, 2.5, 3.0]
     static let skipForwardSeconds: Double = 15
@@ -189,21 +190,32 @@ final class PlayerEngine {
     }
 
     func stop() {
+        playbackGeneration = UUID()
         saveProgress(finished: false, force: true)
         player.pause()
         player.replaceCurrentItem(with: nil)
         queue = []
         currentIndex = nil
         isPlaying = false
+        isLoading = false
         currentTime = 0
         duration = 0
         MPNowPlayingInfoCenter.default().nowPlayingInfo = nil
+    }
+
+    func invalidateLocalFile(_ url: URL, progressKey: String) {
+        if (isLoading && currentEntry?.progressKey == progressKey)
+            || (player.currentItem?.asset as? AVURLAsset)?.url == url {
+            stop()
+        }
     }
 
     // MARK: - Internals
 
     private func start(at index: Int, autoplay: Bool) {
         guard queue.indices.contains(index) else { return }
+        let generation = UUID()
+        playbackGeneration = generation
         saveProgress(finished: false, force: true)
         currentIndex = index
         let entry = queue[index]
@@ -219,7 +231,7 @@ final class PlayerEngine {
                 }
                 let url = try await resolveURL(entry)
                 // The user may have skipped while resolving; only apply if current.
-                guard self.currentEntry == entry else { return }
+                guard self.playbackGeneration == generation, self.currentEntry == entry else { return }
                 let item = AVPlayerItem(url: url)
                 item.audioTimePitchAlgorithm = .timeDomain
                 self.replaceItem(item)
@@ -230,6 +242,7 @@ final class PlayerEngine {
                 if autoplay { self.resume() }
                 self.updateNowPlayingInfo()
             } catch {
+                guard self.playbackGeneration == generation else { return }
                 self.isLoading = false
                 self.lastError = (error as? LocalizedError)?.errorDescription ?? error.localizedDescription
             }
