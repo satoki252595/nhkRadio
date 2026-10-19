@@ -53,24 +53,24 @@ struct MiniPlayerView: View {
                         Text(entry.item.title)
                             .font(.subheadline.weight(.semibold))
                             .lineLimit(1)
-                        Text(entry.file.name)
+                        Text(player.playbackFailure != nil ? "再生できませんでした・再試行できます"
+                             : player.isWaiting ? (appState.downloads.isDownloading(entry.progressKey)
+                                ? "ダウンロード中・再生の読み込み待ち" : "再生データを読み込み中…")
+                             : entry.file.name)
                             .font(.caption2)
                             .foregroundStyle(.secondary)
                             .lineLimit(1)
                             .truncationMode(.middle)
                     }
                     Spacer(minLength: 4)
-                    if player.isLoading {
-                        ProgressView().controlSize(.small)
-                    } else {
                         Button {
                             player.togglePlayPause()
                         } label: {
-                            Image(systemName: player.isPlaying ? "pause.fill" : "play.fill")
+                            Image(systemName: player.playbackFailure != nil ? "arrow.clockwise"
+                                  : player.isPlaying ? "pause.fill" : "play.fill")
                                 .font(.title2)
                         }
-                        .accessibilityLabel(player.isPlaying ? "一時停止" : "再生")
-                    }
+                        .accessibilityLabel(player.playbackFailure != nil ? "再試行" : player.isPlaying ? "一時停止" : "再生")
                     Button {
                         player.next()
                     } label: {
@@ -78,6 +78,7 @@ struct MiniPlayerView: View {
                             .font(.title3)
                     }
                     .accessibilityLabel("次へ")
+                    .disabled(!player.canGoNext)
                 }
                 .padding(.horizontal, 12)
                 .padding(.vertical, 8)
@@ -106,6 +107,39 @@ struct NowPlayingView: View {
                 VStack(spacing: 22) {
                     mediaSurface
                     titleBlock
+                    if let error = appState.downloads.lastError {
+                        VStack(spacing: 8) {
+                            Label(error, systemImage: "exclamationmark.triangle")
+                                .font(.callout)
+                            Text("再度保存するには、ダウンロードボタンを押してください。")
+                                .font(.caption)
+                            Button("閉じる") { appState.downloads.lastError = nil }
+                        }
+                        .padding()
+                        .frame(maxWidth: .infinity)
+                        .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 12))
+                    }
+                    if let message = appState.playbackStatusMessage {
+                        VStack(spacing: 10) {
+                            if player.isWaiting { ProgressView() }
+                            Text(message)
+                                .font(.callout)
+                                .multilineTextAlignment(.center)
+                                .accessibilityAddTraits(.updatesFrequently)
+                            Button("再試行") { player.retry() }
+                                .buttonStyle(.bordered)
+                            if let entry = player.currentEntry,
+                               appState.downloads.isDownloading(entry.progressKey) {
+                                Button("ダウンロードを中止して再生") {
+                                    appState.downloads.cancel(key: entry.progressKey)
+                                    player.retry()
+                                }
+                            }
+                        }
+                        .padding()
+                        .frame(maxWidth: .infinity)
+                        .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 12))
+                    }
                     scrubber
                     transport
                     optionsRow
@@ -201,7 +235,7 @@ struct NowPlayingView: View {
                     }
                 }
             )
-            .disabled(player.duration <= 0)
+            .disabled(player.duration <= 0 || player.isLoading || player.playbackFailure != nil)
             HStack {
                 Text(TimeFormat.clock(scrubPosition ?? player.currentTime))
                 Spacer()
@@ -226,25 +260,24 @@ struct NowPlayingView: View {
                 Image(systemName: "gobackward.15").font(.title)
             }
             .accessibilityLabel("15秒戻る")
+            .disabled(player.duration <= 0 || player.playbackFailure != nil)
             Button { player.togglePlayPause() } label: {
-                if player.isLoading {
-                    ProgressView().controlSize(.large)
-                } else {
                     Image(systemName: player.isPlaying ? "pause.circle.fill" : "play.circle.fill")
                         .font(.system(size: 64))
                         .symbolRenderingMode(.hierarchical)
                         .foregroundStyle(Color.accentColor)
-                }
             }
             .accessibilityLabel(player.isPlaying ? "一時停止" : "再生")
             Button { player.skip(by: PlayerEngine.skipForwardSeconds) } label: {
                 Image(systemName: "goforward.15").font(.title)
             }
             .accessibilityLabel("15秒進む")
+            .disabled(player.duration <= 0 || player.playbackFailure != nil)
             Button { player.next() } label: {
                 Image(systemName: "forward.end.fill").font(.title2)
             }
             .accessibilityLabel("次へ")
+            .disabled(!player.canGoNext)
         }
         .foregroundStyle(.primary)
     }

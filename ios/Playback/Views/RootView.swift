@@ -44,6 +44,7 @@ struct RootView: View {
                 .presentationDragIndicator(.visible)
         }
         .alert("再生エラー", isPresented: errorBinding) {
+            Button("再試行") { appState.player.retry() }
             Button("OK") { appState.player.lastError = nil }
         } message: {
             Text(appState.player.lastError ?? "")

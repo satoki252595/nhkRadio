@@ -57,10 +57,14 @@ struct DownloadsView: View {
     private var list: some View {
         List {
             if !activeKeys.isEmpty {
-                Section("ダウンロード中") {
+                Section {
                     ForEach(activeKeys, id: \.self) { key in
                         activeRow(key: key)
                     }
+                } header: {
+                    Text("ダウンロード中")
+                } footer: {
+                    Text("保存が完了するまでオフライン再生はできません。再生の読み込みが進まない場合は、完了を待つか、右の×で中止して再試行してください。")
                 }
             }
             if !records.isEmpty {

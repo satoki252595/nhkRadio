@@ -261,3 +261,97 @@ final class DownloadDeletionTests: XCTestCase {
         XCTAssertEqual((player.player.currentItem?.asset as? AVURLAsset)?.url, original)
     }
 }
+
+final class PlaybackFeedbackTests: XCTestCase {
+    @MainActor
+    func testDownloadWaitMessageAndCancellationBeforeURLResolution() async throws {
+        let state = AppState()
+        defer { state.player.stop() }
+        let item = try XCTUnwrap(DemoData.items.first)
+        let entry = QueueEntry(item: item, file: try XCTUnwrap(item.mediaFiles.first))
+        let original = try XCTUnwrap(DemoData.bundleURL(forFileName: entry.file.name))
+        var downloadURL: CheckedContinuation<URL, Error>?
+        var playbackURL: CheckedContinuation<URL, Error>?
+        var completed = false
+        state.downloads.onDownloaded = { _, _, _ in completed = true }
+        state.downloads.enqueue(entry: entry) { _ in
+            try await withCheckedThrowingContinuation { downloadURL = $0 }
+        }
+        state.player.resolveURL = { _ in
+            try await withCheckedThrowingContinuation { playbackURL = $0 }
+        }
+        state.player.playQueue([entry])
+        for _ in 0..<100 where downloadURL == nil || playbackURL == nil {
+            try await Task.sleep(for: .milliseconds(10))
+        }
+        XCTAssertTrue(state.playbackStatusMessage?.contains("ダウンロード中") == true)
+        XCTAssertTrue(state.playbackStatusMessage?.contains("中止して再試行") == true)
+        state.downloads.cancel(key: entry.progressKey)
+        XCTAssertFalse(state.downloads.isDownloading(entry.progressKey))
+        XCTAssertTrue(state.playbackStatusMessage?.contains("通信環境") == true)
+        try XCTUnwrap(downloadURL).resume(returning: original)
+        try XCTUnwrap(playbackURL).resume(returning: original)
+        for _ in 0..<100 where state.player.isLoading {
+            try await Task.sleep(for: .milliseconds(10))
+        }
+        XCTAssertFalse(completed, "Cancelled URL resolution must not create a saved copy")
+    }
+
+    @MainActor
+    func testPauseDuringPreparationAndRetryAfterResolutionFailure() async throws {
+        let player = PlayerEngine()
+        defer { player.stop() }
+        let item = try XCTUnwrap(DemoData.items.first)
+        let entry = QueueEntry(item: item, file: try XCTUnwrap(item.mediaFiles.first))
+        let original = try XCTUnwrap(DemoData.bundleURL(forFileName: entry.file.name))
+        var pending: CheckedContinuation<URL, Error>?
+        player.resolveURL = { _ in
+            try await withCheckedThrowingContinuation { pending = $0 }
+        }
+        player.playQueue([entry])
+        for _ in 0..<100 where pending == nil { try await Task.sleep(for: .milliseconds(10)) }
+        XCTAssertTrue(player.isLoading)
+        player.pause()
+        try XCTUnwrap(pending).resume(returning: original)
+        for _ in 0..<100 where player.isLoading { try await Task.sleep(for: .milliseconds(10)) }
+        XCTAssertFalse(player.isPlaying, "Preparation must respect a user's pause")
+        XCTAssertEqual(player.player.rate, 0)
+
+        player.resolveURL = { _ in throw URLError(.notConnectedToInternet) }
+        player.retry()
+        for _ in 0..<100 where player.isLoading { try await Task.sleep(for: .milliseconds(10)) }
+        XCTAssertFalse(player.isPlaying)
+        XCTAssertNotNil(player.playbackFailure)
+        XCTAssertNil(player.player.currentItem, "A failed selection must not keep the previous media")
+        player.resolveURL = { _ in original }
+        player.togglePlayPause()
+        for _ in 0..<100 where player.isLoading { try await Task.sleep(for: .milliseconds(10)) }
+        XCTAssertNil(player.playbackFailure)
+        XCTAssertEqual((player.player.currentItem?.asset as? AVURLAsset)?.url, original)
+        XCTAssertTrue(player.isPlaying)
+    }
+
+    @MainActor
+    func testAVPlayerFailureIsVisibleAndCanRetry() async throws {
+        let player = PlayerEngine()
+        defer { player.stop() }
+        let item = try XCTUnwrap(DemoData.items.first)
+        let entry = QueueEntry(item: item, file: try XCTUnwrap(item.mediaFiles.first))
+        let missing = FileManager.default.temporaryDirectory.appendingPathComponent("missing-\(UUID()).m4a")
+        player.resolveURL = { _ in missing }
+        player.playQueue([entry])
+        for _ in 0..<300 where player.playbackFailure == nil {
+            try await Task.sleep(for: .milliseconds(10))
+        }
+        XCTAssertNotNil(player.playbackFailure, "AVPlayer errors after URL resolution must be surfaced")
+        XCTAssertNotNil(player.lastError)
+        XCTAssertFalse(player.isPlaying)
+        XCTAssertFalse(player.isWaiting)
+        let original = try XCTUnwrap(DemoData.bundleURL(forFileName: entry.file.name))
+        player.resolveURL = { _ in original }
+        player.retry()
+        for _ in 0..<100 where player.isLoading { try await Task.sleep(for: .milliseconds(10)) }
+        XCTAssertNil(player.playbackFailure)
+        XCTAssertEqual((player.player.currentItem?.asset as? AVURLAsset)?.url, original)
+    }
+}

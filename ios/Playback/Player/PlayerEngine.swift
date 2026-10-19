@@ -43,6 +43,8 @@ final class PlayerEngine {
     private(set) var currentIndex: Int?
     private(set) var isPlaying = false
     private(set) var isLoading = false
+    private(set) var isBuffering = false
+    private(set) var playbackFailure: String?
     private(set) var currentTime: Double = 0
     private(set) var duration: Double = 0
     var lastError: String?
@@ -70,6 +72,10 @@ final class PlayerEngine {
     private var wasPlayingBeforeInterruption = false
     private var lastProgressSave = Date.distantPast
     private var playbackGeneration = UUID()
+    private var itemStatusObserver: NSKeyValueObservation?
+    private var playbackStatusObserver: NSKeyValueObservation?
+
+    var isWaiting: Bool { isLoading || isBuffering }
 
     static let availableRates: [Float] = [0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0, 2.5, 3.0]
     static let skipForwardSeconds: Double = 15
@@ -80,6 +86,7 @@ final class PlayerEngine {
         return queue[currentIndex]
     }
     var hasMedia: Bool { currentEntry != nil }
+    var canGoNext: Bool { nextIndex(after: currentIndex) != nil }
     var progressFraction: Double { duration > 0 ? min(1, currentTime / duration) : 0 }
 
     init() {
@@ -94,6 +101,12 @@ final class PlayerEngine {
         configureRemoteCommands()
         observeTime()
         observeInterruptions()
+        playbackStatusObserver = player.observe(\.timeControlStatus, options: [.new]) { [weak self] _, _ in
+            Task { @MainActor in
+                guard let self else { return }
+                self.isBuffering = self.player.timeControlStatus == .waitingToPlayAtSpecifiedRate
+            }
+        }
     }
 
     // MARK: - Queue control
@@ -121,10 +134,27 @@ final class PlayerEngine {
         }
     }
 
+    func retry() {
+        guard let currentIndex else { return }
+        start(at: currentIndex, autoplay: true)
+    }
+
     func resume() {
-        activateAudioSession()
-        player.rate = rate
+        guard let currentIndex else { return }
+        if playbackFailure != nil || (!isLoading && player.currentItem == nil) {
+            start(at: currentIndex, autoplay: true)
+            return
+        }
+        // A pause during URL resolution must also cancel the pending autoplay.
         isPlaying = true
+        guard !isLoading else { return }
+        do {
+            try activateAudioSession()
+        } catch {
+            failPlayback(error)
+            return
+        }
+        player.rate = rate
         updateNowPlayingInfo()
     }
 
@@ -198,6 +228,10 @@ final class PlayerEngine {
         currentIndex = nil
         isPlaying = false
         isLoading = false
+        isBuffering = false
+        playbackFailure = nil
+        lastError = nil
+        itemStatusObserver = nil
         currentTime = 0
         duration = 0
         MPNowPlayingInfoCenter.default().nowPlayingInfo = nil
@@ -217,12 +251,19 @@ final class PlayerEngine {
         let generation = UUID()
         playbackGeneration = generation
         saveProgress(finished: false, force: true)
+        player.pause()
+        itemStatusObserver = nil
+        player.replaceCurrentItem(with: nil)
         currentIndex = index
         let entry = queue[index]
         isLoading = true
+        isBuffering = false
+        isPlaying = autoplay
+        playbackFailure = nil
         lastError = nil
         currentTime = 0
         duration = 0
+        updateNowPlayingInfo()
         Task { [weak self] in
             guard let self else { return }
             do {
@@ -239,12 +280,11 @@ final class PlayerEngine {
                 if let resume = self.resumePositionProvider?(entry), resume > 5 {
                     self.seek(to: resume)
                 }
-                if autoplay { self.resume() }
+                if self.isPlaying { self.resume() }
                 self.updateNowPlayingInfo()
             } catch {
                 guard self.playbackGeneration == generation else { return }
-                self.isLoading = false
-                self.lastError = (error as? LocalizedError)?.errorDescription ?? error.localizedDescription
+                self.failPlayback(error)
             }
         }
     }
@@ -254,6 +294,12 @@ final class PlayerEngine {
             NotificationCenter.default.removeObserver(endObserver)
         }
         player.replaceCurrentItem(with: item)
+        itemStatusObserver = item.observe(\.status, options: [.initial, .new]) { [weak self] item, _ in
+            Task { @MainActor in
+                guard let self, self.player.currentItem === item, item.status == .failed else { return }
+                self.failPlayback(item.error ?? NotionError.network("メディアを読み込めませんでした。"))
+            }
+        }
         endObserver = NotificationCenter.default.addObserver(
             forName: .AVPlayerItemDidPlayToEndTime,
             object: item,
@@ -261,6 +307,17 @@ final class PlayerEngine {
         ) { [weak self] _ in
             Task { @MainActor in self?.handleItemEnded() }
         }
+    }
+
+    private func failPlayback(_ error: Error) {
+        player.pause()
+        isPlaying = false
+        isLoading = false
+        isBuffering = false
+        let detail = (error as? LocalizedError)?.errorDescription ?? error.localizedDescription
+        playbackFailure = "再生できませんでした。通信環境とファイルの共有権限を確認し、再試行してください。\n\(detail)"
+        lastError = playbackFailure
+        updateNowPlayingInfo()
     }
 
     private func handleItemEnded() {
@@ -344,8 +401,9 @@ final class PlayerEngine {
         try? AVAudioSession.sharedInstance().setCategory(.playback, mode: .spokenAudio)
     }
 
-    private func activateAudioSession() {
-        try? AVAudioSession.sharedInstance().setActive(true)
+    private func activateAudioSession() throws {
+        try AVAudioSession.sharedInstance().setCategory(.playback, mode: .spokenAudio)
+        try AVAudioSession.sharedInstance().setActive(true)
     }
 
     private func observeInterruptions() {

@@ -9,6 +9,7 @@ struct PendingDownload: Codable {
     var itemTitle: String
     var fileName: String
     var kindRaw: String
+    var taskIdentifier: Int?
     var key: String { "\(pageID)|\(fileName)" }
 }
 
@@ -71,6 +72,7 @@ final class DownloadManager: NSObject {
 
     private var session: URLSession!
     private var tasks: [String: URLSessionDownloadTask] = [:]
+    private var resolvingTasks: [String: Task<Void, Never>] = [:]
 
     private static let pendingDefaultsKey = "downloads.pending"
 
@@ -96,10 +98,11 @@ final class DownloadManager: NSObject {
         guard !isDownloading(pending.key) else { return }
         progress[pending.key] = -1
         storePending(pending)
-        Task { [weak self] in
+        resolvingTasks[pending.key] = Task { [weak self] in
             do {
                 let url = try await resolveURL(entry)
-                guard let self else { return }
+                guard !Task.isCancelled, let self else { return }
+                self.resolvingTasks[pending.key] = nil
                 // Background URLSessions cannot fetch file:// URLs (demo
                 // bundle media, already-local sources): copy directly.
                 if url.isFileURL {
@@ -108,16 +111,23 @@ final class DownloadManager: NSObject {
                 }
                 let task = self.session.downloadTask(with: url)
                 task.taskDescription = pending.key
+                var running = pending
+                running.taskIdentifier = task.taskIdentifier
+                self.storePending(running)
                 task.countOfBytesClientExpectsToSend = 0
                 self.tasks[pending.key] = task
                 task.resume()
             } catch {
+                guard !Task.isCancelled else { return }
+                self?.resolvingTasks[pending.key] = nil
                 self?.fail(pending: pending, message: (error as? LocalizedError)?.errorDescription ?? error.localizedDescription)
             }
         }
     }
 
     func cancel(key: String) {
+        resolvingTasks[key]?.cancel()
+        resolvingTasks[key] = nil
         tasks[key]?.cancel()
         tasks[key] = nil
         progress[key] = nil
@@ -183,7 +193,9 @@ final class DownloadManager: NSObject {
             Task { @MainActor in
                 guard let self else { return }
                 for case let task as URLSessionDownloadTask in tasks {
-                    if let key = task.taskDescription, !key.isEmpty {
+                    if let key = task.taskDescription, !key.isEmpty,
+                       task.state != .canceling, task.state != .completed,
+                       Self.loadPending()[key] != nil {
                         self.tasks[key] = task
                         if self.progress[key] == nil { self.progress[key] = -1 }
                     }
@@ -198,10 +210,17 @@ extension DownloadManager: URLSessionDownloadDelegate {
                                 didFinishDownloadingTo location: URL) {
         // The system deletes `location` when this method returns: move now.
         guard let key = downloadTask.taskDescription,
-              let pending = DownloadManager.loadPending()[key] else { return }
+              let pending = DownloadManager.loadPending()[key],
+              pending.taskIdentifier == nil || pending.taskIdentifier == downloadTask.taskIdentifier else { return }
         let relative = DownloadStorage.relativePath(pageID: pending.pageID, fileName: pending.fileName)
-        guard let destination = DownloadStorage.fileURL(relativePath: relative) else { return }
         do {
+            if let response = downloadTask.response as? HTTPURLResponse,
+               !(200...299).contains(response.statusCode) {
+                throw NotionError.network("ファイルを取得できませんでした（HTTP \(response.statusCode)）。ライブラリを更新して再試行してください。")
+            }
+            guard let destination = DownloadStorage.fileURL(relativePath: relative) else {
+                throw NotionError.network("保存先を作成できませんでした。端末の空き容量を確認してください。")
+            }
             try FileManager.default.createDirectory(
                 at: destination.deletingLastPathComponent(), withIntermediateDirectories: true)
             if FileManager.default.fileExists(atPath: destination.path) {
@@ -210,6 +229,7 @@ extension DownloadManager: URLSessionDownloadDelegate {
             try FileManager.default.moveItem(at: location, to: destination)
             let size = (try? destination.resourceValues(forKeys: [.fileSizeKey]).fileSize) ?? 0
             Task { @MainActor in
+                guard self.tasks[key] === downloadTask else { return }
                 self.progress[key] = nil
                 self.tasks[key] = nil
                 self.removePending(key: key)
@@ -217,6 +237,7 @@ extension DownloadManager: URLSessionDownloadDelegate {
             }
         } catch {
             Task { @MainActor in
+                guard self.tasks[key] === downloadTask else { return }
                 self.fail(pending: pending, message: error.localizedDescription)
             }
         }
@@ -230,6 +251,7 @@ extension DownloadManager: URLSessionDownloadDelegate {
             ? Double(totalBytesWritten) / Double(totalBytesExpectedToWrite)
             : -1
         Task { @MainActor in
+            guard self.tasks[key] === downloadTask else { return }
             self.progress[key] = fraction
         }
     }
@@ -239,8 +261,9 @@ extension DownloadManager: URLSessionDownloadDelegate {
         guard let error, let key = task.taskDescription else { return }
         let nsError = error as NSError
         if nsError.domain == NSURLErrorDomain, nsError.code == NSURLErrorCancelled { return }
-        let pending = DownloadManager.loadPending()[key]
         Task { @MainActor in
+            guard self.tasks[key] === task else { return }
+            let pending = DownloadManager.loadPending()[key]
             if let pending {
                 self.fail(pending: pending, message: error.localizedDescription)
             } else {

@@ -109,6 +109,7 @@ struct DownloadButton: View {
             }
             .buttonStyle(.borderless)
             .accessibilityLabel("ダウンロードを中止")
+            .accessibilityValue(fraction >= 0 ? "\(Int(fraction * 100))パーセント" : "準備中")
         case .downloaded:
             Menu {
                 Button(role: .destructive) {
@@ -196,6 +197,11 @@ struct LibraryRowView: View {
                 }
                 .font(.caption2)
                 .foregroundStyle(.tertiary)
+                if item.mediaFiles.contains(where: { appState.downloads.isDownloading("\(item.pageID)|\($0.name)") }) {
+                    Label("ダウンロード中", systemImage: "arrow.down.circle")
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                }
                 if let progress, !progress.isFinished, progress.fraction > 0.01 {
                     PlayedProgressBar(fraction: progress.fraction)
                         .frame(maxWidth: 160)

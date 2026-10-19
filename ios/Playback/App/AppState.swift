@@ -147,6 +147,16 @@ final class AppState {
 
     // MARK: - Playback
 
+    var playbackStatusMessage: String? {
+        if let failure = player.playbackFailure { return failure }
+        guard player.isWaiting, let entry = player.currentEntry else { return nil }
+        if let fraction = downloads.progress[entry.progressKey] {
+            let progress = fraction >= 0 ? "（\(Int(fraction * 100))%）" : ""
+            return "ダウンロード中\(progress)です。現在、再生データの読み込みを待っています。完了まで待つか、ダウンロードを中止して再試行してください。"
+        }
+        return "再生データを読み込み中です。時間がかかる場合は通信環境を確認して再試行してください。"
+    }
+
     /// Builds a queue starting at the chosen file, then the rest of the
     /// item's files, then subsequent items in the given list.
     func play(item: LibraryItem, file: MediaFileRef, in list: [LibraryItem]) {
