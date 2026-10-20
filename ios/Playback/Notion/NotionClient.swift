@@ -36,11 +36,13 @@ final class NotionClient {
     /// Called once on a 401; return true if a fresh token is now available.
     var refreshHandler: () async -> Bool = { false }
 
-    private let session: URLSession = {
+    private let session: URLSession
+
+    init(session: URLSession? = nil) {
         let config = URLSessionConfiguration.ephemeral
         config.timeoutIntervalForRequest = 60
-        return URLSession(configuration: config)
-    }()
+        self.session = session ?? URLSession(configuration: config)
+    }
 
     // MARK: - Public API
 
@@ -142,9 +144,9 @@ final class NotionClient {
             throw NotionError.decoding("メディア列「\(mediaProperty)」が見つかりません")
         }
         let files = NotionParsing.mediaFiles(forPropertyValue: value)
-        guard let match = files.first(where: { $0.name == fileName }) ?? files.first,
+        guard let match = files.first(where: { $0.name == fileName }),
               let url = URL(string: match.urlString) else {
-            throw NotionError.decoding("ファイル「\(fileName)」のURLを取得できません")
+            throw NotionError.decoding("ファイル「\(fileName)」が見つかりません。削除または名前が変更された可能性があります。ライブラリを更新してください。")
         }
         return url
     }

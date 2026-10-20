@@ -3,6 +3,102 @@ import Foundation
 import MediaPlayer
 import Observation
 import UIKit
+import UniformTypeIdentifiers
+
+enum MediaPlaybackError: LocalizedError {
+    case unsupported(String)
+    case unreadable
+    case http(Int)
+    case missingConnection
+
+    var errorDescription: String? {
+        switch self {
+        case .unsupported(let name):
+            return "「\(name)」の形式はこの端末では対応していません。「設定」→「対応ファイル形式」を確認してください。"
+        case .unreadable:
+            return "このファイルを開けませんでした。内部の音声・映像形式が未対応、またはファイルが破損している可能性があります。「設定」→「対応ファイル形式」を確認してください。"
+        case .http(let status):
+            return "音源を取得できませんでした（HTTP \(status)）。リンクの有効期限や共有権限を確認し、ライブラリを更新して再試行してください。"
+        case .missingConnection:
+            return "元のデータベースの接続設定がありません。「設定」からこの音源のデータベースを再接続してください。"
+        }
+    }
+}
+
+/// Use the device's decoders and the file's bytes, rather than trusting a
+/// filename or an upload's Content-Type (older NHK recordings mislabel AAC).
+enum PlaybackFormats {
+    private static let inspectionSession = URLSession(configuration: .ephemeral)
+    static let audioCandidates = ["m4a", "mp3", "aac", "wav", "aif", "aiff", "flac", "caf", "ogg", "opus"]
+    static let videoCandidates = ["mp4", "mov", "m4v", "webm", "mkv"]
+    private static let nativeExtensions: Set<String> = {
+        let types: [UTType]
+        if #available(iOS 26.0, *) {
+            types = AVURLAsset.audiovisualContentTypes
+        } else {
+            types = AVURLAsset.audiovisualMIMETypes().compactMap { UTType(mimeType: $0) }
+        }
+        return Set(types.flatMap { $0.tags[.filenameExtension] ?? [] }.map { $0.lowercased() })
+    }()
+    static var audioExtensions: [String] { audioCandidates.filter { nativeExtensions.contains($0) } }
+    static var videoExtensions: [String] { videoCandidates.filter { nativeExtensions.contains($0) } }
+    static func supports(_ name: String) -> Bool {
+        let ext = (name as NSString).pathExtension.lowercased()
+        return (audioCandidates + videoCandidates).contains(ext) && nativeExtensions.contains(ext)
+    }
+
+    static func mimeOverride(header: Data) -> String? {
+        let bytes = [UInt8](header)
+        if bytes.starts(with: Array("fLaC".utf8)) { return "audio/flac" }
+        if bytes.starts(with: Array("caff".utf8)) { return "audio/x-caf" }
+        if bytes.count >= 12 {
+            if bytes[0..<4].elementsEqual("RIFF".utf8), bytes[8..<12].elementsEqual("WAVE".utf8) { return "audio/wav" }
+            if bytes[0..<4].elementsEqual("FORM".utf8),
+               bytes[8..<12].elementsEqual("AIFF".utf8) || bytes[8..<12].elementsEqual("AIFC".utf8) { return "audio/aiff" }
+        }
+        var offset = 0
+        while bytes.count >= offset + 10, bytes[offset..<offset + 3].elementsEqual("ID3".utf8) {
+            let size = bytes[offset + 6..<offset + 10]
+            guard size.allSatisfy({ $0 < 128 }) else { return nil }
+            let footer = bytes[offset + 3] == 4 && bytes[offset + 5] & 0x10 != 0 ? 10 : 0
+            offset += 10 + size.reduce(0) { ($0 << 7) | Int($1) } + footer
+        }
+        guard bytes.count >= offset + 2, bytes[offset] == 0xff else { return nil }
+        if bytes[offset + 1] & 0xf6 == 0xf0 { return "audio/aac" }
+        if bytes[offset + 1] & 0xe0 == 0xe0, bytes[offset + 1] & 0x06 != 0 { return "audio/mpeg" }
+        return nil
+    }
+
+    static func asset(url: URL, fileName: String) async throws -> AVURLAsset {
+        guard supports(fileName) else { throw MediaPlaybackError.unsupported(fileName) }
+        var header = Data()
+        if MediaKind(fileName: fileName) == .audio {
+            // ponytail: inspect at most 64 KiB; larger ID3 tags fall back to
+            // AVFoundation's parser instead of downloading a whole recording.
+            let limit = 65_536
+            if url.isFileURL {
+                let file = try FileHandle(forReadingFrom: url)
+                defer { try? file.close() }
+                header = try file.read(upToCount: limit) ?? Data()
+            } else {
+                var request = URLRequest(url: url)
+                request.timeoutInterval = 20
+                request.cachePolicy = .reloadIgnoringLocalCacheData
+                request.setValue("bytes=0-\(limit - 1)", forHTTPHeaderField: "Range")
+                let (bytes, response) = try await inspectionSession.bytes(for: request)
+                defer { bytes.task.cancel() }
+                if let http = response as? HTTPURLResponse, !(200...299).contains(http.statusCode) {
+                    throw MediaPlaybackError.http(http.statusCode)
+                }
+                for try await byte in bytes.prefix(limit) { header.append(byte) }
+            }
+        }
+        let mime = mimeOverride(header: header)
+        let asset = AVURLAsset(url: url, options: mime.map { [AVURLAssetOverrideMIMETypeKey: $0] })
+        guard try await asset.load(.isPlayable) else { throw MediaPlaybackError.unreadable }
+        return asset
+    }
+}
 
 enum RepeatMode: String, CaseIterable {
     case off, all, one
@@ -74,6 +170,7 @@ final class PlayerEngine {
     private var playbackGeneration = UUID()
     private var itemStatusObserver: NSKeyValueObservation?
     private var playbackStatusObserver: NSKeyValueObservation?
+    private var resolutionTask: Task<Void, Never>?
 
     var isWaiting: Bool { isLoading || isBuffering }
 
@@ -221,6 +318,8 @@ final class PlayerEngine {
 
     func stop() {
         playbackGeneration = UUID()
+        resolutionTask?.cancel()
+        resolutionTask = nil
         saveProgress(finished: false, force: true)
         player.pause()
         player.replaceCurrentItem(with: nil)
@@ -250,6 +349,7 @@ final class PlayerEngine {
         guard queue.indices.contains(index) else { return }
         let generation = UUID()
         playbackGeneration = generation
+        resolutionTask?.cancel()
         saveProgress(finished: false, force: true)
         player.pause()
         itemStatusObserver = nil
@@ -264,7 +364,7 @@ final class PlayerEngine {
         currentTime = 0
         duration = 0
         updateNowPlayingInfo()
-        Task { [weak self] in
+        resolutionTask = Task { [weak self] in
             guard let self else { return }
             do {
                 guard let resolveURL = self.resolveURL else {
@@ -273,7 +373,9 @@ final class PlayerEngine {
                 let url = try await resolveURL(entry)
                 // The user may have skipped while resolving; only apply if current.
                 guard self.playbackGeneration == generation, self.currentEntry == entry else { return }
-                let item = AVPlayerItem(url: url)
+                let asset = try await PlaybackFormats.asset(url: url, fileName: entry.file.name)
+                guard self.playbackGeneration == generation, !Task.isCancelled else { return }
+                let item = AVPlayerItem(asset: asset)
                 item.audioTimePitchAlgorithm = .timeDomain
                 self.replaceItem(item)
                 self.isLoading = false
@@ -315,7 +417,16 @@ final class PlayerEngine {
         isLoading = false
         isBuffering = false
         let detail = (error as? LocalizedError)?.errorDescription ?? error.localizedDescription
-        playbackFailure = "再生できませんでした。通信環境とファイルの共有権限を確認し、再試行してください。\n\(detail)"
+        let networkFailure = sequence(first: error as NSError, next: {
+            $0.userInfo[NSUnderlyingErrorKey] as? NSError
+        }).prefix(8).contains { $0.domain == NSURLErrorDomain }
+        if error is MediaPlaybackError || error is NotionError {
+            playbackFailure = detail
+        } else if networkFailure {
+            playbackFailure = "通信できませんでした。インターネット接続を確認し、再試行してください。\n\(detail)"
+        } else {
+            playbackFailure = MediaPlaybackError.unreadable.errorDescription
+        }
         lastError = playbackFailure
         updateNowPlayingInfo()
     }

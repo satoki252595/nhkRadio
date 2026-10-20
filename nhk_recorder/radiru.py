@@ -472,7 +472,7 @@ def download_ondemand(
     if ytdlp_bin:
         ytdlp_result = _try_ytdlp(
             ytdlp_bin, playlist_url, output_path, timeout_sec,
-            deadline=deadline,
+            deadline=deadline, ffmpeg_path=ffmpeg_path,
         )
         if ytdlp_result:
             logger.info(
@@ -525,12 +525,14 @@ def _try_ytdlp(
     ytdlp_bin: str, stream_url: str, output_path: Path, timeout_sec: int,
     *,
     deadline: float | None = None,
+    ffmpeg_path: str = "ffmpeg",
 ) -> bool | None:
     """yt-dlp で HLS を取得し M4A で保存する。
 
     yt-dlp はデフォルトで拡張子を自動付与するため、`-o <path_without_ext>`
     で拡張子を指定しない形式で渡し、実際の出力は `<path>.mp4` か `.m4a`
-    で生成される。取得後に期待パスへ rename する。
+    で生成される。ADTS AAC は音声を再圧縮せず M4A に remux し、
+    MP4/M4A コンテナは期待パスへ rename する。
 
     Returns:
         True: 成功
@@ -583,7 +585,18 @@ def _try_ytdlp(
         logger.warning("yt-dlp 出力ファイル不見当 (base=%s)", tmp_base)
         return False
 
-    if produced != output_path:
+    if produced.suffix == ".aac":
+        # ADTS AAC is not an M4A container. Renaming it also caused uploads to
+        # advertise audio/mp4, which Apple players correctly failed to open.
+        remux = [
+            ffmpeg_path, "-y", "-i", str(produced), "-c:a", "copy",
+            "-bsf:a", "aac_adtstoasc", "-movflags", "+faststart", str(output_path),
+        ]
+        if not _try_ffmpeg(remux, output_path, timeout_sec, deadline=deadline):
+            output_path.unlink(missing_ok=True)
+            return False
+        produced.unlink(missing_ok=True)
+    elif produced != output_path:
         try:
             produced.rename(output_path)
         except OSError as e:

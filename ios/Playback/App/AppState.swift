@@ -16,7 +16,7 @@ enum AuthState: Equatable {
 final class AppState {
     private(set) var authState: AuthState = .signedOut
 
-    let client = NotionClient()
+    let client: NotionClient
     let auth = AuthService()
     let player = PlayerEngine()
     let downloads = DownloadManager()
@@ -39,7 +39,8 @@ final class AppState {
 
     var isDemo: Bool { authState == .demo }
 
-    init() {
+    init(client: NotionClient = NotionClient()) {
+        self.client = client
         selectedDatabaseID = UserDefaults.standard.string(forKey: "library.selectedDatabaseID")
         restoreSession()
         wireServices()
@@ -187,25 +188,7 @@ final class AppState {
            FileManager.default.fileExists(atPath: url.path) {
             return url
         }
-        // 2. Demo bundle file.
-        if entry.item.databaseID == DemoData.databaseID || entry.item.pageID.hasPrefix("demo-page") {
-            if let url = DemoData.bundleURL(forFileName: entry.file.name) { return url }
-            throw NotionError.decoding("デモファイルが見つかりません")
-        }
-        // 3. External URLs do not expire.
-        if entry.file.isExternal, let url = URL(string: entry.file.urlString) {
-            return url
-        }
-        // 4. Notion-hosted file: refresh the signed URL right now.
-        guard let mapping = activeMapping else {
-            if let url = URL(string: entry.file.urlString) { return url }
-            throw NotionError.decoding("メディア列の設定がありません")
-        }
-        return try await client.freshMediaURL(
-            pageID: entry.item.pageID,
-            mediaProperty: mapping.mediaProperty,
-            fileName: entry.file.name
-        )
+        return try await resolveOriginalURL(for: entry)
     }
 
     // MARK: - Downloads & progress (SwiftData)
@@ -227,12 +210,12 @@ final class AppState {
     func enqueueDownload(_ entry: QueueEntry) {
         downloads.enqueue(entry: entry) { [weak self] entry in
             guard let self else { throw NotionError.network("アプリ状態が破棄されました") }
-            return try await self.resolveURLForDownload(entry)
+            return try await self.resolveOriginalURL(for: entry)
         }
     }
 
     /// Downloads must never resolve to an already-local file.
-    private func resolveURLForDownload(_ entry: QueueEntry) async throws -> URL {
+    private func resolveOriginalURL(for entry: QueueEntry) async throws -> URL {
         if entry.item.databaseID == DemoData.databaseID || entry.item.pageID.hasPrefix("demo-page") {
             if let url = DemoData.bundleURL(forFileName: entry.file.name) { return url }
             throw NotionError.decoding("デモファイルが見つかりません")
@@ -240,12 +223,16 @@ final class AppState {
         if entry.file.isExternal, let url = URL(string: entry.file.urlString) {
             return url
         }
-        guard let mapping = activeMapping else {
-            throw NotionError.decoding("メディア列の設定がありません")
+        // History and queued entries may belong to a different database than
+        // the visible library. Always use the entry's saved connection.
+        let databaseID = entry.item.databaseID
+        let descriptor = FetchDescriptor<ConnectionRecord>(predicate: #Predicate { $0.databaseID == databaseID })
+        guard let connection = try modelContext?.fetch(descriptor).first else {
+            throw MediaPlaybackError.missingConnection
         }
         return try await client.freshMediaURL(
             pageID: entry.item.pageID,
-            mediaProperty: mapping.mediaProperty,
+            mediaProperty: connection.mapping.mediaProperty,
             fileName: entry.file.name
         )
     }

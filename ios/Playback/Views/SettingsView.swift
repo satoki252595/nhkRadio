@@ -33,6 +33,7 @@ struct SettingsView: View {
                     connectionsSection
                 }
                 playbackSection
+                formatsSection
                 storageSection
                 aboutSection
             }
@@ -153,6 +154,23 @@ struct SettingsView: View {
 
     private var rateBinding: Binding<Float> {
         Binding(get: { appState.player.rate }, set: { appState.player.rate = $0 })
+    }
+
+    private var formatsSection: some View {
+        Section {
+            LabeledContent("音声") {
+                Text(PlaybackFormats.audioExtensions.map { ".\($0)" }.joined(separator: " / "))
+                    .multilineTextAlignment(.trailing)
+            }
+            LabeledContent("動画") {
+                Text(PlaybackFormats.videoExtensions.map { ".\($0)" }.joined(separator: " / "))
+                    .multilineTextAlignment(.trailing)
+            }
+        } header: {
+            Text("対応ファイル形式")
+        } footer: {
+            Text("この端末のiOSが読み込める拡張子を表示しています。同じ拡張子でも、内部の音声・映像形式、破損、DRMによっては再生できません。添付名や配信元の形式表記が誤っている音声は、ファイルの内容を確認して再生します。")
+        }
     }
     private var repeatBinding: Binding<RepeatMode> {
         Binding(get: { appState.player.repeatMode }, set: { appState.player.repeatMode = $0 })

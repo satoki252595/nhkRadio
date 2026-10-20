@@ -96,7 +96,7 @@
           runtimePython = mkPython pkgs;
           common = {
             unit = pkgs.runCommand "nhk-radio-unit-tests" {
-              nativeBuildInputs = [ python ];
+              nativeBuildInputs = [ python pkgs.ffmpeg-headless ];
             } ''
               export HOME="$TMPDIR/home"
               mkdir -p "$HOME" source

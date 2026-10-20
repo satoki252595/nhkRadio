@@ -1,5 +1,6 @@
 import XCTest
 import AVFoundation
+import AudioToolbox
 import SwiftData
 @testable import Playback
 
@@ -405,4 +406,160 @@ final class PlaybackFeedbackTests: XCTestCase {
         XCTAssertNil(player.playbackFailure)
         XCTAssertEqual((player.player.currentItem?.asset as? AVURLAsset)?.url, original)
     }
+}
+
+
+final class MediaCompatibilityTests: XCTestCase {
+    // Generated 440 Hz tone; no user recording is included in tests or the app.
+    private var adtsTone: Data {
+        Data(base64Encoded: """
+//FQQBQf/N4CAExhdmM2Mi4yOC4xMDIAAmClVJDacjLzx6eeNV5y5arrJEeUki/MJBt3A/Beq9i77hstqWkf49Lze96vyeBtTFVj
+bNaa8+slJpqqYrmKoyaUslLJaaUmjJQpRkoyUSa0NobQwMbNgwMiRAxs2bNokSKU2bNxRRRRRRRRRRRRRRRIiiiiiiiRERESERRR
+EUUSIooiiiii4P/xUEAVP/wBOJTayV2UU6sp1ZLpz/Ptxps8av/61+/XGuNXr/+14/nzxrjV6//i9/588a61qw3+tjR9FBgLoEyw
+hZ+p1m8pjbnAZzgMDO4TMDAzuEhIMDO4SEgwMDO7hISsGBgZ3cJCTkJsJd/hCrDdT5y5XpSt6UJvZm5QkqSzBpQkJJXgaUJCSV5w
+Y2bCQkqDZuDAxsJCSrHLxDUUUUGooooo3G10UcD/8VBACH/8ATryixrXjnv9n7+3xbpppeqlyOOSSSIkDuf3zpuzZjZ/chk+DDP7
+gZPgwz+8I+PgDP7gcPgDP7gZPgDg//FQQAi//AEIMoninWsr5//s/x/6/+13xd6q99e/1vx99u3LqVRea2KF0IwIqKDUUUGoFC6D
+WjYSzEs0zOub81Pg7fmc//FQQAkf/AEIMooifUCHSMr1//fv/9fxc41xk87rx8V4+Nu4VrKTLCedRzqKedU88551Cec9WUqm+lx7
+qp+V4BzxeJimChVw//FQQAk//AEKMooCjQiHVqr3//tfn/1/8l8alydevX3fP427PDJeKupg+UUS3zGiiiiiiiiq4oJERUqvWJS/
+oU0pkL0O2YBfgP/xUEAMn/wBBjKU410Yh0RB0IhVXr/+m/9f9pfFzWdZvv7979p3cPCSUwC6ujDn8HB6dev8tcptc8830osZcw9V
+Sz2HaLV39v9JZYC1oje3Iw063g12Mm63EnHEIgMkjdka1HD/8VBADJ/8AQwyizohDoiDoRFox6//pd/+3/ter1JajU/T98jrby7y
+olD6fT6SJuL6fT6fSj6fT6UDXBz+cDbcCx7hkDEPDeFANsMTzcp0s6Q90WMUWgJWmO+c1LOBe+tNWsXA//FQQApf/AEAMpzogV6E
+Q6lmd//3e/+//W5xNXqt8fx+/OdN08tCpMvAiYmGk7D0MbAYePHlzLwzSCL4ZztGlttYmvqLNR1hKbB/BKAqDGQ2jv/xUEALf/wB
+CjKQljQ4q0Qh0Qh0Qh0g3/9J/v9R1Lkh6+Nft/O3XuqklUQAYGBu8ZTsDH4luPwBiV4GJA2Y5yVfm90IOaUClNNL4ky8JQv1wGJW
+grOwP5t0F6//8VBADH/8AQQykJYyUJ9CIdCIdCI9K3XP9v0/9vaXrXSzxnw76x4VMzzlyZKANLL7y3kMMtBef0QiiiiKIRIiVxhi
+kREUuU5Hy3NhRL8HfAkFJio6OFLYkUmLk+FfMvCFuLj/8VBADx/8AQYykJYySKNCIdCJNCI9CQVVv/jv/2l3rU1mj8/rf7fvt3KL
+ykyWAm7d9un1zLlAbJIa88888l555PmtKW3rjNEkrGeNchH4bJ9an0uOE4R8thLHRgwxzxnFDuk2zb0td7Fp8E4cK9UU5YSrCDvU
+EO//8VBAC9/8ASAyixoRDohDoRFoRDoyn/9n9v/X/e5qXJctJLpyZK1dXUXgi7nnnSLqni/b2vp6kRPX0dU8WllFE1RJXROMU91C
+qotKaI3ySDI4cEBRUJqlBGzRWUeA//FQQAr//AFSMosacg6Ig6JM33v641c1clySS5HDJInta7Dm9dzzmjnZF8p6Po9yyzr3PORc
+zVHOyLmVRzvRTT0bnkZZ2qOdyLmVFMqiB5EzIpp1wPI4
+""", options: .ignoreUnknownCharacters)!
+    }
+
+    func testHeaderDetectionHandlesID3AndRejectsInvalidLengths() {
+        let id3 = Data([73, 68, 51, 4, 0, 0, 0, 0, 0, 0])
+        XCTAssertEqual(PlaybackFormats.mimeOverride(header: id3 + adtsTone), "audio/aac")
+        XCTAssertEqual(PlaybackFormats.mimeOverride(header: id3 + Data([0xff, 0xfb, 0x90, 0])), "audio/mpeg")
+        XCTAssertNil(PlaybackFormats.mimeOverride(header: Data([73,68,51,4,0,0,128,0,0,0,255,241])))
+        XCTAssertNil(PlaybackFormats.mimeOverride(header: Data("not a media header".utf8)))
+        XCTAssertTrue(PlaybackFormats.supports("EXAMPLE.M4A"))
+        XCTAssertFalse(PlaybackFormats.supports("document.pdf"))
+        print("PLAYBACK_SUPPORTED_AUDIO=\(PlaybackFormats.audioExtensions)")
+        print("PLAYBACK_SUPPORTED_VIDEO=\(PlaybackFormats.videoExtensions)")
+    }
+
+    func testAACNamedM4ACanActuallyDecodeAfterContentDetection() async throws {
+        let file = FileManager.default.temporaryDirectory.appendingPathComponent("\(UUID()).m4a")
+        defer { try? FileManager.default.removeItem(at: file) }
+        try (Data([73, 68, 51, 4, 0, 0, 0, 0, 0, 0]) + adtsTone).write(to: file)
+        let asset = try await PlaybackFormats.asset(url: file, fileName: "recording.m4a")
+        let tracks = try await asset.loadTracks(withMediaType: .audio)
+        let track = try XCTUnwrap(tracks.first)
+        let reader = try AVAssetReader(asset: asset)
+        let output = AVAssetReaderTrackOutput(track: track, outputSettings: [AVFormatIDKey: kAudioFormatLinearPCM])
+        reader.add(output)
+        XCTAssertTrue(reader.startReading())
+        let buffer = try XCTUnwrap(output.copyNextSampleBuffer())
+        XCTAssertGreaterThan(CMSampleBufferGetNumSamples(buffer), 0)
+        reader.cancelReading()
+    }
+
+    @MainActor
+    func testPrivateRecordingsWhenAvailable() async throws {
+        let cache = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)[0]
+            .appendingPathComponent("PlaybackRegression")
+        let remoteFile = cache.appendingPathComponent("private-media-urls.json")
+        guard FileManager.default.fileExists(atPath: remoteFile.path) else {
+            throw XCTSkip("Optional real-recording samples are supplied locally, outside Git.")
+        }
+        let remote = try JSONDecoder().decode([String].self, from: Data(contentsOf: remoteFile))
+        for (index, string) in remote.enumerated() {
+            for url in [cache.appendingPathComponent("real-sample-\(index).m4a"), try XCTUnwrap(URL(string: string))] {
+                do {
+                    if !url.isFileURL {
+                        // AVAssetReader only supports local assets. Exercise
+                        // streaming through the actual AVPlayer engine.
+                        let player = PlayerEngine()
+                        defer { player.stop() }
+                        player.resolveURL = { _ in url }
+                        let item = minimalItem(pageID: "sample-\(index)", databaseID: "test-db",
+                                               title: "Recording", fileName: "recording.m4a")
+                        player.playQueue([QueueEntry(item: item, file: item.mediaFiles[0])])
+                        for _ in 0..<300 where player.currentTime < 0.1 && player.playbackFailure == nil {
+                            try await Task.sleep(for: .milliseconds(100))
+                        }
+                        XCTAssertNil(player.playbackFailure)
+                        XCTAssertGreaterThan(player.currentTime, 0.1)
+                        print("REAL_RECORDING_PASS sample=\(index) local=false time=\(player.currentTime)")
+                        continue
+                    }
+                    let asset = try await PlaybackFormats.asset(url: url, fileName: "recording.m4a")
+                    let tracks = try await asset.loadTracks(withMediaType: .audio)
+                    let track = try XCTUnwrap(tracks.first)
+                    let reader = try AVAssetReader(asset: asset)
+                    let output = AVAssetReaderTrackOutput(track: track, outputSettings: [AVFormatIDKey: kAudioFormatLinearPCM])
+                    reader.add(output)
+                    XCTAssertTrue(reader.startReading())
+                    let buffer = try XCTUnwrap(output.copyNextSampleBuffer())
+                    XCTAssertGreaterThan(CMSampleBufferGetNumSamples(buffer), 0)
+                    reader.cancelReading()
+                    print("REAL_RECORDING_PASS sample=\(index) local=\(url.isFileURL)")
+                } catch {
+                    let failure = error as NSError
+                    XCTFail("Recording \(index), local=\(url.isFileURL): \(failure.domain) \(failure.code)")
+                }
+            }
+        }
+    }
+
+    @MainActor
+    func testOriginalDatabaseMappingAndExactFileSelection() async throws {
+        let configuration = URLSessionConfiguration.ephemeral
+        configuration.protocolClasses = [MediaURLProtocol.self]
+        let session = URLSession(configuration: configuration)
+        defer { session.invalidateAndCancel(); MediaURLProtocol.body = nil }
+        MediaURLProtocol.body = try JSONSerialization.data(withJSONObject: ["properties": [
+            "Original audio": ["type": "files", "files": [
+                ["name": "episode.m4a", "type": "file", "file": ["url": "https://example.test/original.m4a"]]
+            ]],
+            "Other audio": ["type": "files", "files": [
+                ["name": "other.m4a", "type": "file", "file": ["url": "https://example.test/wrong.m4a"]]
+            ]]
+        ]])
+        let client = NotionClient(session: session)
+        let state = AppState(client: client)
+        client.accessTokenProvider = { "test-token" }
+        let container = try ModelContainer(for: ConnectionRecord.self, DownloadRecord.self, ProgressRecord.self,
+                                           configurations: ModelConfiguration(isStoredInMemoryOnly: true))
+        let context = ModelContext(container)
+        state.modelContext = context
+        for (id, property) in [("original-db", "Original audio"), ("visible-db", "Other audio")] {
+            context.insert(ConnectionRecord(databaseID: id, title: id, iconEmoji: nil,
+                mapping: DatabaseMapping(mediaProperty: property, titleProperty: "Name", displayProperties: [])))
+        }
+        try context.save()
+        state.selectedDatabaseID = "visible-db"
+        let item = minimalItem(pageID: "original-page", databaseID: "original-db", title: "History", fileName: "episode.m4a")
+        let resolved = try await state.resolveURL(for: QueueEntry(item: item, file: item.mediaFiles[0]))
+        XCTAssertEqual(resolved.absoluteString, "https://example.test/original.m4a")
+        do {
+            _ = try await client.freshMediaURL(pageID: "original-page", mediaProperty: "Original audio", fileName: "deleted.m4a")
+            XCTFail("A deleted attachment must not play a different file")
+        } catch {
+            XCTAssertTrue(error.localizedDescription.contains("ライブラリを更新"))
+        }
+    }
+}
+
+private final class MediaURLProtocol: URLProtocol {
+    static var body: Data?
+    override class func canInit(with request: URLRequest) -> Bool { true }
+    override class func canonicalRequest(for request: URLRequest) -> URLRequest { request }
+    override func startLoading() {
+        let response = HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: nil,
+                                       headerFields: ["Content-Type": "application/json"])!
+        client?.urlProtocol(self, didReceive: response, cacheStoragePolicy: .notAllowed)
+        client?.urlProtocol(self, didLoad: Self.body ?? Data())
+        client?.urlProtocolDidFinishLoading(self)
+    }
+    override func stopLoading() {}
 }

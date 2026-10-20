@@ -6,6 +6,8 @@ API レスポンスはネットワーク依存なので httpx の MonkeyPatch �
 """
 from datetime import datetime, timedelta, timezone
 from unittest.mock import patch
+import json
+import subprocess
 
 import httpx
 import pytest
@@ -399,3 +401,51 @@ def test_download_ondemand_forwards_deadline_and_skips_fallback_after_timeout(tm
 
     assert ytdlp.call_args.kwargs["deadline"] == 123.0
     ffmpeg.assert_not_called()
+
+
+def test_ytdlp_adts_output_is_remuxed_instead_of_renamed(tmp_path):
+    """Use real AAC bytes and FFmpeg: the final file must really be M4A."""
+    raw = tmp_path / "fixture.aac"
+    subprocess.run([
+        "ffmpeg", "-v", "error", "-f", "lavfi", "-i", "sine=frequency=440:duration=65",
+        "-c:a", "aac", "-b:a", "32k", "-f", "adts", str(raw),
+    ], check=True, capture_output=True)
+    output = tmp_path / "episode.m4a"
+    real_run = radiru.run_captured
+
+    def fake_download(cmd, **kwargs):
+        if cmd[0] == "test-yt-dlp":
+            output.with_suffix(".aac").write_bytes(raw.read_bytes())
+            return subprocess.CompletedProcess(cmd, 0, b"", b"")
+        return real_run(cmd, **kwargs)
+
+    with patch.object(radiru, "run_captured", side_effect=fake_download):
+        assert radiru._try_ytdlp("test-yt-dlp", "https://example.test/audio.m3u8", output, 30)
+    probe = subprocess.run([
+        "ffprobe", "-v", "error", "-show_entries", "format=format_name:stream=codec_name",
+        "-of", "json", str(output),
+    ], check=True, capture_output=True, text=True)
+    metadata = json.loads(probe.stdout)
+    assert "m4a" in metadata["format"]["format_name"]
+    assert metadata["streams"][0]["codec_name"] == "aac"
+    assert output.read_bytes()[4:8] == b"ftyp"
+    assert not output.with_suffix(".aac").exists()
+
+
+def test_ytdlp_failed_remux_does_not_leave_a_fake_m4a(tmp_path):
+    output = tmp_path / "episode.m4a"
+
+    def fake_download(cmd, **kwargs):
+        output.with_suffix(".aac").write_bytes(b"\xff\xf1" + b"x" * 100_001)
+        return subprocess.CompletedProcess(cmd, 0, b"", b"")
+
+    def fail_remux(*args, **kwargs):
+        output.write_bytes(b"partial")
+        return False
+
+    with (
+        patch.object(radiru, "run_captured", side_effect=fake_download),
+        patch.object(radiru, "_try_ffmpeg", side_effect=fail_remux),
+    ):
+        assert not radiru._try_ytdlp("test-yt-dlp", "https://example.test/audio.m3u8", output, 30)
+    assert not output.exists()
