@@ -1,0 +1,132 @@
+{
+  "name": "playback-app-preview-ja-886x1920",
+  "draft": true,
+  "draft_label": "DRAFT・旧build3映像・公開/アップロード不可",
+  "target": {
+    "app": "Playback for Notion",
+    "version": "1.0.0",
+    "build": "6",
+    "source_commit": "5b3f0d6eb911739c0363de2bc759c618106009c4",
+    "locale": "ja"
+  },
+  "footage": {
+    "file": "build3-mirroring-agent-raw-4.mp4",
+    "version": "1.0.0",
+    "build": "3",
+    "source_commit": "24112b856498bd0e78518dcc04ab0e57adf4ee30",
+    "capture": "iPhone Mirroring window capture on Mac, 526x1140 VFR ~29.2fps; iPhone screen region 494x1048 at x16 y76",
+    "verified_on_device": false,
+    "note": "OLD build3 footage. Not build6 evidence and not App Review video."
+  },
+  "size": [
+    886,
+    1920
+  ],
+  "fps": 30,
+  "video_bitrate": "11M",
+  "audio": "silent",
+  "crop": {
+    "x": 21,
+    "y": 76,
+    "w": 484,
+    "h": 1048
+  },
+  "transition_seconds": 0.4,
+  "fade_out_seconds": 0.5,
+  "poster_seconds": 5.0,
+  "caption_style": {
+    "fontsize": 38,
+    "boxcolor": "0x3A3A3C@0.94",
+    "boxborderw": 18,
+    "fade_seconds": 0.3
+  },
+  "segments": [
+    {
+      "id": "library",
+      "in": 27.0,
+      "out": 30.6,
+      "captions": [
+        {
+          "text": "Notionのデータベースをライブラリに",
+          "y": 0.55
+        }
+      ]
+    },
+    {
+      "id": "video-playing",
+      "in": 77.6,
+      "out": 85.6,
+      "captions": [
+        {
+          "text": "添付の動画をアプリ内で再生",
+          "y": 0.84
+        }
+      ]
+    },
+    {
+      "id": "item-detail",
+      "in": 106.2,
+      "out": 109.6,
+      "captions": [
+        {
+          "text": "添付ファイルとプロパティを確認",
+          "y": 0.088
+        }
+      ]
+    },
+    {
+      "id": "downloads",
+      "in": 111.3,
+      "out": 114.7,
+      "captions": [
+        {
+          "text": "ダウンロードしてオフライン再生",
+          "y": 0.58
+        }
+      ]
+    },
+    {
+      "id": "library-end",
+      "in": 31.8,
+      "out": 35.4,
+      "captions": [
+        {
+          "text": "ご自身のデータの再生には",
+          "y": 0.53,
+          "size": 32
+        },
+        {
+          "text": "Notionアカウントの接続が必要です",
+          "y": 0.565,
+          "size": 32
+        }
+      ]
+    }
+  ],
+  "excluded_intervals": [
+    "0.0-26.0 Settings: shows version/build 1.0.0 (3) and source hash; build6 adds 対応ファイル形式 section; delete-all dialog",
+    "36.0-38.5 audio NowPlaying sheet opening / loading: build6 shows new 再生データを読み込み中 status box while waiting",
+    "38.5-60.5 audio NowPlaying: audio is last queue item; build6 disables 次へ (canGoNext ignores repeat), build3 frames show it enabled",
+    "60.5-67.5 library with audio mini player: same 次へ difference in MiniPlayerView",
+    "67.5-74.0 video detail with audio mini player: same 次へ difference",
+    "74.0-77.5 video sheet open / black loading frame: build6 waiting status box differs",
+    "85.6-87.5 video end/loop jump (scrubber reset) avoided",
+    "104.5-106.0 sheet dismiss transition",
+    "Raw build3-settings-only-raw-2.mov (Settings only, build number) and Playback-1.0.0-build3-review.mov (old review edit) not used"
+  ],
+  "notes": [
+    "Every used frame comes from the real Playback app (build3) via iPhone Mirroring; no device frame, no synthetic UI, no composited controls.",
+    "Used scenes were compared against git diff 24112b8..5b3f0d6 of ios/Playback/Views and PlayerEngine: Library idle (LibraryRowView only adds a label while downloading), video NowPlaying steady playback with a following queue item, ItemDetailView (unchanged), Downloads saved list (footer only for active downloads). This is source inference, not build6 capture evidence.",
+    "Audio track is generated silence (AAC 256k 48kHz stereo); no fixture tone, no broadcast audio.",
+    "Login disclosure per Apple app preview guidance is in the end scene caption.",
+    "Poster: exported at 5.0s (video playing), matching the App Store Connect default poster time."
+  ],
+  "remaining_blockers": [
+    "Footage is build3, not build6: build6 must be captured from the installed TestFlight 1.0.0 (6) and the same EDL re-rendered.",
+    "Capture is 494px wide iPhone Mirroring (upscaled ~1.83x to 886x1920); Apple recommends native UI resolution. Prefer QuickTime/USB native capture.",
+    "Library title shows internal DB name 'Playback 公開前検証 2026-10-...' (internal wording + date); rows show 2026/10/20 dates. Use a neutral DB name for the public take.",
+    "Content is synthetic test fixtures (440Hz tone / colour bars), not representative of real use; use own-rights sample media (no NHK/third-party broadcast).",
+    "Audio playback scenes are omitted because build3 shows a stale 次へ state; the fresh take must show audio with a following queue item.",
+    "Human visual review and parent approval before any ASC upload."
+  ]
+}
