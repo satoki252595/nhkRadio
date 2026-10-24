@@ -74,7 +74,7 @@ final class DownloadManager: NSObject {
     private var tasks: [String: URLSessionDownloadTask] = [:]
     private var resolvingTasks: [String: Task<Void, Never>] = [:]
 
-    private static let pendingDefaultsKey = "downloads.pending"
+    nonisolated private static let pendingDefaultsKey = "downloads.pending"
 
     override init() {
         super.init()

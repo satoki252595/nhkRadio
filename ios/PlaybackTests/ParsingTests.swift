@@ -265,6 +265,86 @@ final class DownloadDeletionTests: XCTestCase {
 
 final class PlaybackFeedbackTests: XCTestCase {
     @MainActor
+    func testReplayAfterEndRestartsTheSameMedia() async throws {
+        let player = PlayerEngine()
+        defer { player.stop() }
+        let item = try XCTUnwrap(DemoData.items.first)
+        let entry = QueueEntry(item: item, file: try XCTUnwrap(item.mediaFiles.first))
+        let source = try XCTUnwrap(DemoData.bundleURL(forFileName: entry.file.name))
+        player.resolveURL = { _ in source }
+        player.repeatMode = .off
+        player.playQueue([entry])
+        for _ in 0..<300 where player.duration == 0 {
+            try await Task.sleep(for: .milliseconds(10))
+        }
+        XCTAssertGreaterThan(player.duration, 1)
+        player.seek(to: player.duration - 0.2)
+        for _ in 0..<300 where player.isPlaying {
+            try await Task.sleep(for: .milliseconds(10))
+        }
+        XCTAssertFalse(player.isPlaying)
+        player.togglePlayPause()
+        for _ in 0..<300 where player.currentTime < 0.1 || player.currentTime >= player.duration - 1 {
+            try await Task.sleep(for: .milliseconds(10))
+        }
+        XCTAssertTrue(player.isPlaying)
+        XCTAssertGreaterThan(player.currentTime, 0.1)
+        XCTAssertLessThan(player.currentTime, player.duration - 1)
+    }
+
+    @MainActor
+    func testReplacingQueueSavesOnlyTheOutgoingEntriesProgress() async throws {
+        for selectQueueEntry in [false, true] {
+            let player = PlayerEngine()
+            defer { player.stop() }
+            let source = try XCTUnwrap(DemoData.bundleURL(forFileName: "demo-speech-1.m4a"))
+            let entries = ["first", "second"].map { id in
+                let item = minimalItem(pageID: id, databaseID: "test-db", title: id,
+                                       fileName: "demo-speech-1.m4a")
+                return QueueEntry(item: item, file: item.mediaFiles[0])
+            }
+            var positions = [entries[1].progressKey: 10.0]
+            player.resolveURL = { _ in source }
+            player.resumePositionProvider = { positions[$0.progressKey] }
+            player.progressHandler = { entry, position, _, _ in positions[entry.progressKey] = position }
+            player.playQueue([entries[0]])
+            for _ in 0..<300 where player.duration == 0 {
+                try await Task.sleep(for: .milliseconds(10))
+            }
+            player.pause()
+            player.seek(to: 6)
+            for _ in 0..<100 where abs(player.currentTime - 6) > 0.1 {
+                try await Task.sleep(for: .milliseconds(10))
+            }
+            XCTAssertEqual(player.currentTime, 6, accuracy: 0.1)
+            if selectQueueEntry { player.play(entry: entries[1], in: entries) }
+            else { player.playQueue([entries[1]]) }
+            XCTAssertEqual(try XCTUnwrap(positions[entries[0].progressKey]), 6, accuracy: 0.1)
+            XCTAssertEqual(positions[entries[1].progressKey], 10,
+                           "Replacing a queue must not copy the previous track's position into its replacement")
+        }
+    }
+
+    @MainActor
+    func testInvalidSavedPositionDoesNotSeekPastTheNewMedia() async throws {
+        let player = PlayerEngine()
+        defer { player.stop() }
+        let item = try XCTUnwrap(DemoData.items.first)
+        let entry = QueueEntry(item: item, file: try XCTUnwrap(item.mediaFiles.first))
+        let source = try XCTUnwrap(DemoData.bundleURL(forFileName: entry.file.name))
+        player.resolveURL = { _ in source }
+        player.resumePositionProvider = { _ in 10_000 }
+        player.playQueue([entry])
+        for _ in 0..<300 where player.currentTime < 0.1 || player.duration == 0 || player.currentTime >= player.duration - 1 {
+            try await Task.sleep(for: .milliseconds(10))
+        }
+        XCTAssertNil(player.playbackFailure)
+        XCTAssertTrue(player.isPlaying)
+        XCTAssertGreaterThan(player.currentTime, 0.1)
+        XCTAssertLessThan(player.currentTime, player.duration - 1)
+    }
+
+    @MainActor
     func testRestoredDownloadCompletionAndStaleCallbacks() async throws {
         let savedPending = DownloadManager.loadPending()
         defer { DownloadManager.savePending(savedPending) }

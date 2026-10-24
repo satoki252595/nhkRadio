@@ -209,17 +209,17 @@ final class PlayerEngine {
     // MARK: - Queue control
 
     func play(entry: QueueEntry, in newQueue: [QueueEntry]) {
-        queue = newQueue
-        rebuildShuffleOrder()
-        if let index = newQueue.firstIndex(of: entry) {
-            start(at: index, autoplay: true)
-        }
+        guard let index = newQueue.firstIndex(of: entry) else { return }
+        playQueue(newQueue, startingAt: index)
     }
 
     func playQueue(_ entries: [QueueEntry], startingAt index: Int = 0) {
+        guard entries.indices.contains(index) else { return }
+        saveProgress(finished: false, force: true)
+        // Save against the outgoing queue before its indices refer to new entries.
+        currentIndex = nil
         queue = entries
         rebuildShuffleOrder()
-        guard entries.indices.contains(index) else { return }
         start(at: index, autoplay: true)
     }
 
@@ -238,7 +238,8 @@ final class PlayerEngine {
 
     func resume() {
         guard let currentIndex else { return }
-        if playbackFailure != nil || (!isLoading && player.currentItem == nil) {
+        if playbackFailure != nil || (!isLoading && player.currentItem == nil)
+            || (duration > 0 && currentTime >= duration) {
             start(at: currentIndex, autoplay: true)
             return
         }
@@ -281,11 +282,15 @@ final class PlayerEngine {
     }
 
     func seek(to seconds: Double) {
+        let generation = playbackGeneration
+        let item = player.currentItem
         let target = CMTime(seconds: max(0, seconds), preferredTimescale: 600)
-        player.seek(to: target, toleranceBefore: .zero, toleranceAfter: .zero) { [weak self] _ in
+        player.seek(to: target, toleranceBefore: .zero, toleranceAfter: .zero) { [weak self] finished in
             Task { @MainActor in
-                self?.currentTime = max(0, seconds)
-                self?.updateNowPlayingInfo()
+                guard let self, finished, self.playbackGeneration == generation,
+                      self.player.currentItem === item else { return }
+                self.currentTime = self.player.currentTime().seconds
+                self.updateNowPlayingInfo()
             }
         }
     }
@@ -356,6 +361,7 @@ final class PlayerEngine {
         player.replaceCurrentItem(with: nil)
         currentIndex = index
         let entry = queue[index]
+        let savedPosition = resumePositionProvider?(entry)
         isLoading = true
         isBuffering = false
         isPlaying = autoplay
@@ -374,12 +380,18 @@ final class PlayerEngine {
                 // The user may have skipped while resolving; only apply if current.
                 guard self.playbackGeneration == generation, self.currentEntry == entry else { return }
                 let asset = try await PlaybackFormats.asset(url: url, fileName: entry.file.name)
+                let mediaDuration = (try? await asset.load(.duration))?.seconds
                 guard self.playbackGeneration == generation, !Task.isCancelled else { return }
                 let item = AVPlayerItem(asset: asset)
                 item.audioTimePitchAlgorithm = .timeDomain
                 self.replaceItem(item)
                 self.isLoading = false
-                if let resume = self.resumePositionProvider?(entry), resume > 5 {
+                if let mediaDuration, mediaDuration.isFinite, mediaDuration > 0 {
+                    self.duration = mediaDuration
+                }
+                // Old versions could store another track's position here.
+                if let resume = savedPosition, resume > 5,
+                   self.duration == 0 || resume < self.duration - 1 {
                     self.seek(to: resume)
                 }
                 if self.isPlaying { self.resume() }
@@ -406,8 +418,11 @@ final class PlayerEngine {
             forName: .AVPlayerItemDidPlayToEndTime,
             object: item,
             queue: .main
-        ) { [weak self] _ in
-            Task { @MainActor in self?.handleItemEnded() }
+        ) { [weak self, weak item] _ in
+            Task { @MainActor in
+                guard let self, let item, self.player.currentItem === item else { return }
+                self.handleItemEnded()
+            }
         }
     }
 
@@ -432,6 +447,7 @@ final class PlayerEngine {
     }
 
     private func handleItemEnded() {
+        currentTime = duration
         saveProgress(finished: true, force: true)
         if sleepTimer == .endOfTrack {
             sleepTimer = .off
@@ -486,10 +502,11 @@ final class PlayerEngine {
 
     private func observeTime() {
         let interval = CMTime(seconds: 0.5, preferredTimescale: 600)
-        timeObserver = player.addPeriodicTimeObserver(forInterval: interval, queue: .main) { [weak self] time in
+        timeObserver = player.addPeriodicTimeObserver(forInterval: interval, queue: .main) { [weak self] _ in
             Task { @MainActor in
-                guard let self else { return }
-                self.currentTime = time.seconds.isFinite ? time.seconds : 0
+                guard let self, !self.isLoading, self.player.currentItem != nil else { return }
+                let seconds = self.player.currentTime().seconds
+                self.currentTime = seconds.isFinite ? seconds : 0
                 if let d = self.player.currentItem?.duration.seconds, d.isFinite, d > 0 {
                     self.duration = d
                 }
