@@ -29,7 +29,8 @@ Notionのデータベースに保存した音声・動画を、ライブラリ�
 | [`worker/`](worker/) | Notion OAuth中継、サポート・プライバシーページ |
 | [アプリ設計・接続方法](docs/playback-for-notion.md) | 機能、認証、列マッピング、構成 |
 | [音源互換性の修正](https://github.com/satoki252595/nhkRadio/blob/5b3f0d6eb911739c0363de2bc759c618106009c4/docs/release/playback-media-compatibility.md) | M4A名のAAC音源への対応、形式判別と検証 |
-| [課金・収益化の検討](docs/playback-monetization.md) | 競合8サービスの比較、課金ポイント、価格仮説、需要検証・StoreKit導入計画 |
+| [App Store掲載動画の制作](docs/app-preview.md) | 制作手順・初稿資料。最新の動画差し替え状況は有料公開作業記録を参照 |
+| [課金・収益化の検討](docs/playback-monetization.md) | 競合8サービスの比較、500円買い切りの決定、需要検証・将来の課金案 |
 | [初回公開の追跡Issue](https://github.com/satoki252595/nhkRadio/issues/14) | 最新の検証・提出状況 |
 
 開発環境はプロジェクトの `nix develop` を使います。macOSでは選択済みXcodeの `ios/Playback.xcodeproj` を開いてビルドします。公開用の署名・秘密鍵・ユーザートークン・私的な収録素材はGitに保存しません。
