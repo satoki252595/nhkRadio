@@ -1,0 +1,284 @@
+{
+  "name": "playback-app-preview-ja-886x1920-v3",
+  "target": {
+    "version": "1.0.0",
+    "build": "8",
+    "locale": "ja",
+    "source_commit": "7c90e6e2275c0b8b95d25129df12b7e36c8547cd"
+  },
+  "footage": {
+    "file": "physical-build8-public-take1.mp4",
+    "version": "1.0.0",
+    "build": "8",
+    "verified_on_device": true,
+    "device": "iPhone 16e / iOS 27.0.1",
+    "install": "TestFlight 1.0.0 (8)",
+    "capture": "iPhone Mirroring screen recording, 512x1132 VFR ~29.4fps; phone area x16 y76 w480 h1040 (pixel-measured)",
+    "verified_by": "parent session confirmed TestFlight build 8 update/Open before recording (same take as candidate9 final-v2)"
+  },
+  "size": [
+    886,
+    1920
+  ],
+  "fps": 30,
+  "video_bitrate": "11M",
+  "audio": "silent",
+  "crop": {
+    "x": 16,
+    "y": 76,
+    "w": 480,
+    "h": 1040
+  },
+  "corner_radius": 118,
+  "transition_seconds": 0.35,
+  "fade_out_seconds": 0.5,
+  "poster_seconds": 1.6,
+  "caption_style": {
+    "fontsize": 44,
+    "boxcolor": "0x3A3A3C@0.94",
+    "boxborderw": 20,
+    "fade_seconds": 0.3
+  },
+  "segments": [
+    {
+      "id": "hook-library",
+      "in": 2.0,
+      "out": 6.0,
+      "captions": [
+        {
+          "text": "Notionのデータベースが、",
+          "y": 0.545,
+          "size": 54,
+          "font": "ヒラギノ角ゴシック W6.ttc",
+          "box": false,
+          "fontcolor": "white@0.82",
+          "rise": 24,
+          "shadow": 3
+        },
+        {
+          "text": "プレイリストに。",
+          "y": 0.583,
+          "size": 88,
+          "font": "ヒラギノ角ゴシック W8.ttc",
+          "box": false,
+          "start": 0.35,
+          "rise": 28,
+          "shadow": 4
+        }
+      ]
+    },
+    {
+      "id": "audio-playing",
+      "in": 25.2,
+      "out": 28.6,
+      "captions": [
+        {
+          "text": "音声も、",
+          "y": 0.902,
+          "size": 92,
+          "font": "ヒラギノ角ゴシック W8.ttc",
+          "box": false,
+          "start": 0.15,
+          "rise": 28,
+          "shadow": 4
+        }
+      ]
+    },
+    {
+      "id": "video-playing",
+      "in": 55.6,
+      "out": 58.0,
+      "captions": [
+        {
+          "text": "動画も。",
+          "y": 0.902,
+          "size": 92,
+          "font": "ヒラギノ角ゴシック W8.ttc",
+          "box": false,
+          "start": 0.15,
+          "rise": 28,
+          "shadow": 4
+        },
+        {
+          "text": "映像: NASA Goddard Space Flight Center",
+          "y": 0.968,
+          "size": 22,
+          "fontcolor": "white@0.55",
+          "box": false
+        }
+      ]
+    },
+    {
+      "id": "audio-ending",
+      "in": 41.6,
+      "out": 44.6,
+      "captions": [
+        {
+          "text": "1本終われば、",
+          "y": 0.902,
+          "size": 92,
+          "font": "ヒラギノ角ゴシック W8.ttc",
+          "box": false,
+          "start": 0.15,
+          "rise": 28,
+          "shadow": 4
+        }
+      ]
+    },
+    {
+      "id": "next-autoplay-library",
+      "in": 48.8,
+      "out": 52.2,
+      "captions": [
+        {
+          "text": "次へ、自動で。",
+          "y": 0.56,
+          "size": 88,
+          "font": "ヒラギノ角ゴシック W8.ttc",
+          "box": false,
+          "start": 0.1,
+          "rise": 28,
+          "shadow": 4
+        },
+        {
+          "text": "一覧の次の項目を、続けて再生",
+          "y": 0.632,
+          "size": 42,
+          "font": "ヒラギノ角ゴシック W6.ttc",
+          "box": false,
+          "fontcolor": "white@0.72",
+          "start": 0.5,
+          "rise": 16,
+          "shadow": 3
+        }
+      ]
+    },
+    {
+      "id": "save-while-playing",
+      "in": 34.4,
+      "out": 37.4,
+      "captions": [
+        {
+          "text": "保存しておけば、",
+          "y": 0.902,
+          "size": 92,
+          "font": "ヒラギノ角ゴシック W8.ttc",
+          "box": false,
+          "start": 0.15,
+          "rise": 28,
+          "shadow": 4
+        }
+      ]
+    },
+    {
+      "id": "offline-saved-library",
+      "in": 109.0,
+      "out": 112.2,
+      "captions": [
+        {
+          "text": "オフラインでも。",
+          "y": 0.56,
+          "size": 88,
+          "font": "ヒラギノ角ゴシック W8.ttc",
+          "box": false,
+          "start": 0.1,
+          "rise": 28,
+          "shadow": 4
+        },
+        {
+          "text": "保存した音声・動画は、通信なしで再生",
+          "y": 0.632,
+          "size": 42,
+          "font": "ヒラギノ角ゴシック W6.ttc",
+          "box": false,
+          "fontcolor": "white@0.72",
+          "start": 0.5,
+          "rise": 16,
+          "shadow": 3
+        }
+      ]
+    },
+    {
+      "id": "brand-end-player",
+      "in": 29.0,
+      "out": 34.0,
+      "dim": 0.76,
+      "captions": [
+        {
+          "text": "Playback",
+          "y": 0.2,
+          "size": 132,
+          "font": "ヒラギノ角ゴシック W8.ttc",
+          "box": false,
+          "start": 0.15,
+          "rise": 28,
+          "shadow": 4
+        },
+        {
+          "text": "for Notion",
+          "y": 0.282,
+          "size": 60,
+          "font": "ヒラギノ角ゴシック W6.ttc",
+          "box": false,
+          "fontcolor": "white@0.9",
+          "start": 0.3,
+          "rise": 20,
+          "shadow": 3
+        },
+        {
+          "text": "Notionの音声・動画を、もっと身近に。",
+          "y": 0.362,
+          "size": 42,
+          "font": "ヒラギノ角ゴシック W6.ttc",
+          "box": false,
+          "fontcolor": "white",
+          "start": 0.6,
+          "rise": 16,
+          "shadow": 3
+        },
+        {
+          "text": "ご自身のNotionアカウントを接続して、",
+          "y": 0.893,
+          "size": 40,
+          "font": "ヒラギノ角ゴシック W6.ttc",
+          "box": false,
+          "fontcolor": "white@0.88",
+          "start": 1.0,
+          "rise": 10,
+          "shadow": 3
+        },
+        {
+          "text": "データベース内の音声・動画を再生します",
+          "y": 0.923,
+          "size": 40,
+          "font": "ヒラギノ角ゴシック W6.ttc",
+          "box": false,
+          "fontcolor": "white@0.88",
+          "start": 1.0,
+          "rise": 10,
+          "shadow": 3
+        }
+      ]
+    }
+  ],
+  "excluded_intervals": [
+    "0.0-2.0 / 6.0-11.6: clean library continues (pacing only)",
+    "11.6-25.2: audio start incl. mini player loading label (12.5-17) and sheet presentation (23.3-25.2)",
+    "28.6-29.0 / 34.0-34.4 / 37.4-41.6: audio continues (pacing only); 29.0-34.0 is reused, dimmed, as the closing title background",
+    "44.6-48.8: close tap, sheet dismiss, EOF auto-advance with the video mini player loading label (46-48)",
+    "52.2-55.6: tap on video row and Now Playing sheet presentation",
+    "58.0-108.6: video continues, end/restart loading panel (73-75.5), pause and video download (not used; audio save already shows it), sheet dismiss (107.5-108.6)",
+    "112.2-137.65: library continues (112.2-115.8), push transition (115.8-117.4) and item detail (operation detail, not a benefit; dropped from v3)",
+    "raw audio track (AAC 25 kbps): never decoded into the output; output audio is generated silence"
+  ],
+  "notes": [
+    "v3 (paid-launch 2026-10-25): value-first rebuild of final-v2. Copy states benefits in short beats instead of listing operations; same take, same crop/mask/upscale.",
+    "Order is not chronological: audio-ending (41.6) follows video-playing (55.6) and save-while-playing (34.4) comes after the auto-advance library (48.8). Each shot is shown as recorded; no state is implied that the take does not contain. The auto-advance library shows the finished audio row (played/saved) and the next item (video) playing in the mini player.",
+    "Offline claim: save-while-playing shows the download control turning into the saved state; offline-saved-library shows both rows with the saved badge. Offline playback of saved files is a shipped feature of 1.0.0 (8) (App Store description: ダウンロードし、オフライン再生).",
+    "No price, no date, no device frame, no synthetic UI. All overlays are text only. Login requirement is stated on the last frame without implying that the built-in demo needs sign-in.",
+    "Library items: original chord sketch AAC (project-owned) and NASA GSFC SVS 12118 Earth Time-lapse with its audio removed; rights in candidate8/app-preview/media/RIGHTS.md. NASA credit is shown small on the 2.4 s video shot only.",
+    "Upscale 480x1040 -> 886x1920 (x1.846, lanczos); UI text in the footage is soft at full size. Copy is rendered at output resolution and stays sharp.",
+    "Parent review 2026-10-25 (take2 contact sheet): offline library shortened to 3.2 s; closing title (brand + value + login requirement) moved onto a different real screen, the audio Now Playing sheet (source 29.0-34.0) darkened with black@0.76; brand and value sit inside the artwork area, the requirement in the empty band below the option row (no overlap with the dimmed UI text). The requirement is 40 px for about 3.5 s and is on the last frame."
+  ],
+  "remaining_blockers": []
+}

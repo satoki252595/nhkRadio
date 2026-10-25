@@ -1,0 +1,410 @@
+{
+  "name": "playback-promo-ja-1080x1920-v1",
+  "target": {
+    "version": "1.0.0",
+    "build": "8",
+    "source_commit": "7c90e6e2275c0b8b95d25129df12b7e36c8547cd",
+    "use": "outside the App Store (SNS / web); price 500円・買い切り as decided by the user"
+  },
+  "footage": {
+    "file": "physical-build8-public-take1.mp4",
+    "version": "1.0.0",
+    "build": "8",
+    "verified_on_device": true,
+    "device": "iPhone 16e / iOS 27.0.1",
+    "install": "TestFlight 1.0.0 (8)"
+  },
+  "size": [
+    1080,
+    1920
+  ],
+  "fps": 30,
+  "duration": 25.0,
+  "video_bitrate": "11M",
+  "fade_out_seconds": 0.6,
+  "poster_seconds": 23.0,
+  "background": {
+    "color": "0x0C0C11",
+    "glow_color": "0x272566",
+    "glow_y": 0.12
+  },
+  "crop": {
+    "x": 16,
+    "y": 76,
+    "w": 480,
+    "h": 1040
+  },
+  "card": {
+    "w": 520,
+    "h": 1127,
+    "radius": 46
+  },
+  "music": {
+    "volume": 0.85,
+    "fade_in": 0.3,
+    "fade_out": 2.0
+  },
+  "clips": [
+    {
+      "id": "library",
+      "in": 2.0,
+      "out": 4.2,
+      "start": 3.5,
+      "y": 690
+    },
+    {
+      "id": "audio-playing",
+      "in": 25.6,
+      "out": 27.6,
+      "start": 5.5,
+      "y": 690,
+      "rise": 0
+    },
+    {
+      "id": "audio-ending",
+      "in": 43.0,
+      "out": 44.6,
+      "start": 7.8,
+      "y": 690
+    },
+    {
+      "id": "next-autoplay-library",
+      "in": 48.9,
+      "out": 51.5,
+      "start": 9.25,
+      "y": 690,
+      "rise": 0
+    },
+    {
+      "id": "save-while-playing",
+      "in": 34.6,
+      "out": 37.0,
+      "start": 12.1,
+      "y": 690
+    },
+    {
+      "id": "saved-library",
+      "in": 109.2,
+      "out": 111.2,
+      "start": 14.35,
+      "y": 690,
+      "rise": 0
+    },
+    {
+      "id": "video-playing",
+      "in": 55.8,
+      "out": 58.4,
+      "start": 16.6,
+      "y": 690
+    }
+  ],
+  "icon": {
+    "start": 19.3,
+    "end": 25.0,
+    "size": 240,
+    "y": 470
+  },
+  "texts": [
+    {
+      "text": "Notionにためた、",
+      "start": -0.4,
+      "end": 3.4,
+      "y": 0.215,
+      "size": 56,
+      "font": "ヒラギノ角ゴシック W6.ttc",
+      "color": "white@0.78",
+      "rise": 0
+    },
+    {
+      "text": "ボイスメモ。",
+      "start": 0.25,
+      "end": 3.4,
+      "y": 0.29,
+      "size": 100,
+      "font": "ヒラギノ角ゴシック W8.ttc"
+    },
+    {
+      "text": "語学の音声。",
+      "start": 0.55,
+      "end": 3.4,
+      "y": 0.36,
+      "size": 100,
+      "font": "ヒラギノ角ゴシック W8.ttc"
+    },
+    {
+      "text": "会議の録音。",
+      "start": 0.85,
+      "end": 3.4,
+      "y": 0.43,
+      "size": 100,
+      "font": "ヒラギノ角ゴシック W8.ttc"
+    },
+    {
+      "text": "講義の動画。",
+      "start": 1.15,
+      "end": 3.4,
+      "y": 0.5,
+      "size": 100,
+      "font": "ヒラギノ角ゴシック W8.ttc"
+    },
+    {
+      "text": "まとめて、聴きやすく。",
+      "start": 1.8,
+      "end": 3.4,
+      "y": 0.62,
+      "size": 72,
+      "font": "ヒラギノ角ゴシック W8.ttc",
+      "color": "0xA9A7FF"
+    },
+    {
+      "text": "Playback for Notion",
+      "start": 3.3,
+      "end": 7.7,
+      "y": 0.1,
+      "size": 38,
+      "font": "ヒラギノ角ゴシック W6.ttc",
+      "box": true,
+      "boxcolor": "0x5E5CE6",
+      "rise": 12
+    },
+    {
+      "text": "データベースが、",
+      "start": 3.45,
+      "end": 7.7,
+      "y": 0.165,
+      "size": 80,
+      "font": "ヒラギノ角ゴシック W8.ttc"
+    },
+    {
+      "text": "そのまま再生リストに。",
+      "start": 3.7,
+      "end": 7.7,
+      "y": 0.215,
+      "size": 80,
+      "font": "ヒラギノ角ゴシック W8.ttc"
+    },
+    {
+      "text": "タップした1本から、順番に再生",
+      "start": 4.2,
+      "end": 7.7,
+      "y": 0.272,
+      "size": 40,
+      "font": "ヒラギノ角ゴシック W6.ttc",
+      "color": "white@0.68",
+      "rise": 14
+    },
+    {
+      "text": "連続再生",
+      "start": 7.65,
+      "end": 12.1,
+      "y": 0.1,
+      "size": 38,
+      "font": "ヒラギノ角ゴシック W6.ttc",
+      "box": true,
+      "boxcolor": "0x5E5CE6",
+      "rise": 12
+    },
+    {
+      "text": "1本終われば、",
+      "start": 7.8,
+      "end": 12.1,
+      "y": 0.165,
+      "size": 88,
+      "font": "ヒラギノ角ゴシック W8.ttc"
+    },
+    {
+      "text": "次の1本へ。",
+      "start": 9.25,
+      "end": 12.1,
+      "y": 0.22,
+      "size": 88,
+      "font": "ヒラギノ角ゴシック W8.ttc",
+      "color": "0xA9A7FF"
+    },
+    {
+      "text": "手を止めずに、聴き続けられる",
+      "start": 9.7,
+      "end": 12.1,
+      "y": 0.282,
+      "size": 40,
+      "font": "ヒラギノ角ゴシック W6.ttc",
+      "color": "white@0.68",
+      "rise": 14
+    },
+    {
+      "text": "オフライン再生",
+      "start": 11.95,
+      "end": 16.6,
+      "y": 0.1,
+      "size": 38,
+      "font": "ヒラギノ角ゴシック W6.ttc",
+      "box": true,
+      "boxcolor": "0x2E8B74",
+      "rise": 12
+    },
+    {
+      "text": "保存しておけば、",
+      "start": 12.1,
+      "end": 16.6,
+      "y": 0.165,
+      "size": 88,
+      "font": "ヒラギノ角ゴシック W8.ttc"
+    },
+    {
+      "text": "電波がなくても。",
+      "start": 14.35,
+      "end": 16.6,
+      "y": 0.22,
+      "size": 88,
+      "font": "ヒラギノ角ゴシック W8.ttc",
+      "color": "0x7FE0C4"
+    },
+    {
+      "text": "地下鉄でも、機内でも",
+      "start": 14.8,
+      "end": 16.6,
+      "y": 0.282,
+      "size": 40,
+      "font": "ヒラギノ角ゴシック W6.ttc",
+      "color": "white@0.68",
+      "rise": 14
+    },
+    {
+      "text": "動画も、同じように。",
+      "start": 16.45,
+      "end": 19.2,
+      "y": 0.165,
+      "size": 84,
+      "font": "ヒラギノ角ゴシック W8.ttc"
+    },
+    {
+      "text": "倍速",
+      "start": 16.95,
+      "end": 19.2,
+      "x": 112,
+      "y": 0.252,
+      "size": 36,
+      "font": "ヒラギノ角ゴシック W6.ttc",
+      "box": true,
+      "boxcolor": "white@0.14",
+      "boxborderw": "14|26",
+      "rise": 10
+    },
+    {
+      "text": "スリープタイマー",
+      "start": 17.1,
+      "end": 19.2,
+      "x": 252,
+      "y": 0.252,
+      "size": 36,
+      "font": "ヒラギノ角ゴシック W6.ttc",
+      "box": true,
+      "boxcolor": "white@0.14",
+      "boxborderw": "14|26",
+      "rise": 10
+    },
+    {
+      "text": "バックグラウンド再生",
+      "start": 17.25,
+      "end": 19.2,
+      "x": 608,
+      "y": 0.252,
+      "size": 36,
+      "font": "ヒラギノ角ゴシック W6.ttc",
+      "box": true,
+      "boxcolor": "white@0.14",
+      "boxborderw": "14|26",
+      "rise": 10
+    },
+    {
+      "text": "映像: NASA Goddard Space Flight Center",
+      "start": 16.6,
+      "end": 19.2,
+      "y": 0.958,
+      "size": 22,
+      "color": "white@0.5",
+      "rise": 0
+    },
+    {
+      "text": "Playback for Notion",
+      "start": 19.55,
+      "end": 25.0,
+      "y": 0.4,
+      "size": 76,
+      "font": "ヒラギノ角ゴシック W8.ttc"
+    },
+    {
+      "text": "Notionの音声・動画を、もっと身近に。",
+      "start": 19.8,
+      "end": 25.0,
+      "y": 0.462,
+      "size": 46,
+      "font": "ヒラギノ角ゴシック W6.ttc",
+      "color": "white@0.9",
+      "rise": 16
+    },
+    {
+      "text": "500円・買い切り",
+      "start": 20.3,
+      "end": 25.0,
+      "y": 0.548,
+      "size": 60,
+      "font": "ヒラギノ角ゴシック W8.ttc",
+      "box": true,
+      "boxcolor": "0x5E5CE6",
+      "boxborderw": "20|40",
+      "rise": 16
+    },
+    {
+      "text": "ご自身のデータの再生には、Notionアカウントの接続が必要です",
+      "start": 20.9,
+      "end": 25.0,
+      "y": 0.69,
+      "size": 31,
+      "font": "ヒラギノ角ゴシック W6.ttc",
+      "color": "white@0.72",
+      "rise": 8
+    },
+    {
+      "text": "再生する音声・動画は、ご自身でご用意ください",
+      "start": 20.9,
+      "end": 25.0,
+      "y": 0.718,
+      "size": 31,
+      "font": "ヒラギノ角ゴシック W6.ttc",
+      "color": "white@0.72",
+      "rise": 8
+    },
+    {
+      "text": "本アプリはNotion Labs, Inc.と提携していない独立したアプリです",
+      "start": 20.9,
+      "end": 25.0,
+      "y": 0.746,
+      "size": 28,
+      "font": "ヒラギノ角ゴシック W6.ttc",
+      "color": "white@0.55",
+      "rise": 8
+    },
+    {
+      "text": "iPhone用",
+      "start": 20.9,
+      "end": 25.0,
+      "y": 0.79,
+      "size": 31,
+      "font": "ヒラギノ角ゴシック W6.ttc",
+      "color": "white@0.55",
+      "rise": 8
+    }
+  ],
+  "notes": [
+    "Concept: same as A (データベースがプレイリストに) but told as benefits for the viewer: use-case hook (text, 3.4 s) → three benefit beats with a short real clip each → end card with icon, name, value, price and conditions.",
+    "Real app footage only appears inside the rounded cards (7 clips, about 15 s in total) from the same TestFlight 1.0.0 (8) take as A; no synthetic UI, no device frame.",
+    "Use cases in the hook (ボイスメモ・語学の音声・会議の録音・講義の動画) are examples of the viewer's own files in Notion; the app ships no content. The end card says 再生する音声・動画は、ご自身でご用意ください.",
+    "Feature chips (倍速・スリープタイマー・バックグラウンド再生) are shipped in 1.0.0 (8): PlayerViews.swift rate menu / sleep timer, Info.plist UIBackgroundModes audio, listed in the App Store description.",
+    "Price: 500円・買い切り only (user decision 2026-10-25). No IAP, subscription, update promise, AI, time-stamped notes or auto-save claims.",
+    "Music: playback-original-chord-sketch-30s.m4a (project-original, synthesised with FFmpeg aevalsrc; candidate8/app-preview/media/RIGHTS.md), the same file that plays in the demo library.",
+    "NASA credit is shown small under the video clip only; NASA is not named elsewhere.",
+    "Hook: the first line is fully visible from frame 0 (start -0.4 s, no rise) so the video never opens on an empty background; music starts at 0 s with a 0.3 s fade-in.",
+    "take2 (kept in _drafts/B-take2-bad-hook, not for use) had the hook lines re-timed onto the end card by a faulty one-off edit script; the renderer was not at fault. take3 restored them; this take additionally shows the first line from frame 0."
+  ]
+}
