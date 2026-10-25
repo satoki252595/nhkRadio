@@ -130,10 +130,10 @@ def caption_filters(lines: list[dict], seg_len: float, font: str, work: Path, ke
                 f"fontfile={quote(font)}",
                 f"textfile={quote(str(text_file))}",
                 f"fontsize={size}",
-                "fontcolor=white",
+                f"fontcolor={line.get('fontcolor', 'white')}",
                 "box=1",
-                f"boxcolor={style.get('boxcolor', 'black@0.66')}",
-                f"boxborderw={int(style.get('boxborderw', 18))}",
+                f"boxcolor={line.get('boxcolor', style.get('boxcolor', 'black@0.66'))}",
+                f"boxborderw={int(line.get('boxborderw', style.get('boxborderw', 18)))}",
                 "x=(w-text_w)/2",
                 f"y=h*{float(line['y'])}",
                 f"alpha={quote(alpha)}",
@@ -142,7 +142,20 @@ def caption_filters(lines: list[dict], seg_len: float, font: str, work: Path, ke
     return filters
 
 
-def build_filtergraph(edl: dict, draft: bool, font: str, work: Path) -> tuple[str, float]:
+def corner_mask(edl: dict, work: Path) -> Path | None:
+    """Black rounded-corner mask (output px) hiding the capture window behind the display's own corners."""
+    radius = float(edl.get("corner_radius", 0))
+    if radius <= 0:
+        return None
+    out_w, out_h = edl.get("size", SPEC["iphone_portrait"])
+    mask = work / "corner-mask.png"
+    alpha = f"255*clip(hypot(X-clip(X,{radius},W-1-{radius}),Y-clip(Y,{radius},H-1-{radius}))-{radius}+0.5,0,1)"
+    run(["ffmpeg", "-hide_banner", "-v", "error", "-y", "-f", "lavfi", "-i", f"color=c=black:s={out_w}x{out_h},format=rgba",
+         "-vf", f"geq=r=0:g=0:b=0:a={quote(alpha)}", "-frames:v", "1", "-update", "1", str(mask)])
+    return mask
+
+
+def build_filtergraph(edl: dict, draft: bool, font: str, work: Path, mask: Path | None = None) -> tuple[str, float]:
     out_w, out_h = edl.get("size", SPEC["iphone_portrait"])
     fps = int(edl.get("fps", 30))
     fade = float(edl.get("transition_seconds", 0.4))
@@ -170,6 +183,9 @@ def build_filtergraph(edl: dict, draft: bool, font: str, work: Path) -> tuple[st
         offset = placed[index]["out_start"]
         chains.append(f"[{current}][s{index}]xfade=transition=fade:duration={fade}:offset={offset}[{label}]")
         current = label
+    if mask:
+        chains.append(f"[{current}][{len(placed)}:v]overlay=0:0:shortest=1:format=auto,format=yuv420p[masked]")
+        current = "masked"
     tail = []
     fade_out = float(edl.get("fade_out_seconds", 0.5))
     if fade_out > 0:
@@ -209,7 +225,8 @@ def render(args: argparse.Namespace) -> None:
     font = args.font
     if not Path(font).is_file():
         raise SystemExit(f"font not found: {font}")
-    graph, total = build_filtergraph(edl, draft, font, work)
+    mask = corner_mask(edl, work)
+    graph, total = build_filtergraph(edl, draft, font, work, mask)
     graph_file = work / "filtergraph.txt"
     graph_file.write_text(graph, encoding="utf-8")
     video = out_dir / names["video"]
@@ -218,6 +235,8 @@ def render(args: argparse.Namespace) -> None:
     cmd = ["ffmpeg", "-hide_banner", "-v", "error", "-y"]
     for seg in edl["segments"]:
         cmd += ["-ss", f"{seg['in']}", "-t", f"{round(seg['out'] - seg['in'] + 0.5, 3)}", "-i", str(src)]
+    if mask:
+        cmd += ["-loop", "1", "-framerate", str(edl.get("fps", 30)), "-i", str(mask)]
     bitrate = edl.get("video_bitrate", "11M")
     cmd += [
         "-/filter_complex", str(graph_file),
