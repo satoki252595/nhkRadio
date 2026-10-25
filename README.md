@@ -21,7 +21,7 @@ Notionのデータベースに保存した音声・動画を、ライブラリ�
 
 トークンは端末のKeychain、ダウンロードしたメディアと再生履歴は端末内に保存します。OAuthのコード交換・認証更新には共通のWorkerを使い、中継でコードやトークンを永続保存しません。各ユーザー自身によるNotionのアクセス許可が必要です。
 
-**公開状況（2026-10-22）:** 1.0.0 (6)を内部TestFlightへ配信済み。App Store審査は未提出で、ビルド6の実機検証・動画・最終検査を進めています。現ビルドは無料・アプリ内課金なし。Pro課金は検討段階です。
+**公開状況（2026-10-25）:** 1.0.0 (8)を審査へ提出済み。ユーザー決定で日本向けを**有料ダウンロード500円の買い切り**へ変更し、価格設定を確認済みです。アプリ内課金・サブスクリプションはありません。有料販売に必要な契約状態の確認と紹介動画の差し替えを進めています。[有料公開作業記録](docs/release/playback-paid-launch-2026-10-25.md)・[公開Issue #14](https://github.com/satoki252595/nhkRadio/issues/14)で状況を管理します。
 
 | 場所 | 役割 |
 |---|---|
@@ -29,8 +29,8 @@ Notionのデータベースに保存した音声・動画を、ライブラリ�
 | [`worker/`](worker/) | Notion OAuth中継、サポート・プライバシーページ |
 | [アプリ設計・接続方法](docs/playback-for-notion.md) | 機能、認証、列マッピング、構成 |
 | [音源互換性の修正](https://github.com/satoki252595/nhkRadio/blob/5b3f0d6eb911739c0363de2bc759c618106009c4/docs/release/playback-media-compatibility.md) | M4A名のAAC音源への対応、形式判別と検証 |
-| [App Store掲載動画の制作](docs/app-preview.md) | 実映像の編集手順・初稿のカット表・撮影リスト（公開版は収録待ち） |
-| [課金・収益化の検討](docs/playback-monetization.md) | 無料版とProの案、価格仮説、StoreKitの導入計画 |
+| [App Store掲載動画の制作](docs/app-preview.md) | 制作手順・初稿資料。最新の動画差し替え状況は有料公開作業記録を参照 |
+| [課金・収益化の検討](docs/playback-monetization.md) | 競合8サービスの比較、500円買い切りの決定、需要検証・将来の課金案 |
 | [初回公開の追跡Issue](https://github.com/satoki252595/nhkRadio/issues/14) | 最新の検証・提出状況 |
 
 開発環境はプロジェクトの `nix develop` を使います。macOSでは選択済みXcodeの `ios/Playback.xcodeproj` を開いてビルドします。公開用の署名・秘密鍵・ユーザートークン・私的な収録素材はGitに保存しません。
