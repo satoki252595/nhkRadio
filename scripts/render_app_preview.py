@@ -118,27 +118,52 @@ def output_names(edl: dict, draft: bool) -> dict:
 # ---------------------------------------------------------------- render
 
 def caption_filters(lines: list[dict], seg_len: float, font: str, work: Path, key: str, style: dict) -> list[str]:
+    """drawtext per caption line.
+
+    Optional per-line keys (all default to the original full-segment boxed caption):
+    `start`/`end` (seconds within the segment), `font` (file name next to --font),
+    `box` (false for bare text), `rise` (px the line drifts up while fading in),
+    `shadow` (px offset of a soft black shadow).
+    """
     filters = []
     fade = float(style.get("fade_seconds", 0.3))
-    alpha = f"if(lt(t,{fade}),t/{fade},if(gt(t,{seg_len - fade}),max(0,({seg_len}-t)/{fade}),1))"
     for n, line in enumerate(lines):
         text_file = work / f"caption-{key}-{n}.txt"
         text_file.write_text(line["text"], encoding="utf-8")
         size = int(line.get("size", style.get("fontsize", 40)))
-        filters.append(
-            "drawtext=" + ":".join([
-                f"fontfile={quote(font)}",
-                f"textfile={quote(str(text_file))}",
-                f"fontsize={size}",
-                f"fontcolor={line.get('fontcolor', 'white')}",
+        start = float(line.get("start", 0.0))
+        end = float(line.get("end", seg_len))
+        if start == 0.0 and end == seg_len:
+            alpha = f"if(lt(t,{fade}),t/{fade},if(gt(t,{seg_len - fade}),max(0,({seg_len}-t)/{fade}),1))"
+        else:
+            alpha = (f"if(lt(t,{start}),0,if(lt(t,{start + fade}),(t-{start})/{fade},"
+                     f"if(gt(t,{end - fade}),max(0,({end}-t)/{fade}),1)))")
+        rise = float(line.get("rise", 0))
+        if rise:
+            y = f"h*{float(line['y'])}+{rise}*pow(1-clip((t-{start})/{fade * 1.6},0,1),2)"
+            y_opt = f"y={quote(y)}"
+        else:
+            y_opt = f"y=h*{float(line['y'])}"
+        line_font = str(Path(font).with_name(line["font"])) if line.get("font") else font
+        if not Path(line_font).is_file():
+            raise SystemExit(f"font not found: {line_font}")
+        opts = [
+            f"fontfile={quote(line_font)}",
+            f"textfile={quote(str(text_file))}",
+            f"fontsize={size}",
+            f"fontcolor={line.get('fontcolor', 'white')}",
+        ]
+        if line.get("box", True):
+            opts += [
                 "box=1",
                 f"boxcolor={line.get('boxcolor', style.get('boxcolor', 'black@0.66'))}",
                 f"boxborderw={int(line.get('boxborderw', style.get('boxborderw', 18)))}",
-                "x=(w-text_w)/2",
-                f"y=h*{float(line['y'])}",
-                f"alpha={quote(alpha)}",
-            ])
-        )
+            ]
+        if line.get("shadow"):
+            opts += [f"shadowcolor={line.get('shadowcolor', 'black@0.55')}",
+                     f"shadowx=0", f"shadowy={int(line['shadow'])}"]
+        opts += ["x=(w-text_w)/2", y_opt, f"alpha={quote(alpha)}"]
+        filters.append("drawtext=" + ":".join(opts))
     return filters
 
 
@@ -174,6 +199,9 @@ def build_filtergraph(edl: dict, draft: bool, font: str, work: Path, mask: Path 
             f"trim=duration={seg['length']}",
             "setpts=PTS-STARTPTS",
         ]
+        if seg.get("dim"):
+            # Darken the real footage behind a closing title; the app stays visible.
+            steps.append(f"drawbox=x=0:y=0:w=iw:h=ih:color=black@{float(seg['dim'])}:t=fill")
         steps += caption_filters(seg.get("captions", []), seg["length"], font, work, seg["id"], style)
         steps.append("settb=AVTB")
         chains.append(f"[{index}:v]" + ",".join(steps) + f"[s{index}]")
