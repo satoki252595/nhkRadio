@@ -11,6 +11,7 @@ App Storeの製品ページに載せるApp Preview（iPhone縦）の制作手順
 - 現在App Store Connectへ掲載されているのは旧final-v2。新Aの追加はAppleから409 STATE_ERROR「Can't Create Preview while Waiting For Review appPreviews」で拒否された。動画差し替え・取り下げ・再提出はまだ行っていない。
 - 新しい動画・QA・台本はGit外 `~/.config/playback/release/paid-launch-2026-10-25/`。編集可能な[AのEDL](app-preview-paid.edl.json)と[Bのストーリーボード](promo-video-paid.storyboard.json)はrepoに保存。映像・音声・個人の認証情報はGitへ入れない。
 - 旧final-v2と過去DRAFTは監査用に保持する。元の撮影映像・旧証跡を上書きしない。
+- ユーザーはB（メリット中心）を採用した。BをApp Storeの条件に合わせた**C**（`playback-app-preview-ja-886x1920-c1`、25.003秒、SHA-256 `e5a4f5f94e1d7f986be811289a3b28a551b5dbc4eaf4e5d7e9316d5c549fdd5b`、35,070,595 B）を制作した。状態は PASS_PENDING_HUMAN_REVIEW。編集元は[CのEDL](app-preview-paid-c.edl.json)、出力はGit外の `video/C/`。
 
 ## Appleの仕様（2026-10-22に公式ページで確認）
 
@@ -143,6 +144,9 @@ DRAFTをアップロードできない理由:
 
 - `captions[]` の `start`/`end`（場面内の秒）、`font`（`--font` と同じフォルダにあるファイル名。例: `ヒラギノ角ゴシック W8.ttc`）、`box: false`（背景の箱を付けない）、`rise`（表示を始めるとき下から浮き上がるpx）、`shadow`（影のpx）
 - `segments[]` の `dim`（0〜1）: 締めの文字の下の実画面を黒で暗くする
+- `audio: "music"` と `--music 音源`: 無音の代わりにプロジェクトのオリジナル音源をBGMにする（撮影映像の音声は使わない）。`music{volume, fade_in, fade_out}`。QAでは無音チェックの代わりに「聞こえる・クリップしない」を確認し、EBU R128の要約を残す。無音のEDLから作るfiltergraphは変わらない（A v3で一致を確認）
+
+- **C（App Store、`playback-app-preview-ja-886x1920-c1`、採用されたBの訴求）**: 886x1920、25秒、BGM（Bと同じオリジナル和音）、価格なし。全フレームがビルド8の実画面の全画面表示。Bのコピーと順番（ボイスメモ・語学・会議・講義 → データベースがそのまま再生リストに → 1本終われば次の1本へ → 保存しておけば電波がなくても → 動画も同じように → 名前と条件）を、ライブラリ下の空き領域と再生画面の操作列より下の帯に大きく置いた。文字だけの場面、角丸カード、グラデーション背景、価格は使わない。締めは55%減光したライブラリの上に、アプリ名、Notion接続が必要なこと、音源は利用者が用意すること、非提携を表示し、最後のフレームまで不透明のまま残す。ポスターは2.4秒。
 
 ## 新規撮影リスト（TestFlight 1.0.0 (6)、記録）
 
