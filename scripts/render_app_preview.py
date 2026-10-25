@@ -5,13 +5,16 @@ Run inside `nix develop` so ffmpeg/ffprobe/python come from the project flake.
 Inputs and outputs are always explicit; nothing is auto-selected.
 
   render_app_preview.py sheet  --input SRC --out SHEET.jpg [--start S --duration D --crop x:y:w:h]
-  render_app_preview.py render --edl EDL.json --input SRC --output-dir DIR [--font FONT]
-  render_app_preview.py qa     --edl EDL.json --input SRC --output-dir DIR   (re-run QA only)
+  render_app_preview.py render --edl EDL.json --input SRC --output-dir DIR [--font FONT] [--music AUDIO]
+  render_app_preview.py qa     --edl EDL.json --input SRC --output-dir DIR [--music AUDIO]  (re-run QA only)
 
 The EDL (JSON) holds cut points, crop, captions and provenance. Unless the EDL
 declares footage of the exact target build that was verified on device, the
 render is forced into DRAFT mode: a visible watermark, DRAFT in every filename
 and status DRAFT_NOT_FOR_UPLOAD in the report.
+
+Audio is generated silence unless the EDL sets "audio": "music" and --music
+names a project-owned track (never the captured footage audio).
 """
 from __future__ import annotations
 
@@ -180,7 +183,8 @@ def corner_mask(edl: dict, work: Path) -> Path | None:
     return mask
 
 
-def build_filtergraph(edl: dict, draft: bool, font: str, work: Path, mask: Path | None = None) -> tuple[str, float]:
+def build_filtergraph(edl: dict, draft: bool, font: str, work: Path, mask: Path | None = None,
+                      music: bool = False) -> tuple[str, float]:
     out_w, out_h = edl.get("size", SPEC["iphone_portrait"])
     fps = int(edl.get("fps", 30))
     fade = float(edl.get("transition_seconds", 0.4))
@@ -236,15 +240,24 @@ def build_filtergraph(edl: dict, draft: bool, font: str, work: Path, mask: Path 
         )
     tail.append(f"trim=duration={total}")
     chains.append(f"[{current}]" + ",".join(tail) + "[vout]")
-    chains.append(f"anullsrc=r=48000:cl=stereo,atrim=duration={total}[aout]")
+    if music:
+        m = edl.get("music", {})
+        fade_in, fade_out_a = float(m.get("fade_in", 0.3)), float(m.get("fade_out", 2.0))
+        chains.append(
+            f"[{len(placed) + (1 if mask else 0)}:a]atrim=duration={total},asetpts=PTS-STARTPTS,"
+            f"aformat=sample_rates=48000:channel_layouts=stereo,volume={m.get('volume', 1.0)},"
+            f"afade=t=in:st=0:d={fade_in},afade=t=out:st={total - fade_out_a}:d={fade_out_a},"
+            f"apad=whole_dur={total}[aout]"
+        )
+    else:
+        chains.append(f"anullsrc=r=48000:cl=stereo,atrim=duration={total}[aout]")
     return ";\n".join(chains) + "\n", total
 
 
 def render(args: argparse.Namespace) -> None:
     edl_path, src, out_dir = Path(args.edl).resolve(), Path(args.input).resolve(), Path(args.output_dir).resolve()
     edl = load_edl(edl_path)
-    if edl.get("audio", "silent") != "silent":
-        raise SystemExit("only silent audio is supported (no captured/broadcast audio in previews)")
+    music = audio_mode(edl, args)
     draft = is_draft(edl)
     names = output_names(edl, draft)
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -254,7 +267,7 @@ def render(args: argparse.Namespace) -> None:
     if not Path(font).is_file():
         raise SystemExit(f"font not found: {font}")
     mask = corner_mask(edl, work)
-    graph, total = build_filtergraph(edl, draft, font, work, mask)
+    graph, total = build_filtergraph(edl, draft, font, work, mask, music=music is not None)
     graph_file = work / "filtergraph.txt"
     graph_file.write_text(graph, encoding="utf-8")
     video = out_dir / names["video"]
@@ -265,6 +278,8 @@ def render(args: argparse.Namespace) -> None:
         cmd += ["-ss", f"{seg['in']}", "-t", f"{round(seg['out'] - seg['in'] + 0.5, 3)}", "-i", str(src)]
     if mask:
         cmd += ["-loop", "1", "-framerate", str(edl.get("fps", 30)), "-i", str(mask)]
+    if music:
+        cmd += ["-i", str(music)]
     bitrate = edl.get("video_bitrate", "11M")
     cmd += [
         "-/filter_complex", str(graph_file),
@@ -288,6 +303,19 @@ def render(args: argparse.Namespace) -> None:
 
 
 # ---------------------------------------------------------------- QA
+
+def audio_mode(edl: dict, args: argparse.Namespace) -> Path | None:
+    """None for generated silence, else the project-owned music file named by --music."""
+    mode = edl.get("audio", "silent")
+    if mode == "silent":
+        return None
+    if mode != "music" or not getattr(args, "music", None):
+        raise SystemExit('audio must be "silent", or "music" with --music (no captured/broadcast audio in previews)')
+    music = Path(args.music).resolve()
+    if not music.is_file():
+        raise SystemExit(f"music not found: {music}")
+    return music
+
 
 def probe(path: Path) -> dict:
     return json.loads(run(["ffprobe", "-v", "error", "-show_format", "-show_streams", "-of", "json", str(path)]).stdout)
@@ -388,6 +416,7 @@ def parse_ratio(value: str) -> float:
 def qa(args: argparse.Namespace) -> None:
     edl_path, src, out_dir = Path(args.edl).resolve(), Path(args.input).resolve(), Path(args.output_dir).resolve()
     edl = load_edl(edl_path)
+    music = audio_mode(edl, args)
     draft = is_draft(edl)
     names = output_names(edl, draft)
     video, poster = out_dir / names["video"], out_dir / names["poster"]
@@ -429,6 +458,13 @@ def qa(args: argparse.Namespace) -> None:
     black = detect("blackdetect=d=0.1:pic_th=0.98", "0:v")
     freeze = detect("freezedetect=n=0.001:d=2", "0:v")
     volume = detect("volumedetect", "0:a")
+    loudness = []
+    if music:
+        result = subprocess.run(["ffmpeg", "-hide_banner", "-nostats", "-i", str(video), "-map", "0:a", "-af",
+                                 "ebur128=peak=true", "-f", "null", "-"], text=True, capture_output=True)
+        summary = result.stderr.split("Summary:")[-1]
+        loudness = [line.strip() for line in summary.splitlines() if re.search(r"I:|LRA:|Peak:", line)]
+    max_db = next((float(m.group(1)) for line in volume if (m := re.search(r"max_volume: (-?[\d.]+) dB", line))), None)
 
     contact_sheet(video, qa_dir / "contactsheet-0.5s.jpg", 0.5, 10, font)
     boundaries = boundary_sheet(src, edl, qa_dir / "source-cut-boundaries.jpg", font, work)
@@ -457,8 +493,11 @@ def qa(args: argparse.Namespace) -> None:
         "no_black_segments": not any("black_start" in line for line in black),
         "poster_886x1920": poster.exists() and (probe(poster)["streams"][0]["width"], probe(poster)["streams"][0]["height"]) == (exp_w, exp_h),
         "no_container_metadata_paths": "/Users/" not in json.dumps(info["format"].get("tags", {})),
-        "silent_audio_by_design": any("max_volume: -91" in line or "max_volume: -inf" in line for line in volume),
     }
+    if music:
+        checks["music_audible_not_clipped"] = max_db is not None and -30.0 < max_db <= -1.0
+    else:
+        checks["silent_audio_by_design"] = any("max_volume: -91" in line or "max_volume: -inf" in line for line in volume)
     status = "DRAFT_NOT_FOR_UPLOAD" if draft else ("PASS_PENDING_HUMAN_REVIEW" if all(checks.values()) else "FAIL")
     if draft and not all(checks.values()):
         status = "DRAFT_NOT_FOR_UPLOAD_WITH_FAILED_CHECKS"
@@ -486,6 +525,7 @@ def qa(args: argparse.Namespace) -> None:
             "edl": {"file": edl_path.name, "sha256": sha256(edl_path)},
             "script": {"file": Path(__file__).name, "sha256": sha256(Path(__file__).resolve()), "repo_commit": commit},
             "font": {"file": Path(font).name, "sha256": sha256(Path(font))},
+            "music": {"file": music.name, "bytes": music.stat().st_size, "sha256": sha256(music)} if music else None,
         },
         "tools": {"ffmpeg": tool_identity("ffmpeg"), "ffprobe": tool_identity("ffprobe"),
                   "python": {"executable": sys.executable, "version": sys.version.split()[0]}},
@@ -493,7 +533,8 @@ def qa(args: argparse.Namespace) -> None:
                      {"captions": [c["text"] for c in s.get("captions", [])]} for s in placed],
         "total_seconds": total,
         "checks": checks,
-        "detectors": {"blackdetect": black, "freezedetect_informational": freeze, "volumedetect": volume},
+        "detectors": {"blackdetect": black, "freezedetect_informational": freeze, "volumedetect": volume,
+                      "ebur128_summary": loudness},
         "source_cut_boundaries": boundaries,
         "qa_files": {p.name: sha256(p) for p in sorted(qa_dir.iterdir()) if p.is_file()},
         "notes": edl.get("notes", []),
@@ -562,6 +603,7 @@ def main() -> None:
         p.add_argument("--input", required=True)
         p.add_argument("--output-dir", required=True)
         p.add_argument("--font", default=os.environ.get("APP_PREVIEW_FONT", DEFAULT_FONT))
+        p.add_argument("--music", help='project-owned track, required when the EDL sets "audio": "music"')
         if name == "render":
             p.add_argument("--overwrite", action="store_true")
     p = sub.add_parser("sheet")
