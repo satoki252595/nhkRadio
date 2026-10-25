@@ -2,6 +2,7 @@ import XCTest
 import AVFoundation
 import AudioToolbox
 import SwiftData
+import Observation
 @testable import Playback
 
 final class NotionIDTests: XCTestCase {
@@ -179,6 +180,36 @@ final class FormatHelpersTests: XCTestCase {
 }
 
 final class DownloadDeletionTests: XCTestCase {
+    @MainActor
+    func testDownloadRecordReadsObserveCompletionAndBothDeletionPaths() async throws {
+        let container = try ModelContainer(
+            for: ConnectionRecord.self, DownloadRecord.self, ProgressRecord.self,
+            configurations: ModelConfiguration(isStoredInMemoryOnly: true))
+        let state = AppState()
+        state.modelContext = ModelContext(container)
+        for deleteAll in [false, true] {
+            let pending = PendingDownload(
+                pageID: "observation-\(UUID())", databaseID: "db", itemTitle: "Audio",
+                fileName: "audio.m4a", kindRaw: MediaKind.audio.rawValue)
+            let added = expectation(description: "Downloaded badge updates after completion")
+            withObservationTracking {
+                XCTAssertNil(state.downloadRecord(forKey: pending.key))
+            } onChange: { added.fulfill() }
+            state.downloads.onDownloaded?(pending, "missing/audio.m4a", 1)
+            await fulfillment(of: [added], timeout: 1)
+
+            let removed = expectation(description: "Saved badge and filter update after deletion")
+            withObservationTracking {
+                XCTAssertNotNil(state.downloadRecord(forKey: pending.key))
+            } onChange: { removed.fulfill() }
+            let record = try XCTUnwrap(state.downloadRecord(forKey: pending.key))
+            if deleteAll { state.deleteAllDownloads(records: [record]) }
+            else { state.deleteDownload(record) }
+            await fulfillment(of: [removed], timeout: 1)
+            XCTAssertNil(state.downloadRecord(forKey: pending.key))
+        }
+    }
+
     @MainActor
     func testDeletingCurrentDownloadReleasesPlayerAndResolvesOriginalAgain() async throws {
         for deleteAll in [false, true] {

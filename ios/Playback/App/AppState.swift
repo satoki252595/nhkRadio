@@ -24,6 +24,9 @@ final class AppState {
     /// Set once from the root view (SwiftData environment).
     var modelContext: ModelContext?
 
+    // A fetch alone does not observe SwiftData insertions/deletions in SwiftUI.
+    private var downloadRecordsVersion = 0
+
     // Library state for the selected connection.
     private(set) var items: [LibraryItem] = []
     private(set) var isLoadingLibrary = false
@@ -194,6 +197,7 @@ final class AppState {
     // MARK: - Downloads & progress (SwiftData)
 
     func downloadRecord(forKey key: String) -> DownloadRecord? {
+        _ = downloadRecordsVersion
         guard let modelContext else { return nil }
         let descriptor = FetchDescriptor<DownloadRecord>(
             predicate: #Predicate { $0.key == key })
@@ -244,6 +248,7 @@ final class AppState {
         }
         modelContext?.delete(record)
         try? modelContext?.save()
+        downloadRecordsVersion += 1
     }
 
     func deleteAllDownloads(records: [DownloadRecord]) {
@@ -255,6 +260,7 @@ final class AppState {
             modelContext?.delete(record)
         }
         try? modelContext?.save()
+        downloadRecordsVersion += 1
     }
 
     func toggleFavorite(entry: QueueEntry) {
@@ -333,6 +339,7 @@ final class AppState {
                 kind: MediaKind(rawValue: pending.kindRaw) ?? .other)
             modelContext.insert(record)
             try? modelContext.save()
+            self.downloadRecordsVersion += 1
         }
     }
 }
