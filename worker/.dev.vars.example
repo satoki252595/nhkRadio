@@ -1,3 +1,0 @@
-# Local development only. Copy to .dev.vars (git-ignored) and fill in.
-# Deployed secrets are set with: wrangler secret put NOTION_CLIENT_SECRET
-NOTION_CLIENT_SECRET=
