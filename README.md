@@ -2,40 +2,7 @@
 
 NHKラジオの番組表を取得し、キーワード(例: 落語/英語)にマッチする番組を自動録音してNotionデータベースにアップロードするツール。
 
-このリポジトリでは、録音ツールに加えて **Playback for Notion**（iPhoneアプリ）を管理しています。
-
-## Playback for Notion — Notionの音声・動画をiPhoneで再生
-
-Notionのデータベースに保存した音声・動画を、ライブラリとして再生・ダウンロードするアプリです。自分のワークスペースを接続し、データベースとファイル列を選んで使います。NHK録音DB以外の任意のDBにも接続できます。
-
-| 項目 | 内容 |
-|---|---|
-| 対象 | iPhone・iOS 17以降、日本語 |
-| 接続 | Notion OAuth／自分の接続トークン、DB共有URL・IDの貼り付け |
-| 再生 | 音声・動画、バックグラウンド、AirPlay、動画PiP、倍速、±15秒スキップ |
-| 管理 | 複数DB、検索・フィルタ、お気に入り、キュー、履歴・続きから再生 |
-| 保存 | 選択ダウンロード、進捗・中止・再試行、保存済みファイルのオフライン再生 |
-| お試し | アカウント不要のデモライブラリ |
-
-**対応形式:** 音声はM4A・MP3・AAC・WAV・AIF/AIFF・FLAC・CAFなど、動画はMP4・MOV・M4V。OGG・Opusなどを含む端末別の一覧はアプリの「設定 → 対応ファイル形式」で確認できます。拡張子が同じでも内部コーデック・DRM・ファイル破損によって再生できない場合があります。
-
-トークンは端末のKeychain、ダウンロードしたメディアと再生履歴は端末内に保存します。OAuthのコード交換・認証更新には共通のWorkerを使い、中継でコードやトークンを永続保存しません。各ユーザー自身によるNotionのアクセス許可が必要です。
-
-**公開状況（2026-10-27）:** 1.0.0 (8)を審査へ提出済み。ユーザー決定で日本向けを**有料ダウンロード500円の買い切り**へ変更し、価格設定を確認済みです。アプリ内課金・サブスクリプションはありません。採用されたメリット中心の紹介動画は完成・検査済みです。最新版の有料アプリ契約は同意と有効化を確認済みです。新動画への差し替えとApple配信版の再生確認、価格・契約・IAPなしの検証を終え、ユーザーの最終承認後、2026年10月27日08:12 JSTに再提出しました。現在は審査待ちです。[有料公開作業記録](docs/release/playback-paid-launch-2026-10-25.md)・[公開Issue #14](https://github.com/satoki252595/nhkRadio/issues/14)で状況を管理します。
-
-| 場所 | 役割 |
-|---|---|
-| [`ios/`](ios/) | SwiftUI・SwiftData・AVFoundationによるiPhoneアプリと単体テスト |
-| [`worker/`](worker/) | Notion OAuth中継、サポート・プライバシーページ |
-| [アプリ設計・接続方法](docs/playback-for-notion.md) | 機能、認証、列マッピング、構成 |
-| [音源互換性の修正](https://github.com/satoki252595/nhkRadio/blob/5b3f0d6eb911739c0363de2bc759c618106009c4/docs/release/playback-media-compatibility.md) | M4A名のAAC音源への対応、形式判別と検証 |
-| [App Store掲載動画の制作](docs/app-preview.md) | 制作手順・初稿資料。最新の動画差し替え状況は有料公開作業記録を参照 |
-| [課金・収益化の検討](docs/playback-monetization.md) | 競合8サービスの比較、500円買い切りの決定、需要検証・将来の課金案 |
-| [初回公開の追跡Issue](https://github.com/satoki252595/nhkRadio/issues/14) | 最新の検証・提出状況 |
-
-開発環境はプロジェクトの `nix develop` を使います。macOSでは選択済みXcodeの `ios/Playback.xcodeproj` を開いてビルドします。公開用の署名・秘密鍵・ユーザートークン・私的な収録素材はGitに保存しません。
-
-本アプリはNotion Labs, Inc.と提携していない独立したアプリです。再生アプリに放送番組は付属しません。公開用の映像・音声には、自作または利用許諾済みの素材を使います。
+iPhoneアプリ **Playback for Notion**（録音DBなどNotionの音声・動画を再生するアプリ）は、2026-10-28に専用リポジトリ [`satoki252595/playback-for-notion`](https://github.com/satoki252595/playback-for-notion)（private）へ履歴ごと分離しました。旧Issue #14・#15も移しています。分離前のcommitは、このrepoの履歴にも残っています。
 
 ---
 
