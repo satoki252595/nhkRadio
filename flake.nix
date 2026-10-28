@@ -96,12 +96,14 @@
           runtimePython = mkPython pkgs;
           common = {
             unit = pkgs.runCommand "nhk-radio-unit-tests" {
-              nativeBuildInputs = [ python ];
+              nativeBuildInputs = [ python pkgs.git ];
             } ''
               export HOME="$TMPDIR/home"
-              mkdir -p "$HOME" source
+              mkdir -p "$HOME" source/scripts source/.github/workflows
               cp -R ${./nhk_recorder} source/nhk_recorder
               cp -R ${./tests} source/tests
+              cp ${./scripts}/* source/scripts/
+              cp ${./.github/workflows}/*.yml source/.github/workflows/
               chmod -R u+w source
               cd source
               PYTHONPATH="$PWD" pytest -q
@@ -114,10 +116,11 @@
               mkdir -p source/.github/workflows source/scripts
               cp ${./.github/workflows}/*.yml source/.github/workflows/
               cp ${./scripts/network-namespace-smoke.sh} source/scripts/network-namespace-smoke.sh
+              cp ${./scripts/commit-updated-data.sh} source/scripts/commit-updated-data.sh
               chmod -R u+w source
               cd source
               actionlint -shellcheck=shellcheck .github/workflows/*.yml
-              shellcheck scripts/network-namespace-smoke.sh
+              shellcheck scripts/network-namespace-smoke.sh scripts/commit-updated-data.sh
               touch "$out"
             '';
           };
