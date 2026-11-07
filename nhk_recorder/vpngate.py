@@ -218,16 +218,151 @@ def geolocate_region(ip: str) -> str:
         return ""
 
 
+def _subnet24(ip: str) -> str:
+    parts = ip.split(".")
+    return ".".join(parts[:3]) if len(parts) == 4 else ip
+
+
+def diversify_servers(servers: list[VpnGateServer]) -> list[VpnGateServer]:
+    """Reorder servers so early entries span distinct /24 subnets.
+
+    VPN Gate's top scores are dominated by the public-vpn-* cluster in
+    219.100.37.0/24. When that cluster rejects authentication, a plain
+    top-N list fails as a whole (2026-11-07 data-update: all four
+    candidates AUTH_FAILED). Round-robin across /24 groups keeps the
+    input order inside each group and across group heads, so score or
+    caller priority still leads, but one subnet cannot fill the head.
+    """
+    groups: dict[str, list[VpnGateServer]] = {}
+    order: list[str] = []
+    for server in servers:
+        key = _subnet24(server.ip)
+        if key not in groups:
+            groups[key] = []
+            order.append(key)
+        groups[key].append(server)
+    diversified: list[VpnGateServer] = []
+    round_index = 0
+    while len(diversified) < len(servers):
+        for key in order:
+            group = groups[key]
+            if round_index < len(group):
+                diversified.append(group[round_index])
+        round_index += 1
+    return diversified
+
+
+# Radiko area IDs (JP1..JP47) follow the JIS prefecture order. The names
+# are the English regionName values returned by ip-api.com.
+PREFECTURES_BY_JIS = [
+    "Hokkaido", "Aomori", "Iwate", "Miyagi", "Akita", "Yamagata",
+    "Fukushima", "Ibaraki", "Tochigi", "Gunma", "Saitama", "Chiba",
+    "Tokyo", "Kanagawa", "Niigata", "Toyama", "Ishikawa", "Fukui",
+    "Yamanashi", "Nagano", "Gifu", "Shizuoka", "Aichi", "Mie", "Shiga",
+    "Kyoto", "Osaka", "Hyogo", "Nara", "Wakayama", "Tottori", "Shimane",
+    "Okayama", "Hiroshima", "Yamaguchi", "Tokushima", "Kagawa", "Ehime",
+    "Kochi", "Fukuoka", "Saga", "Nagasaki", "Kumamoto", "Oita",
+    "Miyazaki", "Kagoshima", "Okinawa",
+]
+
+# Inclusive JIS code ranges per region block (Hokkaido, Tohoku, Kanto,
+# Chubu, Kinki, Chugoku, Shikoku, Kyushu/Okinawa). Radiko station lists
+# overlap heavily inside a block, so a same-block exit usually serves
+# the wanted stations even when the prefecture differs.
+_REGION_BLOCKS = [(1, 1), (2, 7), (8, 14), (15, 23), (24, 30), (31, 35),
+                  (36, 39), (40, 47)]
+
+
+def prefecture_for_area(area_id: str) -> str:
+    """Map a Radiko area ID (``JP27``) to its prefecture (``Osaka``)."""
+    if not area_id.startswith("JP"):
+        return ""
+    try:
+        code = int(area_id[2:])
+    except ValueError:
+        return ""
+    if 1 <= code <= len(PREFECTURES_BY_JIS):
+        return PREFECTURES_BY_JIS[code - 1]
+    return ""
+
+
+def _region_block(prefecture: str) -> int:
+    try:
+        code = PREFECTURES_BY_JIS.index(prefecture) + 1
+    except ValueError:
+        return -1
+    for index, (low, high) in enumerate(_REGION_BLOCKS):
+        if low <= code <= high:
+            return index
+    return -1
+
+
+def geolocate_prefectures(ips: list[str]) -> dict[str, str]:
+    """Batch-geolocate IPs to Japanese prefectures via ip-api.com.
+
+    Returns ``{ip: prefecture}`` for IPs confirmed to be in Japan.
+    Any failure yields a partial or empty dict; callers must treat a
+    missing entry as "unknown", never as an error.
+    """
+    result: dict[str, str] = {}
+    unique = list(dict.fromkeys(ip for ip in ips if ip))
+    for start in range(0, len(unique), 100):
+        chunk = unique[start:start + 100]
+        try:
+            resp = httpx.post(
+                "http://ip-api.com/batch?fields=status,country,regionName,query",
+                json=[{"query": ip} for ip in chunk],
+                timeout=15,
+            )
+            if resp.status_code != 200:
+                continue
+            for item in resp.json():
+                if item.get("status") == "success" and item.get("country") == "Japan":
+                    result[item.get("query", "")] = item.get("regionName", "")
+        except (httpx.RequestError, ValueError):
+            continue
+    result.pop("", None)
+    return result
+
+
+def prioritize_servers_for_areas(
+    servers: list[VpnGateServer],
+    area_ids: set[str],
+    prefectures_by_ip: dict[str, str],
+) -> list[VpnGateServer]:
+    """Stable-sort servers toward the Radiko areas still needed.
+
+    Exact-prefecture exits first, same region block second, everything
+    else in its original order. This only reorders attempts: the caller
+    still walks the whole list, so a wrong geolocation costs nothing.
+    """
+    needed = {prefecture_for_area(area) for area in area_ids} - {""}
+    if not needed or not prefectures_by_ip:
+        return list(servers)
+    needed_blocks = {_region_block(prefecture) for prefecture in needed}
+
+    def rank(server: VpnGateServer) -> int:
+        prefecture = prefectures_by_ip.get(server.ip, "")
+        if prefecture in needed:
+            return 0
+        if prefecture and _region_block(prefecture) in needed_blocks:
+            return 1
+        return 2
+
+    return sorted(servers, key=rank)
+
+
 def candidate_fetch_limit(rank: int, count: int) -> int:
     """How many top-scoring servers to fetch for a ranked write.
 
     A single server keeps the historical ``rank + 1`` window. Multiple
-    candidates are always the top ``count`` servers; ``rank`` only rotates
-    which of those is written first.
+    candidates fetch a wider pool (``count * 4``) so subnet
+    diversification has alternatives to the top-scoring cluster;
+    ``rank`` only rotates which candidate is written first.
     """
     if count == 1:
         return rank + 1
-    return count
+    return count * 4
 
 
 def select_candidates(
@@ -239,7 +374,8 @@ def select_candidates(
 
     ``count == 1`` is the historical data-update behavior: exactly
     ``servers[rank]``, or an empty list when that index does not exist.
-    Larger counts walk forward and wrap, and never repeat a server.
+    Larger counts first diversify across /24 subnets, then walk forward
+    from ``rank`` and wrap, and never repeat a server.
     """
     if count < 1 or rank < 0 or not servers:
         return []
@@ -248,11 +384,12 @@ def select_candidates(
             return []
         return [servers[rank]]
 
-    start = rank % len(servers)
+    diversified = diversify_servers(servers)
+    start = rank % len(diversified)
     chosen: list[VpnGateServer] = []
     for offset in range(count):
-        chosen.append(servers[(start + offset) % len(servers)])
-        if len(chosen) == len(servers):
+        chosen.append(diversified[(start + offset) % len(diversified)])
+        if len(chosen) == len(diversified):
             break
     return chosen
 
@@ -305,8 +442,8 @@ def main():
         python -m nhk_recorder.vpngate vpn.ovpn              # 最良の日本サーバー
         python -m nhk_recorder.vpngate vpn.ovpn --region kanto  # 関東(東京等)
         python -m nhk_recorder.vpngate vpn.ovpn --region kansai # 関西(大阪等)
-        python -m nhk_recorder.vpngate /vpn/candidates --count 4 --rank 1
-            # rank から最大4台。output はディレクトリ
+        python -m nhk_recorder.vpngate /vpn/candidates --count 8 --rank 1
+            # rank から最大8台。output はディレクトリ
     """
     import argparse
     import sys
@@ -319,15 +456,15 @@ def main():
     parser.add_argument("--rank", type=int, default=0, help="何番目から使うか (0=最良)")
     parser.add_argument(
         "--count", type=int, default=1,
-        help="書き出す候補数 (1-4, 既定 1)。2以上なら output はディレクトリ",
+        help="書き出す候補数 (1-8, 既定 1)。2以上なら output はディレクトリ",
     )
     parser.add_argument(
         "--region", choices=["kanto", "kansai", "any"], default="any",
         help="対象リージョン (kanto=関東/kansai=関西)",
     )
     args = parser.parse_args()
-    if args.rank < 0 or not 1 <= args.count <= 4:
-        parser.error("--rank は 0 以上、--count は 1 から 4 を指定してください")
+    if args.rank < 0 or not 1 <= args.count <= 8:
+        parser.error("--rank は 0 以上、--count は 1 から 8 を指定してください")
     if args.region in ("kanto", "kansai") and args.count != 1:
         parser.error("--region 指定時は --count 1 のみ対応です")
 

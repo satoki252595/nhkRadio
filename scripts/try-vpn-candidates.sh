@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Try up to 4 VPN Gate OpenVPN configs in order.
+# Try up to 8 VPN Gate OpenVPN configs in order.
 #
 # Each candidate: start openvpn, wait for "Initialization Sequence Completed",
 # then DNS/TCP preflight. On failure the openvpn process is stopped and the
@@ -13,7 +13,7 @@
 set -Eeuo pipefail
 
 config_dir="${1:?usage: try-vpn-candidates.sh CONFIG_DIR}"
-max_candidates=4
+max_candidates=8
 
 if [[ ! -d "$config_dir" ]]; then
   echo "VPN candidate directory not found: $config_dir" >&2

@@ -38,7 +38,12 @@ from .matcher import filter_by_series, filter_programs
 from .notion import _find_duplicates, upload_recording
 from .recorder import make_output_path
 from .schedule_verify import build_schedule_index, verify_program
-from .vpngate import fetch_jp_servers
+from .vpngate import (
+    diversify_servers,
+    fetch_jp_servers,
+    geolocate_prefectures,
+    prioritize_servers_for_areas,
+)
 
 JST = timezone(timedelta(hours=9))
 
@@ -788,11 +793,31 @@ def main() -> None:
     private = [s for s in vpn_servers if not s.hostname.startswith("public-vpn-")]
     public = [s for s in vpn_servers if s.hostname.startswith("public-vpn-")]
     random.shuffle(private)  # private 内はランダムで area 多様性を確保
-    vpn_servers = private + public
+    # 同じ /24 のサーバーは認証可否も出口 area も相関しやすい。試行序盤が
+    # 1 つのサブネットに埋まらないよう分散させる。
+    vpn_servers = diversify_servers(private + public)
     logger.info(
         "VPN Gate: %d 台 (private %d + public %d)",
         len(vpn_servers), len(private), len(public),
     )
+
+    # 未取得の民放番組が必要とする area へ出られるサーバーを前へ寄せる。
+    # ジオロケーションは並び替えだけに使い、失敗時は従来順のまま進む
+    # (2026-11-07 run: JP27 未達のまま試行上限に達し ABC 3 件未取得)。
+    needed_areas = {p.area for p in radiko_pending if p.area}
+    if needed_areas:
+        prefectures = geolocate_prefectures([s.ip for s in vpn_servers])
+        if prefectures:
+            vpn_servers = prioritize_servers_for_areas(
+                vpn_servers, needed_areas, prefectures,
+            )
+            logger.info(
+                "VPN Gate: 必要エリア %s 向けに所在都道府県 (%d 台判定) で優先順位付け",
+                sorted(needed_areas), len(prefectures),
+            )
+        if run_deadline is not None and time.monotonic() >= run_deadline:
+            logger.error("VPN サーバー優先順位付け中に全体実行期限へ到達")
+            sys.exit(124)
 
     attempted_radiko_areas: set[str] = set()
     vpn_data_plane_ok = False

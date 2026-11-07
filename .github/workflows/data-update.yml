@@ -124,8 +124,8 @@ jobs:
         id: vpn
         if: github.event_name != 'workflow_dispatch' || inputs.smoke_only != true
         # Per candidate the limits stay 45s (init) and 30s (preflight).
-        # The step budget only grows so four sequential candidates can finish.
-        timeout-minutes: 12
+        # The step budget only grows so eight sequential candidates can finish.
+        timeout-minutes: 20
         shell: bash
         env:
           WANT_RADIKO: ${{ github.event_name == 'schedule' || inputs.include_radiko == true }}
@@ -142,10 +142,11 @@ jobs:
           candidate_dir="$vpn_dir/candidates"
           install -d -m 700 "$vpn_dir"
 
-          # Run number still picks a starting rank 0..4. vpngate writes the top 4
-          # configs and rotates which one is first; the script tries them in order.
+          # Run number still picks a starting rank 0..4. vpngate writes 8
+          # configs diversified across /24 subnets from a wider pool and
+          # rotates which one is first; the script tries them in order.
           vpn_rank=$(( (GITHUB_RUN_NUMBER + GITHUB_RUN_ATTEMPT - 2) % 5 ))
-          echo "VPN Gate candidates: run=$GITHUB_RUN_NUMBER attempt=$GITHUB_RUN_ATTEMPT start_rank=$vpn_rank count=4"
+          echo "VPN Gate candidates: run=$GITHUB_RUN_NUMBER attempt=$GITHUB_RUN_ATTEMPT start_rank=$vpn_rank count=8"
 
           # This one-shot, unprivileged container receives no secrets or checkout mount.
           if docker run \
@@ -157,7 +158,7 @@ jobs:
             --security-opt no-new-privileges \
             --mount "type=bind,source=${vpn_dir},target=/vpn" \
             "$RUNTIME_IMAGE" \
-            python -m nhk_recorder.vpngate /vpn/candidates --count 4 --rank "$vpn_rank"; then
+            python -m nhk_recorder.vpngate /vpn/candidates --count 8 --rank "$vpn_rank"; then
             docker rm "$VPN_CONFIG_CONTAINER" >/dev/null
           else
             echo "VPN Gate config unavailable: aborting Radiko data update" >&2

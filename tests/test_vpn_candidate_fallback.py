@@ -149,12 +149,16 @@ def test_second_candidate_succeeds_after_auth_failed(tmp_path):
     assert not called.exists()
 
 
-def test_all_four_candidates_fail_exits_nonzero(tmp_path):
+def test_all_eight_candidates_fail_exits_nonzero(tmp_path):
     config_dir, trace, called, env = _prepare(tmp_path, [
         ("public-vpn-201", "203.0.113.10", "AUTH_FAILED"),
         ("public-vpn-088", "203.0.113.11", "AUTH_FAILED"),
         ("public-vpn-014", "203.0.113.12", "timed out waiting for Initialization Sequence Completed"),
         ("public-vpn-003", "203.0.113.13", "preflight:VPN sidecar DNS/TCP preflight failed"),
+        ("home-vpn-104", "203.0.114.10", "AUTH_FAILED"),
+        ("home-vpn-105", "203.0.115.10", "AUTH_FAILED"),
+        ("home-vpn-106", "203.0.116.10", "AUTH_FAILED"),
+        ("home-vpn-107", "203.0.117.10", "AUTH_FAILED"),
         ("public-vpn-999", "203.0.113.14", "ok"),
     ])
 
@@ -165,12 +169,16 @@ def test_all_four_candidates_fail_exits_nonzero(tmp_path):
     assert result.returncode != 0, _failure_detail(result, trace)
     assert "VPN sidecar DNS/TCP preflight passed" not in stdout
     assert "VPN sidecar DNS/TCP preflight failed: aborting Radiko data update" in result.stderr
-    assert "VPN candidates configured=5 trying=4" in stdout
+    assert "VPN candidates configured=9 trying=8" in stdout
     for hostname in (
         "public-vpn-201",
         "public-vpn-088",
         "public-vpn-014",
         "public-vpn-003",
+        "home-vpn-104",
+        "home-vpn-105",
+        "home-vpn-106",
+        "home-vpn-107",
     ):
         assert f"hostname={hostname}" in stdout
     assert "reason=AUTH_FAILED" in stdout
@@ -178,8 +186,8 @@ def test_all_four_candidates_fail_exits_nonzero(tmp_path):
     assert "reason=VPN sidecar DNS/TCP preflight failed" in stdout
     assert "public-vpn-999" not in stdout
     assert "public-vpn-999" not in trace_body
-    assert len([line for line in trace_body.splitlines() if line.startswith("start\t")]) == 4
-    assert len([line for line in trace_body.splitlines() if line.startswith("stop\t")]) == 4
+    assert len([line for line in trace_body.splitlines() if line.startswith("start\t")]) == 8
+    assert len([line for line in trace_body.splitlines() if line.startswith("stop\t")]) == 8
     assert not called.exists()
 
 
@@ -192,7 +200,7 @@ def test_data_update_invokes_fallback_without_swallowing_failure():
     end = workflow.index("name: Generate data with non-privileged exporter")
     step = workflow[start:end]
     assert "bash scripts/try-vpn-candidates.sh" in step
-    assert "--count 4" in step
+    assert "--count 8" in step
     assert "--rank" in step
     assert "continue-on-error" not in step
     assert "exit 1" in step
